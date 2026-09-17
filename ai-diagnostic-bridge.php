@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AI Diagnostic Bridge
  * Description: Secure diagnostic API for WordPress support, troubleshooting and SEO analysis.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Author: Brian Azukaeme
  * Text Domain: ai-diagnostic-bridge
  * Requires at least: 6.5
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AI_DIAGNOSTIC_BRIDGE_VERSION', '0.1.2' );
+define( 'AI_DIAGNOSTIC_BRIDGE_VERSION', '0.1.3' );
 define( 'AI_DIAGNOSTIC_BRIDGE_FILE', __FILE__ );
 define( 'AI_DIAGNOSTIC_BRIDGE_DIR', plugin_dir_path( __FILE__ ) );
 

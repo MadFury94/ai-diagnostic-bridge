@@ -27,13 +27,13 @@ $notice = isset( $_GET['aidb_notice'] ) ? sanitize_key( wp_unslash( $_GET['aidb_
 	</table>
 	<h2><?php echo esc_html__( 'Credential management', 'ai-diagnostic-bridge' ); ?></h2>
 	<p><?php echo esc_html__( 'Keep this credential in your Cloudflare Worker or other server-side secret store. Do not place it in a browser application.', 'ai-diagnostic-bridge' ); ?></p>
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;margin-right:8px">
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" data-wp-router-ignore="true" style="display:inline-block;margin-right:8px">
 		<input type="hidden" name="action" value="aidb_generate" />
 		<?php wp_nonce_field( 'aidb_generate' ); ?>
 		<?php submit_button( empty( $status['configured'] ) ? __( 'Generate credential', 'ai-diagnostic-bridge' ) : __( 'Regenerate credential', 'ai-diagnostic-bridge' ), 'primary', 'submit', false ); ?>
 	</form>
 	<?php if ( ! empty( $status['configured'] ) ) : ?>
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block">
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" data-wp-router-ignore="true" style="display:inline-block">
 		<input type="hidden" name="action" value="aidb_revoke" />
 		<?php wp_nonce_field( 'aidb_revoke' ); ?>
 		<?php submit_button( __( 'Revoke credential', 'ai-diagnostic-bridge' ), 'secondary', 'submit', false ); ?>

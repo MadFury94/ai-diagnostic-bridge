@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Opted credential-management forms out of WordPress client-side view transitions.
+
 ## 0.1.2
 
 - Fixed the admin settings template's namespaced plugin version reference.
