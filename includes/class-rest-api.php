@@ -15,6 +15,11 @@ final class REST_API {
 			'health'  => [ 'callback' => [ self::class, 'health' ] ],
 			'plugins' => [ 'callback' => [ self::class, 'plugins' ] ],
 			'themes'  => [ 'callback' => [ self::class, 'themes' ] ],
+			'errors'  => [ 'callback' => [ self::class, 'errors' ] ],
+			'rest-api' => [ 'callback' => [ self::class, 'rest_api' ] ],
+			'performance' => [ 'callback' => [ self::class, 'performance' ] ],
+			'security' => [ 'callback' => [ self::class, 'security' ] ],
+			'woocommerce' => [ 'callback' => [ self::class, 'woocommerce' ] ],
 		];
 
 		foreach ( $routes as $route => $args ) {
@@ -51,6 +56,11 @@ final class REST_API {
 	public static function health(): array { return Diagnostic_Manager::run( [ 'health' ] )['checks']['health']; }
 	public static function plugins(): array { return Diagnostic_Manager::run( [ 'plugins' ] )['checks']['plugins']; }
 	public static function themes(): array { return Diagnostic_Manager::run( [ 'themes' ] )['checks']['themes']; }
+	public static function errors(): array { return Diagnostic_Manager::run( [ 'errors' ] )['checks']['errors']; }
+	public static function rest_api(): array { return Diagnostic_Manager::run( [ 'rest-api' ] )['checks']['rest-api']; }
+	public static function performance(): array { return Diagnostic_Manager::run( [ 'performance' ] )['checks']['performance']; }
+	public static function security(): array { return Diagnostic_Manager::run( [ 'security' ] )['checks']['security']; }
+	public static function woocommerce(): array { return Diagnostic_Manager::run( [ 'woocommerce' ] )['checks']['woocommerce']; }
 
 	public static function diagnostic_get( WP_REST_Request $request ): array {
 		$checks = $request->get_param( 'checks' );

@@ -13,6 +13,11 @@ final class Diagnostic_Manager {
 		'health'  => [ self::class, 'health' ],
 		'plugins' => [ Plugins::class, 'run' ],
 		'themes'  => [ Themes::class, 'run' ],
+		'errors'  => [ PHP_Errors::class, 'run' ],
+		'rest-api' => [ REST_API_Check::class, 'run' ],
+		'performance' => [ Performance::class, 'run' ],
+		'security' => [ Security::class, 'run' ],
+		'woocommerce' => [ WooCommerce::class, 'run' ],
 	];
 
 	public static function available_checks(): array {

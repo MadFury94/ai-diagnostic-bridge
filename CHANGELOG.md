@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Added PHP error, REST API, performance, security, and WooCommerce diagnostics.
+- Added direct REST routes for the new diagnostic modules.
+
 ## 0.1.4
 
 - Registered admin-post credential actions before `admin-post.php` dispatches them.
