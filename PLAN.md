@@ -273,7 +273,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 - [x] **T03.1** Implement `class-auth.php` to generate a cryptographically random token, show it once, hash it, and store only the hash and lifecycle metadata.
 - [x] **T03.2** Authenticate HTTPS REST requests using a Bearer token; reject missing, malformed, invalid, and revoked credentials with generic 401 responses.
-- [ ] **T03.3** Implement generate, revoke, and regenerate operations with capability checks, admin nonces, and no public JavaScript exposure.
+- [x] **T03.3** Implement generate, revoke, and regenerate operations with capability checks, admin nonces, and no public JavaScript exposure.
 - [x] **T03.4** Add transient-based failed-auth rate limiting and document that Cloudflare/WAF rate limiting remains required.
 - [x] **T03.5** Implement `class-activity-log.php` with configurable enable/disable state and bounded retention for endpoint, check, result, duration, and auth outcome.
 - [ ] **T03.6** Test valid, invalid, revoked, regenerated, rate-limited, and non-admin cases; verify raw tokens never appear in options, logs, responses, or test artifacts.
@@ -349,9 +349,9 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 ### Phase 10 — Admin settings
 
-- [ ] **T10.1** Implement `admin/class-admin.php` and `admin/views/settings.php` under an appropriate capability.
-- [ ] **T10.2** Add credential generate/revoke/regenerate actions protected by WordPress nonces and escaped notices.
-- [ ] **T10.3** Display version, namespace, credential status, last auth timestamps, logging controls/retention, and available modules; never display stored hashes or tokens.
+- [x] **T10.1** Implement `admin/class-admin.php` and `admin/views/settings.php` under an appropriate capability.
+- [x] **T10.2** Add credential generate/revoke/regenerate actions protected by WordPress nonces and escaped notices.
+- [x] **T10.3** Display version, namespace, credential status, last auth timestamps, logging controls/retention, and available modules; never display stored hashes or tokens.
 - [ ] **T10.4** Test CSRF protection, insufficient capabilities, one-time token display, and escaped admin output.
 
 **Exit evidence:** administrators can manage credentials safely without frontend exposure.
@@ -372,10 +372,10 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 Update this block at the end of each session so another AI can continue safely.
 
-- **Current task:** `T03.3`
-- **Last completed task:** `T06.2` (REST foundation plus site, health, plugin, and theme diagnostics)
-- **Files changed in last session:** REST controller, diagnostic manager, site-health, plugins, themes, plugin bootstrap, task tracker
+- **Current task:** `T03.6`
+- **Last completed task:** `T10.3` (REST foundation, core diagnostics, and admin credential management)
+- **Files changed in last session:** REST controller, diagnostic manager, site-health, plugins, themes, admin settings, plugin bootstrap, task tracker
 - **Tests/checks run:** source review completed; PHP syntax/REST smoke tests not run because no PHP runtime/test site is available in this environment
 - **Known blockers:** no PHP runtime or disposable WordPress test site is available here
-- **Next action:** implement admin nonce-protected credential actions (`T03.3`), then response/auth tests (`T02.5`, `T03.6`, `T04.6`) and remaining core modules
-- **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1, T03.2, T03.4, T03.5, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, and T06.2 are implemented. T01.5, T02.4, T04.4, and T04.7 remain partial or blocked.
+- **Next action:** pull commit `08d045f`, generate a credential in Settings → AI Diagnostic Bridge, then run authenticated REST smoke tests; continue with response/auth tests and remaining diagnostic modules.
+- **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.5, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, and T10.1–T10.3 are implemented. T01.5, T02.4, T04.4, T04.7, T03.6, T04.6, and T10.4 remain partial or blocked.
