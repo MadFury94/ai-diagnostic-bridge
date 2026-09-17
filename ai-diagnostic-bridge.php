@@ -25,6 +25,11 @@ define( 'AI_DIAGNOSTIC_BRIDGE_DIR', plugin_dir_path( __FILE__ ) );
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-response.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-activity-log.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-auth.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-site-health.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugins.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-themes.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-diagnostic-manager.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-rest-api.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-plugin.php';
 
 register_activation_hook(
@@ -47,4 +52,3 @@ add_action(
 		Plugin::instance()->boot();
 	}
 );
-

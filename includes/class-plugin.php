@@ -51,6 +51,7 @@ final class Plugin {
 		}
 
 		$this->booted = true;
+		add_action( 'rest_api_init', [ REST_API::class, 'register' ] );
 		do_action( 'aidb_loaded', $this );
 	}
 
@@ -67,4 +68,3 @@ final class Plugin {
 		return AI_DIAGNOSTIC_BRIDGE_VERSION;
 	}
 }
-
