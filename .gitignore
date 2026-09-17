@@ -1,0 +1,15 @@
+# WordPress/plugin development
+vendor/
+node_modules/
+.phpunit.result.cache
+phpunit.xml
+*.log
+coverage/
+.env
+.env.*
+!.env.example
+
+# Local WordPress test files
+wp-content/
+wp-config.php
+
