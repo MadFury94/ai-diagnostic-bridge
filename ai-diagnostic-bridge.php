@@ -30,6 +30,7 @@ require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugins.php'
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-themes.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-diagnostic-manager.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-rest-api.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'admin/class-admin.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-plugin.php';
 
 register_activation_hook(
