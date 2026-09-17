@@ -10,6 +10,10 @@ use BrianAzukaeme\AIDiagnosticBridge\Plugin;
 final class Admin {
 	public static function register(): void {
 		add_options_page( 'AI Diagnostic Bridge', 'AI Diagnostic Bridge', 'manage_options', 'ai-diagnostic-bridge', [ self::class, 'render' ] );
+		self::register_actions();
+	}
+
+	public static function register_actions(): void {
 		add_action( 'admin_post_aidb_generate', [ self::class, 'generate' ] );
 		add_action( 'admin_post_aidb_revoke', [ self::class, 'revoke' ] );
 	}
@@ -50,4 +54,3 @@ final class Admin {
 		check_admin_referer( $action );
 	}
 }
-

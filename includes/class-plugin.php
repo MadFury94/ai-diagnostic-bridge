@@ -53,6 +53,7 @@ final class Plugin {
 		$this->booted = true;
 		add_action( 'rest_api_init', [ REST_API::class, 'register' ] );
 		add_action( 'admin_menu', [ \BrianAzukaeme\AIDiagnosticBridge\Admin\Admin::class, 'register' ] );
+		add_action( 'init', [ \BrianAzukaeme\AIDiagnosticBridge\Admin\Admin::class, 'register_actions' ] );
 		do_action( 'aidb_loaded', $this );
 	}
 

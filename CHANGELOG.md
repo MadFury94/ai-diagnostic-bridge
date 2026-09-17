@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+- Registered admin-post credential actions before `admin-post.php` dispatches them.
+
 ## 0.1.3
 
 - Opted credential-management forms out of WordPress client-side view transitions.
