@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Added the Settings → AI Diagnostic Bridge credential-management screen.
+- Added authenticated REST routes for the initial diagnostic modules.
+
 ## 0.1.0 (unreleased)
 
 - Added standalone plugin bootstrap and lifecycle checks.
