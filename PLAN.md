@@ -285,7 +285,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T04.1** Implement `class-diagnostic-manager.php` with a registry mapping allowlisted check IDs to diagnostic classes.
 - [x] **T04.2** Implement `class-rest-api.php` and register `/ai-diagnostic/v1` routes with authentication permission callbacks.
 - [x] **T04.3** Add `GET /diagnostic` and `POST /diagnostic`; validate `checks` against the registry and reject unknown values.
-- [~] **T04.4** Add route handlers for `/site`, `/health`, `/errors`, `/plugins`, `/themes`, `/rest-api`, `/performance`, `/woocommerce`, and the SEO/image/link routes. Core `site`, `health`, `plugins`, `themes`, and combined routes are implemented; remaining module routes are pending.
+- [~] **T04.4** Add route handlers for `/site`, `/health`, `/errors`, `/plugins`, `/themes`, `/rest-api`, `/performance`, `/woocommerce`, and the SEO/image/link routes. Core and initial operational routes are implemented; SEO/image/link routes are pending.
 - [x] **T04.5** Ensure request data cannot select functions, files, SQL, shell commands, WP-CLI commands, hooks, or arbitrary classes.
 - [ ] **T04.6** Add REST permission, invalid-request, unknown-check, and combined-response tests.
 - [!] **T04.7** Perform an unauthenticated and authenticated REST smoke test against WordPress. Requires access to the activated test site and PHP runtime.
@@ -296,10 +296,10 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 - [x] **T05.1** Implement `class-site-health.php` for safe WordPress/PHP/database versions, URLs, HTTPS, multisite, permalinks, timezone, locale, limits, active theme/plugins, debug state, cron, and REST availability.
 - [x] **T05.2** Implement deterministic health findings and statuses without exposing configuration contents or private data.
-- [ ] **T05.3** Implement `class-php-errors.php` with bounded debug-log reading, error-type parsing, timestamps/frequency, safe messages, normalized paths, and cautious plugin/theme association.
-- [ ] **T05.4** Implement `class-rest-api-check.php` using bounded internal checks; report restrictions and failures without weakening settings.
-- [ ] **T05.5** Implement `class-performance.php` for WordPress-side indicators only.
-- [ ] **T05.6** Implement `class-security.php` for deterministic security observations only.
+- [x] **T05.3** Implement `class-php-errors.php` with bounded debug-log reading, error-type parsing, timestamps/frequency, safe messages, normalized paths, and cautious plugin/theme association.
+- [x] **T05.4** Implement `class-rest-api-check.php` using bounded internal checks; report restrictions and failures without weakening settings.
+- [x] **T05.5** Implement `class-performance.php` for WordPress-side indicators only.
+- [x] **T05.6** Implement `class-security.php` for deterministic security observations only.
 - [ ] **T05.7** Test debug logging disabled/enabled, missing logs, path normalization, REST restrictions, and sensitive-value redaction.
 
 **Exit evidence:** `/site`, `/health`, `/errors`, `/rest-api`, `/performance`, and `/security` return factual structured findings.
@@ -308,8 +308,8 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 - [x] **T06.1** Implement `class-plugins.php` using WordPress plugin APIs for installed, active/network-active, version, author, slug, updates, and deterministic observations.
 - [x] **T06.2** Implement `class-themes.php` for active, parent/child, version, stylesheet metadata, directory, and update observations with path redaction.
-- [ ] **T06.3** Implement `class-woocommerce.php` with an early `not_applicable` result when WooCommerce is absent.
-- [ ] **T06.4** When WooCommerce exists, collect only safe version, currency, gateway/shipping counts, configured page IDs, scheduled-action health, and compatibility/error indicators.
+- [x] **T06.3** Implement `class-woocommerce.php` with an early `not_applicable` result when WooCommerce is absent.
+- [x] **T06.4** When WooCommerce exists, collect only safe version, currency, gateway/shipping counts, configured page IDs, scheduled-action health, and compatibility/error indicators.
 - [ ] **T06.5** Test WooCommerce absent/present fixtures and verify no customer, order, payment, or API-secret data is returned.
 
 **Exit evidence:** module behavior is graceful with and without WooCommerce.
@@ -372,10 +372,10 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 Update this block at the end of each session so another AI can continue safely.
 
-- **Current task:** `T03.6`
-- **Last completed task:** `T10.3` (REST foundation, core diagnostics, and admin credential management)
+- **Current task:** `T02.5`
+- **Last completed task:** `T06.4` (REST foundation, core diagnostics, WooCommerce detection, and admin credential management)
 - **Files changed in last session:** REST controller, diagnostic manager, site-health, plugins, themes, admin settings, plugin bootstrap, task tracker
 - **Tests/checks run:** source review completed; PHP syntax/REST smoke tests not run because no PHP runtime/test site is available in this environment
 - **Known blockers:** no PHP runtime or disposable WordPress test site is available here
-- **Next action:** pull commit `08d045f`, generate a credential in Settings → AI Diagnostic Bridge, then run authenticated REST smoke tests; continue with response/auth tests and remaining diagnostic modules.
+- **Next action:** pull commit `474b275`, run authenticated REST smoke tests for the new modules, then add response/auth tests and SEO analyzers.
 - **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.5, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, and T10.1–T10.3 are implemented. T01.5, T02.4, T04.4, T04.7, T03.6, T04.6, and T10.4 remain partial or blocked.
