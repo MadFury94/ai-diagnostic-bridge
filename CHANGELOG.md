@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Fixed the admin settings template's namespaced plugin version reference.
+
 ## 0.1.1
 
 - Added the Settings → AI Diagnostic Bridge credential-management screen.

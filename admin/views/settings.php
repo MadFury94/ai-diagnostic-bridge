@@ -19,7 +19,7 @@ $notice = isset( $_GET['aidb_notice'] ) ? sanitize_key( wp_unslash( $_GET['aidb_
 		<div class="notice notice-warning"><p><strong><?php echo esc_html__( 'New API credential (shown once):', 'ai-diagnostic-bridge' ); ?></strong></p><p><code style="user-select:all"><?php echo esc_html( (string) $token ); ?></code></p></div>
 	<?php endif; ?>
 	<table class="form-table" role="presentation">
-		<tr><th scope="row">Plugin version</th><td><?php echo esc_html( Plugin::version() ); ?></td></tr>
+		<tr><th scope="row">Plugin version</th><td><?php echo esc_html( \BrianAzukaeme\AIDiagnosticBridge\Plugin::version() ); ?></td></tr>
 		<tr><th scope="row">REST namespace</th><td><code>/wp-json/ai-diagnostic/v1/</code></td></tr>
 		<tr><th scope="row">Credential status</th><td><?php echo ! empty( $status['configured'] ) ? esc_html__( 'Configured', 'ai-diagnostic-bridge' ) : esc_html__( 'Not configured', 'ai-diagnostic-bridge' ); ?></td></tr>
 		<tr><th scope="row">Last successful request</th><td><?php echo esc_html( $status['last_auth_success'] ?: 'Never' ); ?></td></tr>
