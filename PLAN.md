@@ -288,7 +288,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [~] **T04.4** Add route handlers for `/site`, `/health`, `/errors`, `/plugins`, `/themes`, `/rest-api`, `/performance`, `/woocommerce`, and the SEO/image/link routes. Core and initial operational routes are implemented; SEO/image/link routes are pending.
 - [x] **T04.5** Ensure request data cannot select functions, files, SQL, shell commands, WP-CLI commands, hooks, or arbitrary classes.
 - [ ] **T04.6** Add REST permission, invalid-request, unknown-check, and combined-response tests.
-- [~] **T04.7** Authenticated smoke tests completed on `https://anbenigeria.com` for site, plugins, errors, health, WooCommerce, performance, security, and REST API. Unauthenticated rejection testing remains pending.
+- [x] **T04.7** Authenticated smoke tests completed on `https://anbenigeria.com` for site, plugins, errors, health, WooCommerce, performance, security, and REST API; unauthenticated access was also verified to return HTTP 401.
 
 **Exit evidence:** all routes register, unauthenticated calls fail, and only allowlisted modules execute.
 
@@ -375,7 +375,7 @@ Update this block at the end of each session so another AI can continue safely.
 - **Current task:** `T02.5`
 - **Last completed task:** `T06.4` (REST foundation, core diagnostics, WooCommerce detection, and admin credential management)
 - **Files changed in last session:** REST controller, diagnostic manager, site-health, plugins, themes, admin settings, plugin bootstrap, task tracker
-- **Tests/checks run:** live authenticated REST checks completed on anbenigeria.com for site, plugins, errors, health, WooCommerce, performance, security, and REST API; local PHP syntax tests remain unavailable
+- **Tests/checks run:** live authenticated and unauthenticated REST smoke tests completed on anbenigeria.com; plugins now returns `ok` for informational-only findings; local PHP syntax tests remain unavailable
 - **Known blockers:** no local PHP runtime, PHPUnit, WP-CLI, or coding standards tools; unauthenticated REST and lifecycle tests remain
 - **Next action:** run the new T02.5 response-contract tests in a WordPress/PHPUnit environment, then add authentication and REST tests (T03.6, T04.6).
-- **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.4, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, T10.1, and T10.2 are implemented. T00.2, T01.5, T02.4, T04.4, T04.7, T03.6, T04.6, T05.7, T06.5, T10.4, and T11.4 remain partial or blocked.
+- **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.4, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, T10.1, and T10.2 are implemented. T00.2, T01.5, T02.4, T03.5, T03.6, T04.4, T04.6, T05.7, T06.4, T06.5, T10.3, T10.4, and T11.4 remain partial or blocked.
