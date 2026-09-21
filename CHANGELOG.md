@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Kept the plugins diagnostic status as `ok` when findings are informational only; warnings now require a medium, high, or critical finding.
+
 ## 0.1.5
 
 - Added PHP error, REST API, performance, security, and WooCommerce diagnostics.

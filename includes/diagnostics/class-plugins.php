@@ -37,7 +37,17 @@ final class Plugins {
 			}
 		}
 
-		return Response::success( 'plugins', empty( $findings ) ? 'ok' : 'warning', $findings, [ 'plugins' => $items, 'total' => count( $items ) ] );
+		// Informational inventory notes (such as an intentionally inactive
+		// plugin) should not make the entire diagnostic look unhealthy. Reserve
+		// warning status for findings that need investigation.
+		$needs_attention = false;
+		foreach ( $findings as $finding ) {
+			if ( in_array( $finding['severity'] ?? 'info', [ 'critical', 'high', 'medium' ], true ) ) {
+				$needs_attention = true;
+				break;
+			}
+		}
+
+		return Response::success( 'plugins', $needs_attention ? 'warning' : 'ok', $findings, [ 'plugins' => $items, 'total' => count( $items ) ] );
 	}
 }
-

@@ -243,7 +243,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 ### Phase 0 — Workspace and decisions
 
 - [x] **T00.1** Confirm the plugin is developed only in this standalone directory/repository and does not modify or install into the existing WordPress/Next.js project.
-- [!] **T00.2** Confirm PHP 8.1+, WordPress 6.5+, test-site URL, HTTPS availability, and whether `php`, PHPUnit, WP-CLI, and WordPress coding tools are installed. PHP is not available in the current shell; WordPress/test-site details remain to be confirmed.
+- [~] **T00.2** Confirmed on `https://anbenigeria.com`: PHP 8.2.33, WordPress 7.1.1, and HTTPS. Local PHP, PHPUnit, WP-CLI, and coding tools remain unavailable in this shell.
 - [x] **T00.3** Record the target namespace, text domain, version, REST namespace, credential transport, and supported SEO plugins in a small architecture note.
 - [x] **T00.4** Initialize Git, `.gitignore`, `README.md`, `readme.txt`, and a changelog. Do not commit credentials, database dumps, logs, or WordPress core files.
 
@@ -255,7 +255,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T01.2** Create `includes/class-plugin.php` and load classes only after `plugins_loaded`.
 - [x] **T01.3** Add activation checks and minimal default options; ensure activation does not run diagnostics or create unnecessary data.
 - [x] **T01.4** Add uninstall behavior that removes only plugin-owned options/transients/log data after explicit uninstall, never site content.
-- [!] **T01.5** Run `php -l` and activate/deactivate on a disposable WordPress site. Blocked because PHP and a WordPress test site are not available in this environment.
+- [~] **T01.5** Plugin activation and live operation confirmed on `anbenigeria.com`; `php -l` and activation/deactivation lifecycle tests remain pending because PHP is unavailable locally.
 
 **Exit evidence:** activation produces no PHP errors and no frontend request performs diagnostics.
 
@@ -265,7 +265,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T02.2** Define finding builders for stable ID, severity, category, title, factual message, evidence, source, and optional inference fields.
 - [x] **T02.3** Add safe error responses that do not reveal stack traces, absolute paths, secrets, SQL, or request credentials.
 - [~] **T02.4** Add shared sanitization, pagination, bounded-limit, and timestamp helpers. Initial response primitives and bounded values are implemented; shared pagination helpers will be completed with the REST controller.
-- [ ] **T02.5** Write unit tests for response shape, severity validation, pagination normalization, and sensitive-data exclusion.
+- [~] **T02.5** Added PHPUnit response-contract tests for response shape, status/severity validation, finding fields, and safe errors; tests require a WordPress/PHPUnit environment and have not run locally.
 
 **Exit evidence:** fixtures can produce a valid response without loading a diagnostic module.
 
@@ -275,7 +275,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T03.2** Authenticate HTTPS REST requests using a Bearer token; reject missing, malformed, invalid, and revoked credentials with generic 401 responses.
 - [x] **T03.3** Implement generate, revoke, and regenerate operations with capability checks, admin nonces, and no public JavaScript exposure.
 - [x] **T03.4** Add transient-based failed-auth rate limiting and document that Cloudflare/WAF rate limiting remains required.
-- [x] **T03.5** Implement `class-activity-log.php` with configurable enable/disable state and bounded retention for endpoint, check, result, duration, and auth outcome.
+- [~] **T03.5** Implemented the activity-log primitive with configurable retention, but route instrumentation still needs to call it.
 - [ ] **T03.6** Test valid, invalid, revoked, regenerated, rate-limited, and non-admin cases; verify raw tokens never appear in options, logs, responses, or test artifacts.
 
 **Exit evidence:** authentication tests pass and a generated token is displayed exactly once.
@@ -288,7 +288,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [~] **T04.4** Add route handlers for `/site`, `/health`, `/errors`, `/plugins`, `/themes`, `/rest-api`, `/performance`, `/woocommerce`, and the SEO/image/link routes. Core and initial operational routes are implemented; SEO/image/link routes are pending.
 - [x] **T04.5** Ensure request data cannot select functions, files, SQL, shell commands, WP-CLI commands, hooks, or arbitrary classes.
 - [ ] **T04.6** Add REST permission, invalid-request, unknown-check, and combined-response tests.
-- [!] **T04.7** Perform an unauthenticated and authenticated REST smoke test against WordPress. Requires access to the activated test site and PHP runtime.
+- [~] **T04.7** Authenticated smoke tests completed on `https://anbenigeria.com` for site, plugins, errors, health, WooCommerce, performance, security, and REST API. Unauthenticated rejection testing remains pending.
 
 **Exit evidence:** all routes register, unauthenticated calls fail, and only allowlisted modules execute.
 
@@ -309,7 +309,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T06.1** Implement `class-plugins.php` using WordPress plugin APIs for installed, active/network-active, version, author, slug, updates, and deterministic observations.
 - [x] **T06.2** Implement `class-themes.php` for active, parent/child, version, stylesheet metadata, directory, and update observations with path redaction.
 - [x] **T06.3** Implement `class-woocommerce.php` with an early `not_applicable` result when WooCommerce is absent.
-- [x] **T06.4** When WooCommerce exists, collect only safe version, currency, gateway/shipping counts, configured page IDs, scheduled-action health, and compatibility/error indicators.
+- [~] **T06.4** Collects safe WooCommerce version, currency, gateway count, and configured page IDs; shipping counts, scheduled-action health, and compatibility indicators remain to be added.
 - [ ] **T06.5** Test WooCommerce absent/present fixtures and verify no customer, order, payment, or API-secret data is returned.
 
 **Exit evidence:** module behavior is graceful with and without WooCommerce.
@@ -351,7 +351,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 - [x] **T10.1** Implement `admin/class-admin.php` and `admin/views/settings.php` under an appropriate capability.
 - [x] **T10.2** Add credential generate/revoke/regenerate actions protected by WordPress nonces and escaped notices.
-- [x] **T10.3** Display version, namespace, credential status, last auth timestamps, logging controls/retention, and available modules; never display stored hashes or tokens.
+- [~] **T10.3** Displays version, namespace, credential status, and last auth timestamps; logging controls/retention and available-module display remain to be completed.
 - [ ] **T10.4** Test CSRF protection, insufficient capabilities, one-time token display, and escaped admin output.
 
 **Exit evidence:** administrators can manage credentials safely without frontend exposure.
@@ -361,7 +361,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [ ] **T11.1** Run `php -l` across every PHP file.
 - [ ] **T11.2** Run PHPUnit/WordPress tests and record exact results.
 - [ ] **T11.3** Run WordPress Coding Standards and static analysis if available; fix obvious violations.
-- [ ] **T11.4** Run activation/deactivation and authenticated REST smoke tests on a disposable WordPress site.
+- [~] **T11.4** Plugin activation and authenticated REST smoke tests completed on `https://anbenigeria.com`; activation/deactivation lifecycle and unauthenticated REST tests remain pending.
 - [ ] **T11.5** Review every endpoint for capability/authentication, input bounds, privacy, redaction, and no arbitrary execution.
 - [ ] **T11.6** Complete `README.md`, `readme.txt`, endpoint examples, security model, AI boundary, installation, troubleshooting, and known limitations.
 - [ ] **T11.7** Tag `0.1.0` only after the acceptance checklist is complete and the repository contains no secrets or generated test data.
@@ -375,7 +375,7 @@ Update this block at the end of each session so another AI can continue safely.
 - **Current task:** `T02.5`
 - **Last completed task:** `T06.4` (REST foundation, core diagnostics, WooCommerce detection, and admin credential management)
 - **Files changed in last session:** REST controller, diagnostic manager, site-health, plugins, themes, admin settings, plugin bootstrap, task tracker
-- **Tests/checks run:** source review completed; PHP syntax/REST smoke tests not run because no PHP runtime/test site is available in this environment
-- **Known blockers:** no PHP runtime or disposable WordPress test site is available here
-- **Next action:** pull commit `474b275`, run authenticated REST smoke tests for the new modules, then add response/auth tests and SEO analyzers.
-- **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.5, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, and T10.1–T10.3 are implemented. T01.5, T02.4, T04.4, T04.7, T03.6, T04.6, and T10.4 remain partial or blocked.
+- **Tests/checks run:** live authenticated REST checks completed on anbenigeria.com for site, plugins, errors, health, WooCommerce, performance, security, and REST API; local PHP syntax tests remain unavailable
+- **Known blockers:** no local PHP runtime, PHPUnit, WP-CLI, or coding standards tools; unauthenticated REST and lifecycle tests remain
+- **Next action:** run the new T02.5 response-contract tests in a WordPress/PHPUnit environment, then add authentication and REST tests (T03.6, T04.6).
+- **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.4, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, T10.1, and T10.2 are implemented. T00.2, T01.5, T02.4, T04.4, T04.7, T03.6, T04.6, T05.7, T06.5, T10.4, and T11.4 remain partial or blocked.
