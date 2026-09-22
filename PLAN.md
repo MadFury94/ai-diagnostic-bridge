@@ -1,6 +1,18 @@
 # AI Diagnostic Bridge — Implementation Plan
 
-## Objective
+## Support evidence and application preparation
+
+Read [APPLICATION-CONTEXT.md](APPLICATION-CONTEXT.md) alongside this plan. After meaningful work, update [SUPPORT-JOURNAL.md](SUPPORT-JOURNAL.md) with the symptom, hypothesis, AI verification/correction, repair, validation, customer explanation, and actual timing (or “not measured”). Maintain this evidence through January 2027 without claiming unfinished work is shipped or fixture results are real-store outcomes. Keep Missus unchanged.
+
+- [ ] Set up a small real WooCommerce test store with synthetic products and test-mode payments.
+- [ ] Complete and document deliberate WordPress/WooCommerce break/diagnose/repair exercises from the journal.
+- [ ] Record Brian's independent reproduction and customer-ready explanations.
+- [ ] Measure a defined manual versus bridge-assisted troubleshooting task; record limitations and sample size.
+- [ ] Verify concrete Missus bug/repair artifacts before linking those cases to the application narrative.
+
+These support exercises complement the implementation sequence below; they are not completed by passing the automated suite.
+
+## Implementation objective
 
 Build a standalone WordPress plugin named **AI Diagnostic Bridge** (`0.1.0`) that exposes authenticated, deterministic WordPress and SEO diagnostics to a future Cloudflare Worker and AI diagnostic agent.
 
@@ -265,7 +277,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T02.2** Define finding builders for stable ID, severity, category, title, factual message, evidence, source, and optional inference fields.
 - [x] **T02.3** Add safe error responses that do not reveal stack traces, absolute paths, secrets, SQL, or request credentials.
 - [~] **T02.4** Add shared sanitization, pagination, bounded-limit, and timestamp helpers. Initial response primitives and bounded values are implemented; shared pagination helpers will be completed with the REST controller.
-- [~] **T02.5** Added PHPUnit response-contract tests for response shape, status/severity validation, finding fields, and safe errors; tests require a WordPress/PHPUnit environment and have not run locally.
+- [x] **T02.5** Response-contract tests passed on 2026-09-21 using PHP 8.3.33, PHPUnit 10.5.64, and the installed local WordPress/SQLite runtime via `tests/local-bootstrap.php`: 5 tests, 19 assertions. Bootstrap verifies that the source checkout is tested rather than the installed plugin copy.
 
 **Exit evidence:** fixtures can produce a valid response without loading a diagnostic module.
 
@@ -275,8 +287,8 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T03.2** Authenticate HTTPS REST requests using a Bearer token; reject missing, malformed, invalid, and revoked credentials with generic 401 responses.
 - [x] **T03.3** Implement generate, revoke, and regenerate operations with capability checks, admin nonces, and no public JavaScript exposure.
 - [x] **T03.4** Add transient-based failed-auth rate limiting and document that Cloudflare/WAF rate limiting remains required.
-- [~] **T03.5** Implemented the activity-log primitive with configurable retention, but route instrumentation still needs to call it.
-- [ ] **T03.6** Test valid, invalid, revoked, regenerated, rate-limited, and non-admin cases; verify raw tokens never appear in options, logs, responses, or test artifacts.
+- [x] **T03.5** Diagnostic routes now record one bounded activity entry per handled request, including authentication failure, request result, endpoint, and duration; request secrets/content are excluded. Disabled logging and retention verified on 2026-09-21.
+- [x] **T03.6** Authentication/logging tests passed on 2026-09-21 for valid, missing, malformed, invalid, revoked, regenerated, rate-limited/expired, and non-admin cases. Verified token exclusion from credential settings, diagnostic responses, and activity logs. Full local suite: 14 tests, 114 assertions, using a temporary SQLite snapshot removed on shutdown. Existing local token still works after tests.
 
 **Exit evidence:** authentication tests pass and a generated token is displayed exactly once.
 
@@ -287,7 +299,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T04.3** Add `GET /diagnostic` and `POST /diagnostic`; validate `checks` against the registry and reject unknown values.
 - [~] **T04.4** Add route handlers for `/site`, `/health`, `/errors`, `/plugins`, `/themes`, `/rest-api`, `/performance`, `/woocommerce`, and the SEO/image/link routes. Core and initial operational routes are implemented; SEO/image/link routes are pending.
 - [x] **T04.5** Ensure request data cannot select functions, files, SQL, shell commands, WP-CLI commands, hooks, or arbitrary classes.
-- [ ] **T04.6** Add REST permission, invalid-request, unknown-check, and combined-response tests.
+- [x] **T04.6** REST permission, combined GET/POST, unknown-check, malformed JSON, invalid type/nesting, exact ID matching, limits, deduplication, defaults, precedence, and unsupported method/route tests passed on 2026-09-21. Full suite: 22 tests, 491 assertions. Local HTTP confirmed valid combined requests return 200 and nested input, altered IDs, and malformed JSON return 400. Changed PHP syntax checks passed.
 - [x] **T04.7** Authenticated smoke tests completed on `https://anbenigeria.com` for site, plugins, errors, health, WooCommerce, performance, security, and REST API; unauthenticated access was also verified to return HTTP 401.
 
 **Exit evidence:** all routes register, unauthenticated calls fail, and only allowlisted modules execute.
@@ -300,7 +312,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T05.4** Implement `class-rest-api-check.php` using bounded internal checks; report restrictions and failures without weakening settings.
 - [x] **T05.5** Implement `class-performance.php` for WordPress-side indicators only.
 - [x] **T05.6** Implement `class-security.php` for deterministic security observations only.
-- [ ] **T05.7** Test debug logging disabled/enabled, missing logs, path normalization, REST restrictions, and sensitive-value redaction.
+- [x] **T05.7** Debug logging disabled/enabled, default/custom/missing logs, Windows/Unix path normalization, byte/line bounds, REST restrictions/transport failures, and sensitive-data exclusion verified on 2026-09-21. Full suite: 31 tests, 583 assertions. Fixed unbounded/raw log reads and ignored debug configuration; REST namespaces now contain names, redirects are surfaced, and transport error details are excluded. Changed PHP syntax checks passed; local authenticated errors endpoint returned HTTP 200 / not_applicable with logging disabled.
 
 **Exit evidence:** `/site`, `/health`, `/errors`, `/rest-api`, `/performance`, and `/security` return factual structured findings.
 
@@ -309,8 +321,8 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 - [x] **T06.1** Implement `class-plugins.php` using WordPress plugin APIs for installed, active/network-active, version, author, slug, updates, and deterministic observations.
 - [x] **T06.2** Implement `class-themes.php` for active, parent/child, version, stylesheet metadata, directory, and update observations with path redaction.
 - [x] **T06.3** Implement `class-woocommerce.php` with an early `not_applicable` result when WooCommerce is absent.
-- [~] **T06.4** Collects safe WooCommerce version, currency, gateway count, and configured page IDs; shipping counts, scheduled-action health, and compatibility indicators remain to be added.
-- [ ] **T06.5** Test WooCommerce absent/present fixtures and verify no customer, order, payment, or API-secret data is returned.
+- [x] **T06.4** Added configured/enabled gateway counts, published-page checks, shipping zone/enabled-method counts including zone 0, bounded site-wide failed/overdue scheduled-action summaries, official database-update-needed status, and HPOS configuration. Missing APIs remain unknown; extension exceptions produce generic findings without details.
+- [x] **T06.5** WooCommerce absent/present fixtures passed, including configuration failures, optional APIs, shipping/action bounds, informational severity, and private-data exclusion. Full suite on 2026-09-21: 40 tests, 629 assertions; PHP syntax checks passed. Actual local HTTP returned 200/not_applicable with WooCommerce absent. Present behavior is fixture-tested, not verified against a real WooCommerce installation; retain that integration check for final validation.
 
 **Exit evidence:** module behavior is graceful with and without WooCommerce.
 
@@ -370,12 +382,19 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 ## Handoff record
 
+### Local setup verification — 2026-09-21
+
+- Local PHP/SQLite write probe passed; WP-CLI confirms WordPress is installed. The previous tooling/write-access blocker is resolved.
+- AI Diagnostic Bridge 0.1.5 copied and activated locally; PHP server started at `http://127.0.0.1:8085`.
+- Website/login HTTP 200; admin redirects to login. Fixed null Authorization header handling in `includes/class-auth.php`; syntax check passed, and missing/invalid authorization both return HTTP 401 JSON.
+- T02.5 completed: `tests/local-bootstrap.php` loads the disposable WordPress runtime and repository plugin source. PHPUnit passed all 5 tests / 19 assertions; bootstrap syntax check passed. Authenticated local health smoke check returned HTTP 200 and `success: true`; token was read from ignored `.env` without display. Authentication and lifecycle test coverage is still incomplete.
+
 Update this block at the end of each session so another AI can continue safely.
 
-- **Current task:** `T02.5`
-- **Last completed task:** `T06.4` (REST foundation, core diagnostics, WooCommerce detection, and admin credential management)
-- **Files changed in last session:** REST controller, diagnostic manager, site-health, plugins, themes, admin settings, plugin bootstrap, task tracker
-- **Tests/checks run:** live authenticated and unauthenticated REST smoke tests completed on anbenigeria.com; plugins now returns `ok` for informational-only findings; local PHP syntax tests remain unavailable
-- **Known blockers:** no local PHP runtime, PHPUnit, WP-CLI, or coding standards tools; unauthenticated REST and lifecycle tests remain
-- **Next action:** run the new T02.5 response-contract tests in a WordPress/PHPUnit environment, then add authentication and REST tests (T03.6, T04.6).
+- **Current task:** `T07.1`
+- **Last completed task:** `T06.4/T06.5` (WooCommerce diagnostics and fixture tests)
+- **Files changed in last session:** WooCommerce diagnostic module/API adapter, `tests/WooCommerceTest.php`, README, setup guide, progress notes, and task tracker
+- **Tests/checks run:** 40 PHPUnit tests / 629 assertions passed in the temporary SQLite snapshot; changed PHP syntax checks passed; authenticated local WooCommerce endpoint returned HTTP 200 / not_applicable. Existing token remains valid, with no token output or live site changes. Real WooCommerce-present integration remains for final validation.
+- **Known blockers:** no blocker for local tests; coding standards tool availability remains unverified. Official WordPress fixture/lifecycle framework still needs setup; local tests use a disposable SQLite snapshot.
+- **Next action:** implement the SEO manager and shared post-analysis result contract (T07.1).
 - **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.4, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, T10.1, and T10.2 are implemented. T00.2, T01.5, T02.4, T03.5, T03.6, T04.4, T04.6, T05.7, T06.4, T06.5, T10.3, T10.4, and T11.4 remain partial or blocked.

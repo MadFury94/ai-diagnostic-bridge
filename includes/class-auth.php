@@ -39,7 +39,7 @@ final class Auth {
 			return false;
 		}
 
-		$header = trim( $request->get_header( 'authorization' ) );
+		$header = trim( $request->get_header( 'authorization' ) ?? '' );
 		if ( ! preg_match( '/^Bearer\s+(.+)$/i', $header, $matches ) ) {
 			self::record_failure( $identifier );
 			return false;

@@ -28,8 +28,16 @@ final class Diagnostic_Manager {
 		return Site_Health::run( 'health' );
 	}
 
-	public static function run( array $checks ): array {
-		$requested = array_values( array_unique( array_map( 'sanitize_key', $checks ) ) );
+	public static function run( array $checks ): array|\WP_Error {
+		if ( ! array_is_list( $checks ) || count( $checks ) > 20 ) {
+			return Response::error( 'invalid_checks', 'Checks must be a list of at most 20 supported check IDs.', 400 );
+		}
+		foreach ( $checks as $check ) {
+			if ( ! is_string( $check ) || ! in_array( $check, self::available_checks(), true ) ) {
+				return Response::error( 'invalid_checks', 'One or more requested diagnostic checks are not available.', 400 );
+			}
+		}
+		$requested = array_values( array_unique( $checks ) );
 		$unknown   = array_values( array_diff( $requested, self::available_checks() ) );
 		if ( empty( $requested ) ) {
 			$requested = [ 'site' ];
