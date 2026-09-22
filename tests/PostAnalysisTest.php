@@ -94,6 +94,7 @@ final class PostAnalysisTest extends TestCase {
 		$context = new PostAnalysisFixture($post);
 		$result = \BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Image_Analysis::analyze($post->post_content, 16, $context);
 		$this->assertSame(1, $result['observations']['count']);
+		$this->assertFalse($result['observations']['featured_image']['present']);
 		$this->assertSame('photo.jpg', $result['observations']['items'][0]['filename']);
 		$this->assertTrue($result['observations']['items'][0]['alt_present']);
 		$this->assertSame(0, $result['observations']['items'][0]['attachment_id']);

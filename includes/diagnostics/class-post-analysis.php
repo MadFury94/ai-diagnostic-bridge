@@ -251,13 +251,17 @@ final class Image_Analysis {
 			];
 		}
 		$findings = [];
+		$featured = $featured_id > 0;
+		if (!$featured) {
+			$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding('seo-image-missing-featured', 'low', 'seo-image', 'Featured image is not set', 'The public post does not have a featured image configured.', [], 'seo');
+		}
 		if ($missing > 0) {
 			$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding('seo-image-missing-alt', 'medium', 'seo-image', 'Images without alt text were observed.', 'One or more content images have no alt text.', ['count' => $missing], 'seo');
 		}
 		if ($long > 0) {
 			$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding('seo-image-long-alt', 'info', 'seo-image', 'Unusually long image alt text was observed.', 'One or more image alt values exceed the observation threshold.', ['count' => $long], 'seo');
 		}
-		return ['observations' => ['count' => count($items), 'missing_alt_count' => $missing, 'items' => $items], 'findings' => $findings];
+		return ['observations' => ['count' => count($items), 'missing_alt_count' => $missing, 'featured_image' => ['present' => $featured, 'attachment_id' => $featured_id], 'items' => $items], 'findings' => $findings];
 	}
 
 	private static function length(string $value): int { return function_exists('mb_strlen') ? mb_strlen($value) : strlen($value); }

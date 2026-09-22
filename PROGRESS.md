@@ -280,3 +280,11 @@ Added authenticated paginated /seo/posts, aggregated /seo/issues, and site-level
 ## 2026-09-23 — T09.4 SEO collection edge coverage completed
 
 Added tests for invalid pagination bounds, empty pages, stable pagination metadata, issue-count aggregation, and private-data exclusion. Focused SEO collection/link/image/REST tests passed with 17 tests and 406 assertions. The known SQLite/WooCommerce shutdown fatal remains after PHPUnit assertions. The SEO analyzer and collection layer are ready for authenticated deployment smoke testing; remaining work includes admin/security quality checks and optional link verification.
+
+## 2026-09-23 — Anbe Nigeria SEO deployment verified
+
+The updated plugin from commit eee2a2d is active on Anbe Nigeria. Authenticated read-only smoke tests passed for the SEO post, image issues, link issues, SEO posts, SEO issues, and SEO site endpoints. No public posts existed, so public page 976 was used for the single-post route; it returned HTTP 200 with the shared contract. Collection routes returned HTTP 200 and reported 11 published post/page records across 3 pages. No live state or private data was changed.
+
+## 2026-09-23 — Featured-image detection gap identified
+
+Live post 969 confirmed the analyzer could inspect the post but did not explicitly flag a missing featured image. Added the seo-image-missing-featured finding and featured-image observation; focused local tests passed with 9 tests and 39 assertions. Push and live recheck remain.
