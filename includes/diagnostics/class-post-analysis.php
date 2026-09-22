@@ -240,16 +240,18 @@ final class Image_Analysis {
 			if (self::length($alt) > 125) { $long++; }
 		}
 		$featured_id = $context->featured_image_id($post_id);
+		$featured_alt = $featured_id > 0 ? $context->attachment_alt($featured_id) : '';
 		if ($featured_id > 0 && !array_filter($items, static fn (array $item): bool => $item['attachment_id'] === $featured_id)) {
 			$items[] = [
 				'attachment_id' => $featured_id,
 				'url' => esc_url_raw($context->attachment_url($featured_id)),
 				'filename' => $context->attachment_filename($featured_id),
-				'alt_present' => '' !== $context->attachment_alt($featured_id),
-				'alt_length' => self::length($context->attachment_alt($featured_id)),
+				'alt_present' => '' !== $featured_alt,
+				'alt_length' => self::length($featured_alt),
 				'featured' => true,
 			];
 		}
+		if ($featured_id > 0 && '' === $featured_alt) { $missing++; }
 		$findings = [];
 		$featured = $featured_id > 0;
 		if (!$featured) {
