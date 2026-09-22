@@ -133,6 +133,19 @@ final class RestValidationTest extends TestCase {
 		$this->assertSame( 401, rest_do_request( $request )->get_status() );
 	}
 
+	public function test_seo_post_route_requires_authentication_and_returns_contract(): void {
+		$unauthenticated = rest_do_request( $this->request( 'GET', 'seo/post/12', false ) );
+		$this->assertSame( 401, $unauthenticated->get_status() );
+
+		$response = rest_do_request( $this->request( 'GET', 'seo/post/12' ) );
+		$this->assertSame( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertTrue( $data['success'] );
+		$this->assertSame( 'seo_post_analysis', $data['metadata']['contract'] );
+		$this->assertArrayHasKey( 'observations', $data['metadata'] );
+		$this->assertStringNotContainsString( $this->token, wp_json_encode( $data ) );
+	}
+
 	public function test_unsupported_methods_and_routes_do_not_run_diagnostics(): void {
 		foreach ( [ [ 'DELETE', 'diagnostic' ], [ 'PUT', 'diagnostic' ], [ 'POST', 'health' ], [ 'GET', 'unknown' ] ] as [ $method, $route ] ) {
 			$this->assertSame( 404, rest_do_request( $this->request( $method, $route ) )->get_status() );

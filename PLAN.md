@@ -328,34 +328,34 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 ### Phase 7 — SEO post analyzers
 
-- [ ] **T07.1** Implement `class-seo-manager.php` and a shared post-analysis result contract.
-- [ ] **T07.2** Implement `class-post-analysis.php` for public post/page title, slug, excerpt, word count, content, and metadata observations.
-- [ ] **T07.3** Implement configurable title checks: missing, empty, short, long, duplicate, and title/slug relationship observations.
-- [ ] **T07.4** Implement supported metadata readers for Yoast, Rank Math, and AIOSEO only where documented; never overwrite metadata.
-- [ ] **T07.5** Implement meta-description checks: missing, empty, short, long, and duplicate.
-- [ ] **T07.6** Implement `class-indexability.php` for status, visibility/password, noindex/robots, canonical, and determinable sitemap observations.
-- [ ] **T07.7** Implement `GET /seo/post/{id}` with explicit authentication, public-content privacy rules, and stable `seo_findings` output.
+- [x] **T07.1** Implement `class-seo-manager.php` and a shared post-analysis result contract.
+- [x] **T07.2** Implement `class-post-analysis.php` for public post/page title, slug, excerpt, word count, content, and metadata observations.
+- [x] **T07.3** Implement configurable title checks: missing, empty, short, long, duplicate, and title/slug relationship observations.
+- [x] **T07.4** Implement supported metadata readers for Yoast, Rank Math, and AIOSEO only where documented; never overwrite metadata.
+- [x] **T07.5** Implement meta-description checks: missing, empty, short, long, and duplicate.
+- [x] **T07.6** Implement `class-indexability.php` for status, visibility/password, noindex/robots, canonical, and determinable sitemap observations.
+- [x] **T07.7** Implement `GET /seo/post/{id}` with explicit authentication, public-content privacy rules, and stable `seo_findings` output.
 - [ ] **T07.8** Test title/meta thresholds, duplicates, private/password posts, canonical/noindex signals, and sensitive-content exclusion.
 
 **Exit evidence:** one post can be analyzed deterministically without making edits.
 
 ### Phase 8 — SEO headings, images, and links
 
-- [ ] **T08.1** Add heading parsing for H1 count, missing/multiple H1s, hierarchy jumps, empty headings, and long headings.
-- [ ] **T08.2** Implement `class-image-analysis.php` for attachment ID, URL, filename, alt presence/length, and featured-image state.
-- [ ] **T08.3** Implement paginated `GET /images/issues` and ensure no alt text is generated or applied.
-- [ ] **T08.4** Implement `class-link-analysis.php` for internal/external links, missing hrefs, malformed URLs, duplicates, and bounded optional internal verification with timeouts.
-- [ ] **T08.5** Implement paginated `GET /links/issues`; never crawl the site during ordinary requests.
+- [x] **T08.1** Add heading parsing for H1 count, missing/multiple H1s, hierarchy jumps, empty headings, and long headings.
+- [x] **T08.2** Implement `class-image-analysis.php` for attachment ID, URL, filename, alt presence/length, and featured-image state. Implemented within the post-analysis module.
+- [x] **T08.3** Implement paginated `GET /images/issues` and ensure no alt text is generated or applied.
+- [~] **T08.4** Implement `class-link-analysis.php` for internal/external links, missing hrefs, malformed URLs, duplicates, and bounded optional internal verification with timeouts. Bounded content-link classification is implemented; optional verification remains.
+- [x] **T08.5** Implement paginated `GET /links/issues`; never crawl the site during ordinary requests.
 - [ ] **T08.6** Test malformed HTML/links, empty headings, missing alt text, duplicate links, pagination, and request timeouts.
 
 **Exit evidence:** image, heading, and link issues are factual, bounded, and paginated.
 
 ### Phase 9 — SEO collections and aggregation
 
-- [ ] **T09.1** Implement paginated `GET /seo/posts?per_page=&page=` without loading all posts into memory.
-- [ ] **T09.2** Implement `GET /seo/issues` with stable issue types and critical/high/medium/low summary counts.
-- [ ] **T09.3** Implement `GET /seo/site` for site-level indexability and supported sitemap/SEO-plugin observations.
-- [ ] **T09.4** Test pagination boundaries, empty collections, duplicate issue aggregation, and large-site limits.
+- [x] **T09.1** Implement paginated `GET /seo/posts?per_page=&page=` without loading all posts into memory.
+- [x] **T09.2** Implement `GET /seo/issues` with stable issue types and critical/high/medium/low summary counts.
+- [x] **T09.3** Implement `GET /seo/site` for site-level indexability and supported sitemap/SEO-plugin observations.
+- [x] **T09.4** Test pagination boundaries, empty collections, duplicate issue aggregation, and large-site limits.
 
 **Exit evidence:** SEO dashboard endpoints provide predictable collection and summary contracts.
 
@@ -391,10 +391,10 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 Update this block at the end of each session so another AI can continue safely.
 
-- **Current task:** `T07.1`
-- **Last completed task:** `T06.4/T06.5` (WooCommerce diagnostics and fixture tests)
-- **Files changed in last session:** WooCommerce diagnostic module/API adapter, `tests/WooCommerceTest.php`, README, setup guide, progress notes, and task tracker
-- **Tests/checks run:** 40 PHPUnit tests / 629 assertions passed in the temporary SQLite snapshot; changed PHP syntax checks passed; authenticated local WooCommerce endpoint returned HTTP 200 / not_applicable. Existing token remains valid, with no token output or live site changes. Real WooCommerce-present integration remains for final validation.
+- **Current task:** `T10.4`
+- **Last completed task:** `T09.4` (SEO collection edge and pagination tests)
+- **Files changed in last session:** `tests/SEOCollectionsTest.php`, and task/evidence records
+- **Tests/checks run:** Focused SEO collection/link/image/REST tests passed: 17 tests / 406 assertions. Coverage includes invalid bounds, empty pages, stable pagination, issue-count aggregation, and private-data exclusion. The known temporary SQLite/WooCommerce shutdown fatal remains after PHPUnit assertions.
 - **Known blockers:** no blocker for local tests; coding standards tool availability remains unverified. Official WordPress fixture/lifecycle framework still needs setup; local tests use a disposable SQLite snapshot.
-- **Next action:** implement the SEO manager and shared post-analysis result contract (T07.1).
+- **Next action:** complete remaining admin/security quality checks, then deploy and smoke-test the SEO routes on Anbe Nigeria.
 - **Do not redo:** T00.1, T00.3, T00.4, T01.1–T01.4, T02.1–T02.3, T03.1–T03.4, T04.1–T04.3, T04.5, T05.1, T05.2, T06.1, T06.2, T10.1, and T10.2 are implemented. T00.2, T01.5, T02.4, T03.5, T03.6, T04.4, T04.6, T05.7, T06.4, T06.5, T10.3, T10.4, and T11.4 remain partial or blocked.

@@ -196,3 +196,87 @@ Use the current commands in LOCAL-WORDPRESS-SETUP.md; do not duplicate extension
 ## 2026-09-22 — Synthetic WooCommerce baseline completed with SQLite limitation
 
 Step 2 of WOOCOMMERCE-TEST-PLAN.md is complete. The configured product, shipping zone/rate, offline payment method, cart total, and synthetic order were verified. The first checkout exposed SQLite stock-reservation incompatibility; a temporary local-only bypass allowed a single baseline order and was removed immediately. This is documented as a limitation, not a plugin fix. Next task is checkout-page break/repair (step 3).
+
+## 2026-09-22 — Live Anbe Nigeria smoke test after plugin installation
+
+Read-only authenticated smoke test completed. Missing authorization returned 401; health/plugins/errors/performance/security/rest-api/woocommerce returned 200 with safe envelopes. WooCommerce 11.1.1 is present. Findings: inactive LiteSpeed Cache (info); no enabled payment gateways (info); no shipping methods (info); at least 100 failed site-wide scheduled actions, truncated at the diagnostic safety cap (medium). No live changes were made. See SUPPORT-JOURNAL.md for exact safe summaries. The local WooCommerce SQLite checkout limitation does not establish a live-site checkout failure.
+
+## 2026-09-22 — Live route and validation checks completed
+
+Read-only /site, /themes, and combined /diagnostic requests returned HTTP 200. A combined POST for health, plugins, and WooCommerce also returned 200. Unknown and malformed check inputs returned 400 as expected. No live state was changed; detailed evidence is in SUPPORT-JOURNAL.md.
+
+## 2026-09-22 — Anbe Nigeria Pay on Delivery verified
+
+The live WooCommerce diagnostic now reports one enabled payment gateway out of three configured. The public Store API reports one visible product. No order was placed; this confirms configuration and catalog visibility, not end-to-end checkout or payment completion.
+
+## 2026-09-22 — Live WooCommerce checkout confirmed
+
+Brian confirmed two Anbe Nigeria orders were created successfully using Pay on Delivery. Orders are visible with pending/processing status and no reported errors. This completes the live checkout smoke test; order identifiers and customer data remain out of diagnostics and documentation.
+
+## 2026-09-22 — Local checkout break/repair completed
+
+The disposable local checkout-page exercise passed. Unpublishing page 13 reproduced the guest failure and the bridge finding; republishing it and adding the test product restored checkout. Final diagnostic confirmed the page as published and cleared the checkout-page-invalid finding. Exact elapsed timing remains unmeasured.
+
+## 2026-09-22 — Local shipping recovery verified
+
+The disposable flat-rate shipping method was temporarily disabled and then restored. Final bridge verification returned one enabled shipping method, one shipping zone, and no no-shipping-methods finding. Payment gateway break/repair and final safety checks remain.
+
+## 2026-09-22 — Local payment gateway recovery verified
+
+The disposable Pay on Delivery gateway break/repair exercise passed. Disabling it produced zero enabled gateways and the expected bridge finding; restoring it returned one enabled gateway and cleared that finding. Final safety checks remain.
+
+## 2026-09-22 — Final local safety checks completed
+
+Unauthenticated and invalid-token requests returned 401. Restored gateway/shipping baseline remained intact, and response privacy checks found no token or private order/customer/payment data. PHPUnit completed 40 tests and 625 assertions with one skip; a post-suite WooCommerce Action Scheduler/SQLite shutdown fatal remains a local compatibility limitation.
+
+## 2026-09-22 — T07.1 SEO manager contract completed
+
+Implemented the shared SEO manager contract in includes/diagnostics/class-seo-manager.php and loaded it from the plugin bootstrap. The contract returns the normal response envelope, stable seo_post_analysis metadata, fixed observation slots for future analyzers, post identity, and clean not_applicable behavior when no post is requested. Informational findings do not elevate the check status. Focused tests passed (2 tests, 11 assertions); the full suite passed (42 tests, 636 assertions, 1 skipped). The known post-suite WooCommerce SQLite shutdown fatal remains. T07.2 post analysis has not started.
+
+## 2026-09-22 — T07.2 public post analysis completed
+
+Implemented the bounded public post/page analyzer on the T07.1 contract. It accepts only published post/page records, reports title and slug values with lengths, excerpt presence/length, content presence/character count, word count, metadata availability, and public indexability facts. It does not return raw post content and excludes private, password-protected, unpublished, missing, or unsupported post types. Focused tests passed with 4 tests and 23 assertions; the full suite passed with 44 tests and 648 assertions and one skip. The known WooCommerce Action Scheduler/SQLite shutdown fatal remains after assertions complete. T07.3 title checks have not started.
+
+## 2026-09-22 — T07.3 configurable title checks completed
+
+Added configurable title findings to the bounded post analyzer: missing/empty, short, long, duplicate, and title/slug relationship observations. Thresholds are clamped to safe integer bounds, evidence contains lengths/counts rather than raw title content, and title/slug mismatch is informational so it cannot elevate the check status. Focused post/SEO tests passed with 6 tests and 28 assertions. The known temporary SQLite/WooCommerce shutdown fatal remains after PHPUnit assertions. T07.4/T07.5 metadata and meta-description work has not started.
+
+## 2026-09-22 — T07.4/T07.5 metadata and meta-description checks completed
+
+Added read-only supported metadata readers for documented Yoast, Rank Math, and AIOSEO post-meta keys. The analyzer reports source and length/presence only and never writes metadata. Added configurable meta-description findings for missing, short, long, and duplicate descriptions. Focused post/SEO tests passed with 8 tests and 35 assertions. The known temporary SQLite/WooCommerce shutdown fatal remains after PHPUnit assertions. T07.6 indexability analysis and the SEO REST route remain.
+
+## 2026-09-22 — T07.6 indexability observations completed
+
+Added deterministic indexability observations to the public post analyzer: post status, public/password visibility, supported noindex signals, canonical metadata where present, and an explicit sitemap-not-determinable state. A supported noindex signal creates a medium finding; no Google indexing claim is made. Focused post/SEO tests passed with 9 tests and 39 assertions. The known temporary SQLite/WooCommerce shutdown fatal remains after PHPUnit assertions. T07.7 authenticated SEO post routing remains.
+
+## 2026-09-22 — T07.7 authenticated SEO post route completed
+
+Added authenticated GET /ai-diagnostic/v1/seo/post/{id}. It uses the bounded public post analyzer, returns the shared seo_post_analysis contract, rejects unauthenticated requests with 401, and excludes private/unpublished/password-protected content through the analyzer. Focused REST/post/SEO tests passed with 18 tests and 422 assertions. The known temporary SQLite/WooCommerce shutdown fatal remains after PHPUnit assertions. T07.8 edge-case and privacy coverage expansion remains.
+
+## 2026-09-22 — Initial heading, image-alt, and link analysis
+
+The authenticated SEO post route now parses bounded post HTML for heading structure, content-image alt presence/length, and link classification. It reports missing/multiple H1s, empty/long headings, hierarchy jumps, missing alt text, missing/malformed/duplicate links, and internal/external counts without crawling other URLs or returning raw markup. Focused REST/post/SEO tests passed with 19 tests and 428 assertions. Full attachment/featured-image metadata and paginated collection routes remain; the known SQLite/WooCommerce shutdown fatal remains after assertions.
+
+## 2026-09-22 — Local SEO route smoke verification
+
+The local installed plugin copy was synchronized with the repository SEO route code. After a clean local server restart, authenticated GET /index.php?rest_route=/ai-diagnostic/v1/seo/post/12 returned HTTP 200 with the seo_post_analysis contract, three findings, and bounded heading/image/link observations. No live site was changed.
+
+## 2026-09-23 — T08.2 image attachment and featured-image observations completed
+
+Completed the image analyzer within post analysis. Each bounded content image now reports attachment ID when resolvable, public URL, sanitized filename, alt presence/length, and featured state; a featured image is included when configured. Missing and long alt findings remain read-only. Focused post-analysis tests passed with 9 tests and 38 assertions. Paginated image issue collection remains; the known SQLite/WooCommerce shutdown fatal persists after assertions.
+
+## 2026-09-23 — T08.3 paginated image issues endpoint completed
+
+Added authenticated GET /ai-diagnostic/v1/images/issues with bounded page/per_page validation, published post/page filtering, item and pagination metadata, and no content mutation or alt generation. Local smoke verification returned HTTP 200 with page 1/per_page 5 and safe pagination (	otal: 6, pages: 2). Focused image/REST tests passed with 11 tests and 388 assertions. The known SQLite/WooCommerce shutdown fatal remains after assertions.
+
+## 2026-09-23 — T08.5 paginated link issues endpoint completed
+
+Added authenticated GET /ai-diagnostic/v1/links/issues with bounded pagination over published posts/pages. It returns link classifications, missing/malformed/duplicate findings, and pagination metadata without crawling or verifying external URLs. Local smoke verification returned HTTP 200 with page 1/per_page 5 and six public records across two pages. Focused link/image/REST tests passed with 13 tests and 393 assertions. Optional bounded internal verification remains deliberately unimplemented.
+
+## 2026-09-23 — T09.1-T09.3 SEO collection layer completed
+
+Added authenticated paginated /seo/posts, aggregated /seo/issues, and site-level /seo/site endpoints. Collections query bounded published post/page pages, return items and pagination, aggregate stable finding IDs, and avoid site-wide crawls. Site-level output reports WordPress public visibility and explicitly leaves sitemap inclusion undetermined. Focused collection/link/image/REST tests passed with 15 tests and 398 assertions. T09.4 edge-case coverage and deployment smoke testing remain.
+
+## 2026-09-23 — T09.4 SEO collection edge coverage completed
+
+Added tests for invalid pagination bounds, empty pages, stable pagination metadata, issue-count aggregation, and private-data exclusion. Focused SEO collection/link/image/REST tests passed with 17 tests and 406 assertions. The known SQLite/WooCommerce shutdown fatal remains after PHPUnit assertions. The SEO analyzer and collection layer are ready for authenticated deployment smoke testing; remaining work includes admin/security quality checks and optional link verification.

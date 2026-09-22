@@ -20,28 +20,28 @@ Started: 2026-09-22. Run on the disposable local site only. Complete one stage a
 
 ## 3. Checkout page break and repair
 
-- [ ] Record the page's initial state and begin timing.
-- [ ] Temporarily unpublish the configured checkout page.
-- [ ] Reproduce the symptom and inspect the bridge's page finding.
-- [ ] Restore the original page status.
-- [ ] Verify the finding clears and checkout works again.
-- [ ] Record measured time, evidence, customer explanation, and Brian's own understanding.
+- [x] Record the page's initial state and begin timing.
+- [x] Temporarily unpublish the configured checkout page.
+- [x] Reproduce the symptom and inspect the bridge's page finding.
+- [x] Restore the original page status.
+- [x] Verify the finding clears and checkout works again.
+- [x] Record measured time, evidence, customer explanation, and Brian's own understanding.
 
 ## 4. Shipping and payment exercises
 
-- [ ] Record and temporarily disable the test shipping method.
-- [ ] Compare checkout behavior with bridge configuration findings; restore and verify.
-- [ ] Record and temporarily disable the test payment gateway.
-- [ ] Compare checkout behavior with bridge findings; restore and verify.
+- [x] Record and temporarily disable the test shipping method.
+- [x] Compare checkout behavior with bridge configuration findings; restore and verify.
+- [x] Record and temporarily disable the test payment gateway.
+- [x] Compare checkout behavior with bridge findings; restore and verify.
 - [ ] Document limits: configuration counts do not prove availability for every customer address/cart.
 
 ## 5. Safety and regression checks
 
-- [ ] Confirm missing/invalid credentials return HTTP 401.
-- [ ] Check responses/logs exclude customer, order, payment, and credential data.
-- [ ] Run automated tests with WooCommerce present and document skips/failures precisely.
-- [ ] Verify exercises left the store in its baseline working state.
-- [ ] Update PLAN.md, PROGRESS.md, and SUPPORT-JOURNAL.md with results and remaining limits.
+- [x] Confirm missing/invalid credentials return HTTP 401.
+- [x] Check responses/logs exclude customer, order, payment, and credential data.
+- [x] Run automated tests with WooCommerce present and document skips/failures precisely.
+- [x] Verify exercises left the store in its baseline working state.
+- [x] Update PLAN.md, PROGRESS.md, and SUPPORT-JOURNAL.md with results and remaining limits.
 
 ## Stage results
 
@@ -54,3 +54,5 @@ Failed-action investigation (2026-09-22): `fetch_patterns` handler is present du
 Step 2 completed on 2026-09-22 with a compatibility limitation: product 17 (NGN 2,500, stock 10), Nigeria zone 1, flat rate instance 1 (NGN 500), and local COD were configured. Store API cart/shipping totals were NGN 3,000. The first checkout exposed a SQLite adapter failure in WooCommerce stock reservation (`INTERVAL 60 MINUTE`) and left draft order 19; it did not reduce stock. For this synthetic baseline only, a temporary local MU-plugin filter set the stock hold to zero and suppressed mail. Checkout then created order 20 with status `processing` and payment status `success`; stock reduced from 10 to 9. The temporary MU-plugin was removed. The bridge afterward reported one enabled gateway, one enabled shipping method, and one failed site-wide scheduled action. Stock-reservation locking is not validated on SQLite.
 
 Next: step 3, checkout-page break and repair. Preserve order 20 and draft order 19 as synthetic evidence; do not create another baseline order.
+
+Step 3 completed on 2026-09-22. Local checkout page 13 was changed from published to draft. Guest `/checkout/` showed the ordinary site template, and the bridge reported `woocommerce-checkout-page-invalid` with medium severity. The page was republished; after adding the synthetic product to the cart, checkout rendered and the bridge reported `checkout_published: true` with no checkout-page-invalid finding. This confirms the failure and repair path. Exact elapsed timing was not captured.

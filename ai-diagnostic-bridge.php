@@ -33,6 +33,11 @@ require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-rest-api-che
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-performance.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-security.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-woocommerce.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-seo-manager.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-post-analysis.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-image-issues.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-link-issues.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-seo-collections.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-diagnostic-manager.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-rest-api.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'admin/class-admin.php';

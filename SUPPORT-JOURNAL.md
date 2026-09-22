@@ -161,3 +161,95 @@ Configured product 17 (synthetic physical notebook, NGN 2,500, stock 10), Nigeri
 For this disposable baseline only, installed a temporary local MU-plugin that set `woocommerce_order_hold_stock_minutes` to zero and suppressed mail. Checkout then succeeded: order 20, `processing`, COD payment status `success`, total NGN 3,000, stock reduced from 10 to 9. Removed the temporary MU-plugin immediately afterward. This verifies cart, shipping, offline payment, order creation, and stock reduction; it does not validate concurrent stock reservation locking on SQLite. Draft order 19 and order 20 are synthetic local evidence; no real payment, email, customer, or fulfilment occurred.
 
 The bridge now reports one enabled gateway, one enabled shipping method, and one failed site-wide scheduled action. Saved baseline state is in `.tools/woocommerce-baseline.json`. Time to diagnose/repair and time saved: not measured. Brian's independent reproduction and explanation: still to be recorded. Next is checkout-page break/repair; do not create another baseline order.
+
+## 2026-09-22 â€” Anbe Nigeria route and validation checks
+
+Additional read-only checks returned HTTP 200 for `/site`, `/themes`, and the combined `/diagnostic` route. A POST diagnostic request for `health`, `plugins`, and `woocommerce` returned HTTP 200. Unknown check names and nested/non-string checks were rejected with HTTP 400, confirming request validation. No live content, settings, orders, customers, or credentials were changed.
+
+## 2026-09-22 â€” Anbe Nigeria live installation smoke test
+
+Brian installed AI Diagnostic Bridge on Anbe Nigeria and stored the credential in the ignored `.env` file. Read-only smoke testing was run against the live HTTPS REST namespace; the credential was not printed or added to evidence.
+
+Unauthenticated `/health` returned HTTP 401 as expected. Authenticated requests returned HTTP 200 with `success: true` for `/health`, `/plugins`, `/errors`, `/performance`, `/security`, `/rest-api`, and `/woocommerce`.
+
+Safe summaries: health status `ok` with no findings; plugins status `ok` with one informational finding that LiteSpeed Cache is installed but inactive; errors status `not_applicable` with no findings; performance/security/REST status `ok` with no findings. WooCommerce 11.1.1 is installed with USD currency, three configured gateways and zero enabled, shipping enabled with zero zones/methods, and HPOS/configuration fields available. WooCommerce returned warning status because it reported no enabled gateways, no shipping methods (informational findings), and a site-wide scheduled-action review finding. Failed scheduled actions reached the diagnostic cap of 100 and were marked truncated; overdue count was zero. No order/customer/payment data was requested or returned.
+
+No live settings, plugins, scheduled actions, orders, or credentials were changed. These results are current smoke evidence, not a claim that live checkout is broken; use staging before any deliberate break/repair exercise. The token remains only in ignored local storage and must never be committed or printed.
+
+## 2026-09-22 — Anbe Nigeria Pay on Delivery and product visibility check
+
+After Brian added a product and enabled Pay on Delivery, the read-only WooCommerce diagnostic returned HTTP 200 with one enabled payment gateway (3 configured total). WooCommerce 11.1.1, USD currency, published shop/cart/checkout pages, HPOS enabled, and zero overdue scheduled actions were reported. The public WooCommerce Store API returned HTTP 200 with one visible product. No order was placed and no live state was changed by the bridge.
+
+## 2026-09-22 — Anbe Nigeria live checkout confirmation
+
+Brian confirmed two live orders were created after adding a product and enabling Pay on Delivery. The orders are visible in WooCommerce, with pending orders and the current order processing; no checkout, payment, or scheduled-action errors were observed. This confirms live catalog visibility, checkout submission, Pay on Delivery selection, order creation, and status progression. Order identifiers and customer details are intentionally excluded from this journal.
+
+## 2026-09-22 — Local WooCommerce checkout page break and repair
+
+On the disposable local site, checkout page 13 was temporarily changed from published to draft. A guest visiting /checkout/ received the ordinary site template instead of checkout. The bridge returned woocommerce-checkout-page-invalid with medium severity and reported the checkout page as unpublished. The page was republished; after adding the synthetic product to the cart, checkout rendered successfully. A final bridge request returned HTTP 200, checkout_published: true, and no checkout-page-invalid finding. No live site was changed. Elapsed timing was not captured.
+
+## 2026-09-22 — Local WooCommerce shipping method break and recovery
+
+The local flat-rate shipping method (zone 1, instance 1) was temporarily disabled through the WooCommerce instance setting. The setting was restored to enabled, the local server was restarted, and the final bridge request returned HTTP 200 with one enabled shipping method, one shipping zone, and no woocommerce-no-shipping-methods finding. The remaining scheduled-actions finding was unrelated. No live site was changed.
+
+## 2026-09-22 — Local WooCommerce Pay on Delivery break and recovery
+
+The local Pay on Delivery gateway was temporarily disabled by changing its local-only WooCommerce setting. The bridge returned HTTP 200 with zero enabled gateways and the woocommerce-no-enabled-gateways informational finding. The setting was restored to enabled; final verification returned one enabled gateway and no no-enabled-gateways finding. No live site, real payment, customer, or order data was involved.
+
+## 2026-09-22 — Local WooCommerce regression and safety checks
+
+Final local checks confirmed missing and invalid credentials return HTTP 401. The restored WooCommerce baseline remains one enabled payment gateway and one enabled shipping method. Diagnostic responses were checked for the configured token and private order/customer/payment fields; no credential or order data was exposed. The automated suite completed 40 tests, 625 assertions, with one documented skip. PHPUnit reported a shutdown fatal from WooCommerce Action Scheduler querying the SQLite adapter after the suite; test results were still OK and this matches the known local SQLite compatibility boundary, not a plugin assertion failure.
+
+## 2026-09-22 — T07.1 SEO manager and shared contract
+
+Implemented the narrowly scoped SEO manager contract. It supplies the standard response envelope, a versioned seo_post_analysis contract, stable post identity and observation slots for title, slug, excerpt, word count, metadata, indexability, headings, images, and links. No post content is read or exposed yet, and no SEO route or analyzer was added. Empty analysis returns 
+ot_applicable with no findings; informational findings leave the check ok, preserving the WooCommerce severity rule. Focused verification passed with 2 tests and 11 assertions; the full suite passed with 42 tests and 636 assertions and one skip. The temporary SQLite test runtime still reports the known WooCommerce Action Scheduler shutdown fatal after assertions complete. T07.2 remains unverified and is next.
+
+## 2026-09-22 — T07.2 bounded public post analysis
+
+Implemented class-post-analysis.php using the shared SEO contract. A public post/page produces bounded observations for title, slug, excerpt, content size, word count, metadata availability, and public status. Raw post content is never returned. Missing, private, password-protected, unpublished, and unsupported records return a clean 
+ot_applicable result without exposing their title or content. Focused verification passed with 4 tests and 23 assertions; the complete suite passed with 44 tests and 648 assertions and one skip. The temporary SQLite runtime still reports the known WooCommerce Action Scheduler shutdown fatal after tests. Title threshold checks and SEO routes remain unimplemented.
+
+## 2026-09-22 — T07.3 configurable title observations
+
+Extended the public post analyzer with bounded configurable title checks for missing/empty, short, long, duplicate, and title/slug relationship observations. Thresholds are validated and clamped; evidence avoids returning raw title content. The title/slug relationship is explicitly an informational observation and does not raise overall status. Focused verification passed with 6 tests and 28 assertions. The known SQLite/WooCommerce Action Scheduler shutdown fatal remains after assertions. Metadata readers, meta-description checks, and SEO routes remain unimplemented.
+
+## 2026-09-22 — T07.4/T07.5 supported metadata and descriptions
+
+Added read-only metadata readers for documented Yoast, Rank Math, and AIOSEO post-meta keys. The analyzer does not overwrite metadata and returns only source, presence, and length observations. Added configurable meta-description checks for missing, short, long, and duplicate descriptions. Focused verification passed with 8 tests and 35 assertions. The temporary SQLite runtime still reports the known WooCommerce Action Scheduler shutdown fatal after assertions. Indexability analysis and an authenticated SEO REST endpoint remain unimplemented.
+
+## 2026-09-22 — T07.6 indexability observations
+
+Added indexability analysis for public posts/pages. It reports status, public/password visibility, supported robots noindex signals, canonical metadata when available, and explicitly marks sitemap inclusion as undeterminable unless a later documented source supports it. A noindex signal produces a medium factual finding; the analyzer does not claim search-engine indexing. Focused verification passed with 9 tests and 39 assertions. The SQLite/WooCommerce shutdown fatal remains after assertions. The authenticated SEO post route is still pending.
+
+## 2026-09-22 — T07.7 authenticated SEO post endpoint
+
+Added GET /ai-diagnostic/v1/seo/post/{id} with the existing bearer authentication and activity logging path. The route returns the stable SEO post-analysis contract for an explicitly requested public post/page and does not expose private content. Unauthenticated access returned 401 in tests; authenticated access returned the contract without the token. Focused verification passed with 18 tests and 422 assertions. The temporary SQLite/WooCommerce shutdown fatal remains after assertions. Live Anbe verification is not yet applicable because the route has not been deployed there.
+
+## 2026-09-22 — Initial heading, image-alt, and link observations
+
+Extended the authenticated SEO post analysis with bounded HTML parsing. Heading observations cover H1 count, missing/multiple H1s, empty headings, hierarchy jumps, and long headings. Content images report counts and missing/long alt text without generating or changing alt values. Links are classified as internal/external and checked for missing hrefs, malformed schemes, and duplicates; no site-wide crawl or link verification runs. Focused verification passed with 19 tests and 428 assertions. Attachment IDs, featured-image state, optional link verification, and paginated image/link collections remain incomplete.
+
+## 2026-09-22 — Local SEO route smoke verification
+
+The running local site initially returned est_no_route because it was serving the separate installed plugin copy before the new route files were synchronized. After syncing the repository plugin files and restarting the local PHP server, authenticated GET /index.php?rest_route=/ai-diagnostic/v1/seo/post/12 returned HTTP 200 with the shared seo_post_analysis contract and bounded heading, image, and link observations. No live site was changed.
+
+## 2026-09-23 — T08.2 image attachment and featured-image observations
+
+Completed bounded image observations for the SEO post route. Content images report attachment IDs when resolvable, sanitized filenames, public URLs, alt presence/length, and featured state; configured featured images are included as observations. Missing or long alt text creates findings, and no alt value is generated or changed. Focused verification passed with 9 tests and 38 assertions. Paginated image collections and optional link verification remain unimplemented.
+
+## 2026-09-23 — T08.3 paginated image issues
+
+Implemented the authenticated paginated /images/issues endpoint. It scans only published posts/pages in bounded pages, returns image issue items and {page, per_page, total, pages}, and never generates or applies alt text. Local smoke verification returned HTTP 200 for page 1/per_page 5 with six public records across two pages. Focused verification passed with 11 tests and 388 assertions. Link issue pagination remains next.
+
+## 2026-09-23 — T08.5 paginated link issues
+
+Implemented the authenticated paginated /links/issues endpoint. It scans bounded published post/page batches and reports link counts and factual missing-href, malformed-scheme, and duplicate findings. It never launches a site-wide crawl or verifies arbitrary external URLs. Local smoke verification returned HTTP 200 with six public records across two pages. Focused verification passed with 13 tests and 393 assertions. Optional bounded internal link verification remains a documented limit.
+
+## 2026-09-23 — T09.1-T09.3 SEO collections and site aggregation
+
+Implemented authenticated paginated /seo/posts, /seo/issues, and /seo/site. Post and issue collections are bounded to published posts/pages and expose stable items, pagination, and issue counts; site output reports public visibility without claiming sitemap or Google indexing where not determinable. Focused verification passed with 15 tests and 398 assertions. Empty-page/duplicate-aggregation edge coverage and Anbe deployment smoke testing remain next.
+
+## 2026-09-23 — T09.4 SEO collection edge coverage
+
+Completed collection edge tests covering invalid bounds, empty pages, stable pagination, issue aggregation, and sensitive-data exclusion. Focused verification passed with 17 tests and 406 assertions. The temporary SQLite/WooCommerce Action Scheduler shutdown fatal remains after assertions. The SEO routes are ready for deployment smoke testing; admin/security quality work and optional link verification remain.
