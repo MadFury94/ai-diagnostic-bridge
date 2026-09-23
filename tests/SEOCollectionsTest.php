@@ -33,6 +33,9 @@ final class SEOCollectionsTest extends TestCase {
 		$this->assertTrue($result['success']);
 		$this->assertArrayHasKey('issue_counts', $result['metadata']);
 		$this->assertIsArray($result['metadata']['issue_counts']);
+		$this->assertNotEmpty($result['metadata']['items']);
+		$this->assertArrayHasKey('title', $result['metadata']['items'][0]);
+		$this->assertArrayHasKey('post_type', $result['metadata']['items'][0]);
 		$this->assertStringNotContainsString('fixture-secret', wp_json_encode($result));
 	}
 }

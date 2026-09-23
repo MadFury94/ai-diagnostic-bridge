@@ -288,3 +288,43 @@ The updated plugin from commit eee2a2d is active on Anbe Nigeria. Authenticated 
 ## 2026-09-23 — Featured-image detection gap identified
 
 Live post 969 confirmed the analyzer could inspect the post but did not explicitly flag a missing featured image. Added the seo-image-missing-featured finding and featured-image observation; focused local tests passed with 9 tests and 39 assertions. Push and live recheck remain.
+
+## 2026-09-23 — Anbe featured-image detection confirmed
+
+The deployed fix works on Anbe. Post 969 returned HTTP 200 with seo-image-missing-featured and eatured_present: false; title, meta-description, and heading findings also remained visible. No content images or missing-alt images were present. No live state was changed.
+
+## 2026-09-23 — Anbe featured-image repair confirmed
+
+Post 969 now reports a featured image (attachment 816), one image, and no missing-alt images. The seo-image-missing-featured finding cleared after Brian's repair. Remaining findings are title length, missing meta description, and missing H1.
+
+## 2026-09-23 — Anbe missing-alt detection confirmed
+
+The deployed fix now detects the featured image's missing alt text on post 969: one image, featured present, alt absent, missing_alt count 1, and seo-image-missing-alt finding. No bridge-side live changes were made.
+
+## 2026-09-23 — Anbe post and aggregate SEO findings verified
+
+Post 969 repair reduced its findings to informational title/slug mismatch and medium missing meta description. Featured image and alt text now pass. Site-wide /seo/issues returned HTTP 200 for 12 published records and exposed stable aggregate counts for headings, images, links, meta descriptions, and titles. No live content was changed by the bridge.
+
+## 2026-09-23 — Post versus aggregate alt results clarified
+
+Post 969's image item now reports alt present with length 10 and missing-alt count zero. The aggregate missing-alt count of four is from other published records and does not include post 969 as a current issue.
+
+## 2026-09-23 — Anbe meta description detected
+
+Post 969 now has a Yoast meta description. The missing finding cleared, but length 204 triggered seo-meta-description-long at low severity. Only that actionable length finding and the informational title/slug mismatch remain.
+
+## 2026-09-23 — Anbe shortened meta description verified
+
+After Brian shortened the Yoast meta description on post 969, the authenticated read-only check returned HTTP 200 with status ok. The meta-description finding is cleared; only seo-title-slug-mismatch remains at informational severity, so it does not elevate the overall status. No bridge-side live changes were made.
+
+## 2026-09-23 — Anbe site-wide issue scan refreshed
+
+Authenticated read-only `/seo/issues` returned HTTP 200 with 12 published records. Current counts are: missing meta descriptions 11, short titles 8, missing featured images 7, missing H1 headings 6, missing image alt text 4, heading hierarchy jumps 4, duplicate links 2, title/slug mismatches 2, multiple H1 headings 1, and missing link hrefs 1. Post 976 is the next repair target because it has only a missing meta description and missing featured image.
+
+## 2026-09-23 — Anbe record types clarified
+
+The 12 records in the site-wide scan are 11 published Pages and one published Post. ID 969 is the only Post and is currently ok; ID 976 is a Page with missing meta description and featured image findings. The next repair must therefore be opened under Pages in the WordPress dashboard.
+
+## 2026-09-23 — SEO collection labels improved
+
+Updated `/seo/posts` and `/seo/issues` collection items to include the sanitized record title and `post_type` beside `post_id`. This makes issue lists actionable from the dashboard while keeping content bodies and private data excluded. Focused collection tests passed: 4 tests and 16 assertions; the known SQLite/WooCommerce shutdown fatal remains after assertions.

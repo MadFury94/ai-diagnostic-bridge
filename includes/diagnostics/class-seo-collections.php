@@ -13,7 +13,7 @@ final class SEO_Collections {
 		$items = [];
 		foreach ((array) $query->posts as $id) {
 			$result = Post_Analysis::run((int) $id);
-			$items[] = ['post_id' => (int) $id, 'check' => $result['check'], 'findings' => $result['findings'], 'metadata' => $result['metadata']];
+			$items[] = array_merge(self::identity((int) $id), ['check' => $result['check'], 'findings' => $result['findings'], 'metadata' => $result['metadata']]);
 		}
 		return self::collection('seo-posts', $items, $query);
 	}
@@ -29,7 +29,7 @@ final class SEO_Collections {
 				$key = (string) ($finding['id'] ?? 'unknown');
 				$counts[$key] = ($counts[$key] ?? 0) + 1;
 			}
-			if (!empty($result['findings'])) { $items[] = ['post_id' => (int) $id, 'findings' => $result['findings']]; }
+			if (!empty($result['findings'])) { $items[] = array_merge(self::identity((int) $id), ['findings' => $result['findings']]); }
 		}
 		ksort($counts);
 		return self::collection('seo-issues', $items, $query, ['issue_counts' => $counts]);
@@ -45,6 +45,16 @@ final class SEO_Collections {
 	private static function query(int $page, int $per_page): \WP_Query|\WP_Error {
 		if ($page < 1 || $page > 1000 || $per_page < 1 || $per_page > 50) { return Response::error('invalid_pagination', 'Page must be 1-1000 and per_page must be 1-50.', 400); }
 		return new \WP_Query(['post_type' => ['post', 'page'], 'post_status' => 'publish', 'posts_per_page' => $per_page, 'paged' => $page, 'fields' => 'ids', 'no_found_rows' => false, 'ignore_sticky_posts' => true]);
+	}
+
+	/** @return array{post_id:int,title:string,post_type:string} */
+	private static function identity(int $post_id): array {
+		$post = get_post($post_id);
+		return [
+			'post_id' => $post_id,
+			'title' => $post instanceof \WP_Post ? trim(wp_strip_all_tags((string) $post->post_title)) : '',
+			'post_type' => $post instanceof \WP_Post ? (string) $post->post_type : '',
+		];
 	}
 
 	private static function collection(string $id, array $items, \WP_Query $query, array $metadata = []): array {

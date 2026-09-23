@@ -261,3 +261,39 @@ After Brian updated the live plugin from commit eee2a2d, authenticated read-only
 ## 2026-09-23 — Featured-image gap found and fixed
 
 The new Anbe post was analyzed successfully (post 969), but the first live result showed zero images without an explicit missing-featured-image finding. Added a bounded seo-image-missing-featured low finding and a eatured_image observation with presence/attachment ID. Focused local post-analysis tests passed with 9 tests and 39 assertions. The live fix still requires deployment before rechecking Anbe.
+
+## 2026-09-23 — Anbe featured-image finding verified
+
+After Brian updated Anbe to commit 3fed6a0, a read-only SEO analysis of post 969 returned HTTP 200 and reported seo-image-missing-featured with eatured_present: false. The same response also reported the existing title-long, meta-description-missing, and heading-missing-H1 findings. The post contained zero content images and zero missing-alt images. No post content or private data was retrieved for evidence.
+
+## 2026-09-23 — Anbe featured-image repair verified
+
+Brian assigned a featured image to post 969. Read-only recheck returned HTTP 200 with eatured_present: true, attachment ID 816, one image, and zero missing-alt images. The seo-image-missing-featured finding cleared; title-long, meta-description-missing, and heading-missing-H1 findings remained. No bridge-side live changes were made.
+
+## 2026-09-23 — Anbe featured-image alt detection verified
+
+After updating Anbe to commit 72631bc, post 969 returned HTTP 200 with seo-image-missing-alt. The post has one featured image (attachment 816), eatured_present: true, eatured_alt_present: false, and missing_alt: 1. The previous missing-featured finding remains cleared. No live content was changed by the bridge.
+
+## 2026-09-23 — Anbe post repair and aggregate findings verified
+
+After Brian updated post 969, the authenticated single-post route returned HTTP 200 with only seo-title-slug-mismatch (info) and seo-meta-description-missing (medium). Featured image remained present and missing-alt count was zero. The aggregated /seo/issues?page=1&per_page=50 route returned HTTP 200 with 12 published records on one page and stable issue counts: heading hierarchy jumps 4, missing H1 6, multiple H1 1, missing alt 4, missing featured image 7, duplicate links 2, missing href 1, missing meta descriptions 12, short titles 8, and title/slug mismatches 2. No post content or private data was included in evidence.
+
+## 2026-09-23 — Aggregate alt count clarified
+
+A follow-up check confirmed post 969's featured image attachment 816 has lt_present: true and lt_length: 10; its missing-alt count is zero. The aggregate count of four missing-alt findings belongs to other published records, not post 969.
+
+## 2026-09-23 — Anbe meta-description repair verified
+
+Brian added a Yoast meta description to post 969. The missing-description finding cleared; the analyzer detected the description with source yoast and length 204, producing the expected low-severity seo-meta-description-long finding. The informational title/slug mismatch remains. No bridge-side live changes were made.
+
+## 2026-09-23 â€” Anbe shortened meta description verified
+
+Brian shortened the Yoast meta description on post 969. The authenticated read-only recheck returned HTTP 200 and status ok; the meta-description finding cleared and only the informational title/slug mismatch remains. This confirms the analyzer distinguishes a repaired description from the remaining non-blocking title/slug observation. No bridge-side live changes were made.
+
+## 2026-09-23 - Anbe site-wide issue scan refreshed
+
+Authenticated read-only /seo/issues returned HTTP 200 with 12 published records. Current counts: missing meta descriptions 11, short titles 8, missing featured images 7, missing H1 headings 6, missing image alt text 4, heading hierarchy jumps 4, duplicate links 2, title/slug mismatches 2, multiple H1 headings 1, and missing link hrefs 1. Post 976 is the next repair target because it has only a missing meta description and missing featured image.
+
+## 2026-09-23 - SEO collection labels improved
+
+Updated /seo/posts and /seo/issues collection items to include the sanitized record title and post_type beside post_id. This makes issue lists actionable from the dashboard while keeping content bodies and private data excluded. Focused collection tests passed: 4 tests and 16 assertions; the known SQLite/WooCommerce shutdown fatal remains after assertions.
