@@ -14,7 +14,7 @@ if ( ! mkdir( $test_database_dir, 0700 ) ) {
 }
 define( 'DB_DIR', $test_database_dir );
 define( 'DB_FILE', 'tests.sqlite' );
-register_shutdown_function( static function () use ( $test_database_dir ): void {
+$cleanup_test_database = static function () use ( $test_database_dir ): void {
 	global $wpdb;
 	if ( isset( $wpdb ) ) {
 		$wpdb->close();
@@ -26,6 +26,11 @@ register_shutdown_function( static function () use ( $test_database_dir ): void 
 		}
 	}
 	rmdir( $test_database_dir );
+};
+// Queue cleanup behind WordPress' shutdown hook instead of closing SQLite
+// before WooCommerce's shutdown callbacks have finished using it.
+register_shutdown_function( static function () use ( $cleanup_test_database ): void {
+	register_shutdown_function( $cleanup_test_database );
 } );
 $source_database = new SQLite3( dirname( __DIR__ ) . '/local-wp2/wp-content/database/.ht.sqlite', SQLITE3_OPEN_READONLY );
 $test_database = new SQLite3( $test_database_dir . '/' . DB_FILE );

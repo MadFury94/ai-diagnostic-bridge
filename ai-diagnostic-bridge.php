@@ -27,6 +27,8 @@ require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-activity-log.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-auth.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-site-health.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugins.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugin-vulnerability-matcher.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugin-vulnerability-source.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-themes.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-php-errors.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-rest-api-check.php';
