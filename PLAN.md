@@ -392,7 +392,7 @@ The WordPress plugin remains a deterministic evidence source. The dashboard and 
 
 **Exit evidence:** a read-only dashboard can inspect Anbe and the local site through the Worker, and AI explanations are clearly separated from deterministic WordPress evidence.
 
-## Handoff record
+- [x] **T12.6** Added dashboard plugin/core update review: WordPress plugin update transient data, installed-version vulnerability findings, official changelog links, core update urgency, and human-reviewed site-specific release-note explanations. No automatic updates or heuristic bug claims.\n\n## Handoff record
 
 ### Local setup verification ï¿½ 2026-09-21
 
@@ -411,5 +411,6 @@ Update this block at the end of each session so another AI can continue safely.
 - **Connection status:** Anbe is now configured in the deployed encrypted store. API/browser smoke scripts passed. Root `.env` still targets local WordPress and was not imported as Anbe. Dashboard sign-in key is in ignored `worker/.private/dashboard-access.txt`; never print it.
 - **Next action:** continue dashboard polish only. A future WPScan secondary source would require a separate decision and token-management design.
 - **Preserved backlog:** optional internal-link verification remains unimplemented; T10.3 logging controls/available-module display remain partial. Test SQLite/WooCommerce shutdown ordering is fixed; the full suite now exits successfully with 81 tests, 804 assertions, and one WooCommerce-absent case skipped. The separate SQLite stock-reservation limitation remains. Plugin SEO routes were already deployed and verified on Anbe in prior sessions; do not repeat implementation from stale earlier checklist notes.
+
 
 

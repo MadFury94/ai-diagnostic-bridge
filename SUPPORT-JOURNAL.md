@@ -442,3 +442,15 @@ The full suite after the lifecycle test passed with **82 tests, 811 assertions, 
 **Validation:** Draft explanations are visibly amber/dashed and labeled unverified. The copyable support reply is unavailable until verification or correction. No credentials, customer/order/payment data, or full post body was sent to AI, and no WordPress write path exists.
 
 **Timestamp:** 2026-09-26 (live Anbe acceptance). Local Worker suite: 37 tests passed; dashboard production build passed.
+
+## 2026-09-26 — Core/plugin update review documented
+
+**Need:** SEO findings are now working, but support also needs to know when WordPress or an installed plugin needs review and what an update may change.
+
+**Implementation:** The dashboard's Updates and release review panel now reads the WordPress plugin update transient through the existing diagnostic route, shows installed/available versions and the version-jump class, links to the official plugin changelog, and highlights real installed-version vulnerability findings. A new `core-updates` diagnostic reads WordPress core update data and reports installed/available versions, release type, jump severity, and official release notes.
+
+**Site-specific interpretation:** Each plugin update has an explicit `Explain this update for my site` action. It sends only the bounded update evidence to the existing AI explanation workflow and remains an unverified draft until a reviewer accepts or corrects it. Version numbers alone do not claim that an update has bugs or will break the site.
+
+**Safety:** No automatic updates were added. Security advisories and official compatibility/deprecation statements remain evidence-gated; general bug prediction is intentionally excluded.
+
+**Validation:** Worker type-check and dashboard production build passed. Source commit: `8d32f70`.

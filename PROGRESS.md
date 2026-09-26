@@ -433,3 +433,11 @@ The Worker now generates explanations only after an explicit dashboard click, fr
 Live Anbe acceptance generated a real explanation for a missing-meta-description finding and marked it `verified-as-is`. A second real finding (missing featured image) was deliberately corrected; the original AI output and corrected current output were both retrieved afterward, with reviewer note and timestamp. Regeneration creates a fresh draft and preserves the old attempt only when it is retained by the reviewer workflow. The support-reply copy control is rendered only for `verified-as-is` or `corrected`, and is absent for a draft.
 
 Worker checks: TypeScript check passed; 37 Vitest tests passed after adding evidence-boundary and five-field validation coverage. Dashboard production build passed. The deployed Worker uses the Workers AI JSON-schema response mode and the D1 `explanations` table migration.
+
+## 2026-09-26 — Core and plugin update intelligence
+
+Added the update review layer after the SEO/AI workflow. The dashboard now reads the existing plugin diagnostic inventory and displays installed versus available plugin versions, major/minor/patch review signals, evidence-backed known-vulnerability counts, and links to the official WordPress.org changelog. Each plugin update can be sent through the existing human-reviewed AI explanation workflow; the result remains a draft until verified or corrected.
+
+Added a WordPress core-updates diagnostic using WordPress's core update data. It reports the installed and available versions, release type, major/minor jump, and official release-notes URL. Security and major core updates receive higher review severity. No update is performed automatically, and ordinary bug claims are not inferred from version numbers.
+
+Worker type-check and dashboard production build passed. Source commit: `8d32f70`.
