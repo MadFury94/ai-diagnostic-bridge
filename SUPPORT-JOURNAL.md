@@ -431,3 +431,14 @@ The version decision is resolved: the plugin release target is **0.1.6**, update
 Local lifecycle validation used the disposable WordPress environment. Activation created the expected minimal `aidb_settings` option with no PHP notices or warnings. Deactivation did not create orphaned options or mutate the plugin settings contract. Re-activation completed cleanly and preserved the existing settings. The focused lifecycle test passed with 1 test and 7 assertions.
 
 The full suite after the lifecycle test passed with **82 tests, 811 assertions, and one expected WooCommerce-absent skip**. A repository review found no tracked credentials or generated test data; local WordPress/tool paths are ignored. This closes the remaining Phase 11 work and permits release tag `0.1.6`.
+## 2026-09-26 — AI explanation and human verification case (T12.4/T12.5)
+
+**Symptom:** A deterministic SEO finding needed a human-reviewed explanation before it could be copied into support communication.
+
+**AI output:** On explicit request, the Worker sent only the bounded finding snapshot and returned five structured fields. The first Anbe finding (missing meta description) was accepted as-is. The second (missing featured image) was corrected by the reviewer to keep the summary explicitly tied to displayed evidence.
+
+**Correction:** The database retains the complete original AI output, current corrected fields, final status, reviewer note, reviewer identity (`dashboard-user`), and review timestamp. Retrieval after both actions confirmed the original and corrected versions remained available.
+
+**Validation:** Draft explanations are visibly amber/dashed and labeled unverified. The copyable support reply is unavailable until verification or correction. No credentials, customer/order/payment data, or full post body was sent to AI, and no WordPress write path exists.
+
+**Timestamp:** 2026-09-26 (live Anbe acceptance). Local Worker suite: 37 tests passed; dashboard production build passed.

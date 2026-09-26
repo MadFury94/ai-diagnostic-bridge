@@ -426,3 +426,10 @@ The release target was resolved from the old 0.1.0 planning placeholder to plugi
 Local lifecycle verification passed against the disposable WordPress environment: activation created the expected minimal `aidb_settings` option with no PHP notices or warnings; deactivation preserved that plugin-owned settings option without creating orphaned data; re-activation preserved the same settings contract. Focused lifecycle validation passed with 1 test and 7 assertions, and the complete suite passed with 82 tests, 811 assertions, and one expected WooCommerce-absent skip.
 
 The repository review found no tracked credentials or generated local WordPress/tool data; those paths are ignored. Phase 11 is complete and release tag `0.1.6` is the release target.
+## 2026-09-26 — T12.4/T12.5 AI explanation and human verification acceptance
+
+The Worker now generates explanations only after an explicit dashboard click, from a bounded single-finding evidence object. The AI request excludes credentials, customer/order/payment data, full post bodies, and WordPress writes, and requests the five structured fields: summary, why_it_matters, recommended_next_step, verification_step, and caveats. Drafts use a dashed amber presentation and are labeled `AI-generated interpretation — not yet verified.`
+
+Live Anbe acceptance generated a real explanation for a missing-meta-description finding and marked it `verified-as-is`. A second real finding (missing featured image) was deliberately corrected; the original AI output and corrected current output were both retrieved afterward, with reviewer note and timestamp. Regeneration creates a fresh draft and preserves the old attempt only when it is retained by the reviewer workflow. The support-reply copy control is rendered only for `verified-as-is` or `corrected`, and is absent for a draft.
+
+Worker checks: TypeScript check passed; 37 Vitest tests passed after adding evidence-boundary and five-field validation coverage. Dashboard production build passed. The deployed Worker uses the Workers AI JSON-schema response mode and the D1 `explanations` table migration.
