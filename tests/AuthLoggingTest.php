@@ -174,4 +174,50 @@ final class AuthLoggingTest extends TestCase {
 			wp_set_current_user( 0 );
 		}
 	}
+
+	public function test_credential_actions_reject_missing_or_invalid_nonces(): void {
+		wp_set_current_user(1);
+		$die_handler = static fn () => static function (): void { throw new \RuntimeException('csrf-denied'); };
+		add_filter('wp_die_handler', $die_handler);
+		try {
+			foreach (['generate', 'revoke'] as $method) {
+				$_REQUEST = ['_wpnonce' => 'invalid-fixture'];
+				try {
+					Admin::$method();
+					$this->fail('Invalid nonce was accepted.');
+				} catch (\RuntimeException $error) {
+					$this->assertSame('csrf-denied', $error->getMessage());
+				}
+			}
+		} finally {
+			$_REQUEST = [];
+			remove_filter('wp_die_handler', $die_handler);
+			wp_set_current_user(0);
+		}
+	}
+
+	public function test_new_token_is_rendered_once_and_admin_values_are_escaped(): void {
+		wp_set_current_user(1);
+		require_once ABSPATH . 'wp-admin/includes/template.php';
+		$token = 'token-once-fixture';
+		set_transient('aidb_new_token_1', $token, MINUTE_IN_SECONDS);
+		$settings = Plugin::settings();
+		$settings['credential_created_at'] = '2026-01-01T00:00:00+00:00';
+		$settings['last_auth_success'] = '<script>alert(1)</script>';
+		$settings['last_auth_failure'] = '<img src=x onerror=alert(1)>';
+		Plugin::update_settings($settings);
+		ob_start();
+		Admin::render();
+		$first = (string) ob_get_clean();
+		ob_start();
+		Admin::render();
+		$second = (string) ob_get_clean();
+		wp_set_current_user(0);
+
+		$this->assertStringContainsString(esc_html($token), $first);
+		$this->assertStringNotContainsString($token, $second);
+		$this->assertStringNotContainsString('<script>alert(1)</script>', $first);
+		$this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $first);
+		$this->assertStringNotContainsString('<img src=x onerror=alert(1)>', $first);
+	}
 }

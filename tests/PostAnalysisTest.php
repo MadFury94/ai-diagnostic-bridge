@@ -139,4 +139,40 @@ final class PostAnalysisTest extends TestCase {
 		$this->assertNull($result['metadata']['post']);
 		$this->assertStringNotContainsString('Private content', wp_json_encode($result));
 	}
+
+	public function test_title_and_meta_edge_cases_are_evidence_bounded(): void {
+		$title_findings = Title_Checks::findings('', '', [''], ['min_length' => 5, 'max_length' => 12]);
+		$this->assertContains('seo-title-missing', array_column($title_findings, 'id'));
+		$this->assertContains('seo-title-duplicate', array_column(Title_Checks::findings('Same title', 'same-title', ['Same title', 'Same title'], ['min_length' => 5, 'max_length' => 60]), 'id'));
+		$this->assertContains('seo-title-long', array_column(Title_Checks::findings('This title is definitely too long', 'this-title-is-definitely-too-long', [], ['min_length' => 5, 'max_length' => 12]), 'id'));
+		$this->assertContains('seo-title-slug-mismatch', array_column(Title_Checks::findings('A valid public title', 'different-slug', [], ['min_length' => 5, 'max_length' => 60]), 'id'));
+
+		$this->assertContains('seo-meta-description-missing', array_column(Meta_Description_Checks::findings('   ', [], ['meta_min_length' => 10, 'meta_max_length' => 30]), 'id'));
+		$this->assertContains('seo-meta-description-short', array_column(Meta_Description_Checks::findings('short', [], ['meta_min_length' => 10, 'meta_max_length' => 30]), 'id'));
+		$this->assertContains('seo-meta-description-long', array_column(Meta_Description_Checks::findings(str_repeat('long ', 10), [], ['meta_min_length' => 10, 'meta_max_length' => 30]), 'id'));
+		$this->assertContains('seo-meta-description-duplicate', array_column(Meta_Description_Checks::findings('Repeated description', ['Repeated description', 'Repeated description'], ['meta_min_length' => 5, 'meta_max_length' => 60]), 'id'));
+		$this->assertStringNotContainsString('Repeated description', wp_json_encode(Meta_Description_Checks::findings('Repeated description', ['Repeated description', 'Repeated description'], ['meta_min_length' => 5, 'meta_max_length' => 60])));
+	}
+
+	public function test_password_protected_posts_are_excluded_without_leaking_content(): void {
+		$post = new \WP_Post((object) [
+			'ID' => 17, 'post_type' => 'post', 'post_status' => 'publish', 'post_password' => 'secret',
+			'post_title' => 'Protected title', 'post_name' => 'protected-title', 'post_content' => 'Protected body marker',
+		]);
+		$result = Post_Analysis::run(17, new PostAnalysisFixture($post));
+		$this->assertSame('not_applicable', $result['check']['status']);
+		$this->assertSame([], $result['findings']);
+		$this->assertStringNotContainsString('Protected body marker', wp_json_encode($result));
+		$this->assertStringNotContainsString('Protected title', wp_json_encode($result));
+	}
+
+	public function test_malformed_markup_and_heading_structure_are_graceful(): void {
+		$result = \BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Content_Analysis::analyze('<h2><span>Unclosed<h1>First</h1><h1>Second</h1><h4></h4><a href="/broken">link');
+		$ids = array_column($result['findings'], 'id');
+		$this->assertContains('seo-heading-multiple-h1', $ids);
+		$this->assertContains('seo-heading-empty', $ids);
+		$this->assertContains('seo-heading-hierarchy-jump', $ids);
+		$this->assertIsInt($result['links']['count']);
+		$this->assertIsInt($result['images']['count']);
+	}
 }

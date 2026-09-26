@@ -19,4 +19,11 @@ final class ImageIssuesTest extends TestCase {
 		$this->assertArrayHasKey('items', $result['metadata']);
 		$this->assertSame(['page', 'per_page', 'total', 'pages'], array_keys($result['metadata']['pagination']));
 	}
+
+	public function test_collection_limits_include_the_maximum_page_size(): void {
+		$result = Image_Issues::run(1, 50);
+		$this->assertTrue($result['success']);
+		$this->assertSame(50, $result['metadata']['pagination']['per_page']);
+		$this->assertSame(400, Image_Issues::run(1, 51)->get_error_data()['status']);
+	}
 }

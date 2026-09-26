@@ -1,53 +1,94 @@
-# AI Diagnostic Bridge
+﻿# AI Diagnostic Bridge
 
-Standalone WordPress plugin project for secure, deterministic WordPress support and SEO diagnostics. The plugin is the evidence layer in a future `React → Cloudflare Worker → Cloudflare AI → WordPress` architecture; it contains no AI provider integration and does not automatically change WordPress.
+AI Diagnostic Bridge is a read-only WordPress plugin for deterministic support and SEO evidence. It reports structured observations and findings; it does not edit posts, change settings, install or update plugins, or call an AI provider. Version 0.1.6 requires WordPress 6.5+ and PHP 8.1+.
 
-Implementation is tracked in [PLAN.md](PLAN.md). Version `0.1.5` includes the authenticated REST foundation, admin credential-management screen, and initial core diagnostics.
+## Installation
 
-## Support purpose and project journal
+1. Download or clone this repository.
+2. Copy the `ai-diagnostic-bridge` directory into `wp-content/plugins/`.
+3. Activate **AI Diagnostic Bridge** in WordPress admin.
+4. Open **Settings -> AI Diagnostic Bridge** and generate a credential.
+5. Copy the credential immediately into a server-side secret store such as a Cloudflare Worker. It is displayed once and is never returned by the REST API.
+6. Send authenticated requests with `Authorization: Bearer <credential>`.
 
-This project also supports Brian's preparation for an Automattic Happiness Engineer application from January 2027 onward. [Application context](APPLICATION-CONTEXT.md) explains Jen's guidance and the separate Missus project. The [support evidence journal](SUPPORT-JOURNAL.md) records problems, verified AI corrections, before/after results, customer explanations, and remaining practice. Current tests and local API results are evidence of progress, not a claim of a finished AI product or measured customer time savings.
+The plugin can also be installed from a packaged release ZIP. Do not put the credential in browser JavaScript, source control, or a public configuration file.
+
+## REST API
+
+The namespace is `/wp-json/ai-diagnostic/v1/`. Every plugin route requires the diagnostic Bearer credential. Unauthenticated requests return HTTP 401.
+
+Core checks:
+
+- `GET /site`
+- `GET /health`
+- `GET /plugins`
+- `GET /themes`
+- `GET /errors`
+- `GET /rest-api`
+- `GET /performance`
+- `GET /security`
+- `GET /woocommerce`
+
+SEO checks:
+
+- `GET /seo/post/{id}` for one explicitly requested public post or page
+- `GET /seo/posts?page=1&per_page=20`
+- `GET /seo/issues?page=1&per_page=20`
+- `GET /seo/site`
+- `GET /images/issues?page=1&per_page=20`
+- `GET /links/issues?page=1&per_page=20`
+
+Collection `page` is limited to 1-1000 and `per_page` to 1-50. Diagnostic check lists contain at most 20 entries and only allow exact registered IDs.
+
+Combined checks can be requested with GET:
+
+```bash
+curl -H 'Authorization: Bearer YOUR_TOKEN' \
+  'https://example.com/wp-json/ai-diagnostic/v1/diagnostic?checks=health,plugins,woocommerce'
+```
+
+POST accepts a JSON object:
+
+```bash
+curl -X POST -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H 'Content-Type: application/json' \
+  --data '{"checks":["health","plugins"]}' \
+  'https://example.com/wp-json/ai-diagnostic/v1/diagnostic'
+```
+
+Responses use a stable envelope with `success`, `plugin`, `check`, `findings`, and `metadata`. Findings contain bounded evidence rather than raw post bodies, credentials, customer data, action arguments, or PHP log lines.
+
+## Security model
+
+REST authentication uses a generated 256-bit random token. WordPress stores only a password hash; the raw token is displayed once through the admin screen. Revoke and regenerate invalidate the previous credential. Failed authentication is rate-limited per client and route for five minutes after ten failures. Activity logging records only endpoint, result, duration, timestamp, and authentication outcome; request headers, bodies, query values, and response contents are excluded.
+
+Admin credential actions require `manage_options` and WordPress nonces. Admin-rendered values are escaped. Diagnostic input is allowlisted and bounded, and no request value selects a PHP function, file, SQL query, shell command, hook, or arbitrary class.
+
+The plugin's vulnerability lookup uses the public keyless WPVulnerability feed. It has no API token. Successful clean and matching results are cached per slug for four hours in WordPress transients; failures are never cached as clean. Update findings use WordPress core's existing update transient and never perform updates.
+
+## AI boundary
+
+The plugin supplies deterministic evidence only. It has no AI provider integration and never asks an AI system to write to WordPress. A future dashboard may interpret verified findings and draft support guidance, but any repair remains a separate, human-reviewed action.
 
 ## Tests
 
-The `tests/` directory contains PHPUnit tests for the stable response envelope, allowed status and severity values, finding fields, and safe error responses. Run them inside a WordPress PHPUnit environment with PHPUnit installed:
+Run the local WordPress suite with the disposable environment:
 
 ```bash
-phpunit -c phpunit.xml.dist
+.tools/php/php.exe -d auto_prepend_file=tests/local-bootstrap.php .tools/phpunit.phar -c phpunit.xml.dist
 ```
 
-The tests require WordPress so the plugin sanitization helpers and `WP_Error` implementation are available. They do not call external APIs or expose stored credentials.
+The verified 2026-09-25 result is 81 tests, 804 assertions, one expected WooCommerce-absent skip. PHP syntax checks covered 40 project/plugin PHP files with zero errors. PHPCS and PHPStan were not installed or configured in this workspace.
 
-For the disposable Windows setup in `local-wp2`, use the command in [LOCAL-WORDPRESS-SETUP.md](LOCAL-WORDPRESS-SETUP.md) with `--bootstrap tests/local-bootstrap.php`. This tests the plugin source checkout against the installed WordPress runtime and a temporary SQLite database snapshot. The snapshot is removed on shutdown; credential tests do not change the local site's token or log. This is not the official WordPress fixture framework. Verified on 2026-09-21: **40 tests, 629 assertions passed** on PHP 8.3.33 and PHPUnit 10.5.64.
+## Troubleshooting and limitations
 
-## Combined diagnostic input
+- A 401 means the Bearer credential is missing, malformed, revoked, or rate-limited. Generate a new credential in the admin screen and wait for the rate-limit window if needed.
+- A `not_applicable` result can mean an optional component is not installed or its required API is unavailable; it is not a claim that the site is broken.
+- WooCommerce present behavior is covered by automated fixtures. Manual break/repair exercises were separately verified against Anbe's live WooCommerce installation. SQLite has a known stock-reservation limitation in the disposable test environment.
+- Error-log reads require `WP_DEBUG` and `WP_DEBUG_LOG`; raw log messages are intentionally withheld.
+- Optional bounded internal-link verification is not implemented. Ordinary link analysis classifies links and never crawls or makes unbounded internal requests.
+- Vulnerability data depends on the availability and coverage of the public WPVulnerability feed. A timeout, malformed response, or incomplete advisory remains unknown and cannot create a clean or vulnerability claim.
+- The plugin does not detect general non-security update bugs, and it does not prove exploitation, compatibility, checkout success, or search-engine indexing.
 
-Authenticated `GET /ai-diagnostic/v1/diagnostic` accepts `checks` as a comma-separated string or an indexed list. `POST` supports a JSON object such as `{"checks":["health","plugins"]}`; JSON `checks` takes precedence over query/form values. Comma-separated strings remain supported in JSON as well.
+Project implementation status and evidence are tracked in [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), and [SUPPORT-JOURNAL.md](SUPPORT-JOURNAL.md).
 
-Supported IDs are `site`, `health`, `plugins`, `themes`, `errors`, `rest-api`, `performance`, `security`, and `woocommerce`. IDs must match exactly. Duplicate IDs run once, in first-occurrence order. Omitted checks or an empty list default to `site`; explicit null, empty strings, non-string members, objects, nested lists, and unknown IDs return HTTP 400. Lists are limited to 20 entries before deduplication, and comma-separated input to 1,024 bytes. Oversized input is rejected rather than truncated. JSON bodies must be objects; WordPress rejects malformed JSON with its standard `rest_invalid_json` error. Unknown fields are ignored and cannot select executable code.
-
-## PHP log and REST diagnostics
-
-The `/errors` check reads only when `WP_DEBUG` and `WP_DEBUG_LOG` enable logging. It supports the default file and configured custom local files, following [WordPress debug settings](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/). Missing or disabled logs return `not_applicable`.
-
-Reads are bounded to the last 65,536 bytes and 100 nonempty lines; metadata reports bytes read and truncation. A potentially partial first line is discarded. Findings expose error type, a recognized timestamp, and a line number/location where parsed. Recognized plugin/theme PHP paths are normalized to `wp-content/...`; other paths become `[path]`. Raw messages and stack traces are excluded because they may contain credentials or private data. This replaces the earlier raw `evidence.line` field with structured evidence; error text is intentionally unavailable through the API.
-
-The REST check uses a five-second timeout and 4,096-byte response limit. It does not follow redirects; redirects, authentication restrictions, and server errors report warnings. Transport failures report a generic error without the upstream message, code, or response contents. Namespace metadata contains registered namespace names.
-
-## WooCommerce diagnostics
-
-Without WooCommerce loaded, `/woocommerce` returns `not_applicable`. When available, it reports version/currency, database-update-needed status, configured page IDs/publication validity, configured and enabled gateway counts, shipping summaries, scheduled-action summaries, and HPOS enabled state. HPOS state is a configuration fact, not proof that all extensions are compatible. Database health reports WooCommerce's update flag, not a full integrity check.
-
-`payment_gateway_count` now counts configured gateways; `enabled_payment_gateway_count` reports enabled ones. It does not evaluate checkout availability or create a customer session; WooCommerce documents that its [checkout availability API is unsuitable for REST contexts](https://woocommerce.github.io/code-reference/classes/WC-Payment-Gateways.html).
-
-Shipping includes the rest-of-world zone (0) plus at most 100 custom zones, with truncation indicated. Empty gateway/shipping configurations are informational because free-order or virtual-product stores may use them. Missing/unpublished configured pages are warnings.
-
-Action Scheduler summaries are explicitly **site-wide**, not attributed solely to WooCommerce. Failed actions and pending actions overdue by more than five minutes are queried through the [Action Scheduler API](https://actionscheduler.org/api/) as IDs only. Each query reads at most 101 IDs, reports at most 100, and indicates truncation; IDs and action arguments are never returned. Missing APIs yield null counts rather than an assumed zero. Extension exceptions produce generic findings without exception details.
-
-WooCommerce-present behavior is covered by fixtures; the local HTTP test covers WooCommerce absent. A real WooCommerce-present integration check remains for final validation.
-
-## Activity logging
-
-Matched diagnostic requests record one entry in the `aidb_activity_log` option: timestamp, registered endpoint name, request success, elapsed milliseconds, and authentication result. Combined checks produce one entry for the combined request. A successful request may still contain health warnings; `success` describes request execution, not site health. Missing, invalid, revoked, and rate-limited credentials are recorded as unsuccessful and unauthenticated. Headers, tokens, request bodies, query parameters, and response contents are not logged.
-
-Logging follows `aidb_settings.logging_enabled` and retains the newest `log_retention` entries (default 100, clamped to 10–500). Dashboard controls remain pending. Requests blocked upstream by WordPress authentication, before reaching the route callbacks, and unmatched routes are outside this log. Hooks follow WordPress's [REST callback lifecycle](https://developer.wordpress.org/reference/hooks/rest_request_after_callbacks/); later permission probes do not add log entries.
