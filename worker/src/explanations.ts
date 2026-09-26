@@ -87,6 +87,7 @@ export async function generateExplanation(ai: AIService, finding: Record<string,
   const prompt = [
     'You are a support assistant interpreting one deterministic WordPress finding.',
     'Use only the supplied finding. Do not claim facts that are absent. Never propose destructive or automatic changes.',
+    'If official_changelog and affected_site_context are present, explain the documented changes first, then connect them to this site context. Clearly distinguish direct evidence, plausible relevance, and what still needs verification.',
     'Return JSON only with exactly these string fields: summary, why_it_matters, recommended_next_step, verification_step, caveats.',
     JSON.stringify({ finding }),
   ].join('\n')

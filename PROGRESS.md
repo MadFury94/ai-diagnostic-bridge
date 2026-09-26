@@ -447,3 +447,9 @@ Worker type-check and dashboard production build passed. Source commit: `8d32f70
 Follow-up usability work makes plugin state explicit: the dashboard now lists every installed plugin, labels each as Active or Installed but inactive, shows the installed version, and visibly badges Update available, Up to date, or Known vulnerability. Update rows link to the official WordPress.org changelog.
 
 The `Explain this update for my site` action now retrieves the official WordPress.org plugin changelog through a bounded Worker endpoint and sends that changelog, the installed/available versions, and the site's plugin evidence into the existing AI draft workflow. The result remains unverified until a human review, and no update is performed automatically.
+
+## 2026-09-26 — Dashboard overview redesign and site-context AI
+
+The signed-in overview was reorganized so update status is visible immediately: summary cards show installed plugin count, updates needing review, and known vulnerabilities; the installed-plugin table labels every plugin as active/inactive and up to date/update available/vulnerable; core updates and plugin reviews are grouped under one review panel.
+
+Plugin changelog explanations now include bounded site context: WordPress/site metadata, active plugin inventory, and relevant deterministic findings. The AI prompt explicitly separates documented changelog facts, likely relevance to this site, and verification steps. The explanation remains a draft until human verification or correction.
