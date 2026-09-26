@@ -441,3 +441,9 @@ Added the update review layer after the SEO/AI workflow. The dashboard now reads
 Added a WordPress core-updates diagnostic using WordPress's core update data. It reports the installed and available versions, release type, major/minor jump, and official release-notes URL. Security and major core updates receive higher review severity. No update is performed automatically, and ordinary bug claims are not inferred from version numbers.
 
 Worker type-check and dashboard production build passed. Source commit: `8d32f70`.
+
+## 2026-09-26 — Update UI clarity and official changelog interpretation
+
+Follow-up usability work makes plugin state explicit: the dashboard now lists every installed plugin, labels each as Active or Installed but inactive, shows the installed version, and visibly badges Update available, Up to date, or Known vulnerability. Update rows link to the official WordPress.org changelog.
+
+The `Explain this update for my site` action now retrieves the official WordPress.org plugin changelog through a bounded Worker endpoint and sends that changelog, the installed/available versions, and the site's plugin evidence into the existing AI draft workflow. The result remains unverified until a human review, and no update is performed automatically.

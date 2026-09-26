@@ -22,6 +22,8 @@ export type PluginRecord = { name: string; slug: string; version: string; active
 export type PluginEnvelope = { success: boolean; check: { id: string; status: string; timestamp: string }; findings: Finding[]; metadata: { plugins?: PluginRecord[]; total?: number; current_version?: string; available_version?: string | null; [key: string]: unknown } }
 export const scanPlugins = () => api<PluginEnvelope>('bridge/plugins')
 export const scanCoreUpdates = () => api<PluginEnvelope>('bridge/core-updates')
+export type PluginChangelog = { slug: string; name: string; current_version: string | null; changelog: string; source_url: string }
+export const getPluginChangelog = (slug: string) => api<PluginChangelog>(`plugin-changelog?slug=${encodeURIComponent(slug)}`)
 export type Post = { post_id: number; title: string; post_type: string; findings: Finding[]; check: { status: string }; metadata: Record<string, unknown> }
 export type Envelope = {
   success: boolean;
@@ -30,7 +32,7 @@ export type Envelope = {
   metadata: { items?: Post[]; pagination?: { page: number; per_page: number; total: number; pages: number }; [key: string]: unknown };
 }
 export const getExplanation = (findingId: string) => api<{ explanation: Explanation | null }>(`explanations?finding_id=${encodeURIComponent(findingId)}`)
-export const askExplanation = (finding: Finding, post: Post) => api<{ explanation: Explanation }>('explanations/generate', 'POST', { finding: { ...finding, post: { id: post.post_id, type: post.post_type, title: post.title } } })
+export const askExplanation = (finding: Finding, post: Post, extraEvidence?: Record<string, unknown>) => api<{ explanation: Explanation }>('explanations/generate', 'POST', { finding: { ...finding, evidence: { ...finding.evidence, ...(extraEvidence ?? {}) }, post: { id: post.post_id, type: post.post_type, title: post.title } } })
 export const verifyExplanation = (id: string, reviewer_note?: string) => api<{ explanation: Explanation }>(`explanations/${id}/verify`, 'POST', { reviewer_note })
 export const correctExplanation = (id: string, fields: ExplanationFields, reviewer_note?: string) => api<{ explanation: Explanation }>(`explanations/${id}/correct`, 'POST', { fields, reviewer_note })
 export const regenerateExplanation = (id: string) => api<{ explanation: Explanation }>(`explanations/${id}/regenerate`, 'POST', {})

@@ -18,6 +18,18 @@ const explanationInsert = async (env: Env, finding: Record<string, unknown>, ori
   if (!row) throw new ApiError(500, 'storage_error', 'The explanation could not be saved.')
   return rowToRecord(row)
 }
+const pluginSlug = (value: string) => /^[a-z0-9][a-z0-9-]{1,90}$/.test(value) ? value : null
+const officialChangelog = async (slug: string) => {
+  const safe = pluginSlug(slug)
+  if (!safe) throw new ApiError(400, 'invalid_plugin', 'A valid WordPress.org plugin slug is required.')
+  const response = await fetch(`https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=${encodeURIComponent(safe)}`, { headers: { Accept: 'application/json' } })
+  if (!response.ok) throw new ApiError(502, 'changelog_unavailable', 'The official plugin changelog is unavailable.')
+  const data = object(await boundedJson(response, 256 * 1024))
+  const sections = object(data.sections)
+  const html = typeof sections.changelog === 'string' ? sections.changelog : ''
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/\s+/g, ' ').trim().slice(0, 12000)
+  return { slug: safe, name: typeof data.name === 'string' ? data.name.slice(0, 200) : safe, current_version: typeof data.version === 'string' ? data.version.slice(0, 80) : null, changelog: text, source_url: `https://wordpress.org/plugins/${safe}/#developers` }
+}
 
 async function api(request: Request, env: Env) {
   const url = new URL(request.url)
@@ -77,6 +89,9 @@ async function api(request: Request, env: Env) {
     const finding = safeFinding(body.finding)
     const output = await generateExplanation(env.AI, finding)
     return json(explanationResponse(await explanationInsert(env, finding, output)))
+  }
+  if (url.pathname === '/api/plugin-changelog' && request.method === 'GET') {
+    return json(await officialChangelog(url.searchParams.get('slug') ?? ''))
   }
   const explanationMatch = url.pathname.match(/^\/api\/explanations\/([0-9a-f-]{20,60})\/(verify|correct|regenerate)$/)
   if (explanationMatch && request.method === 'POST') {

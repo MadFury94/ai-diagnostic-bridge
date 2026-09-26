@@ -454,3 +454,9 @@ The full suite after the lifecycle test passed with **82 tests, 811 assertions, 
 **Safety:** No automatic updates were added. Security advisories and official compatibility/deprecation statements remain evidence-gated; general bug prediction is intentionally excluded.
 
 **Validation:** Worker type-check and dashboard production build passed. Source commit: `8d32f70`.
+
+## 2026-09-26 — Clarified installed/update status and changelog meaning
+
+The first update panel made available updates visible but did not clearly show the full installed inventory. The dashboard now lists every installed plugin with its active/inactive state and explicit `Up to date`, `Update available`, or `Known vulnerability` badges.
+
+The site-specific AI explanation action now reads the official WordPress.org changelog before generating its draft. The AI receives the bounded changelog text plus the installed and available versions and explains what the documented changes may mean for this site's evidence. It does not infer bugs from a version number, perform updates, or present an unverified interpretation as fact.
