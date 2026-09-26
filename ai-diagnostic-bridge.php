@@ -26,6 +26,7 @@ require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-response.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-activity-log.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/class-auth.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-site-health.php';
+require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-core-updates.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugins.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugin-vulnerability-matcher.php';
 require_once AI_DIAGNOSTIC_BRIDGE_DIR . 'includes/diagnostics/class-plugin-vulnerability-source.php';
@@ -65,4 +66,5 @@ add_action(
 		Plugin::instance()->boot();
 	}
 );
+
 

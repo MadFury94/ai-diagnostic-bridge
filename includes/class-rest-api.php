@@ -22,6 +22,7 @@ final class REST_API {
 		$routes = [
 			'site'    => [ 'callback' => [ self::class, 'site' ] ],
 			'health'  => [ 'callback' => [ self::class, 'health' ] ],
+            'core-updates' => [ 'callback' => [ self::class, 'core_updates' ] ],
 			'plugins' => [ 'callback' => [ self::class, 'plugins' ] ],
 			'themes'  => [ 'callback' => [ self::class, 'themes' ] ],
 			'errors'  => [ 'callback' => [ self::class, 'errors' ] ],
@@ -152,6 +153,7 @@ final class REST_API {
 
 	public static function site(): array { return Diagnostic_Manager::run( [ 'site' ] )['checks']['site']; }
 	public static function health(): array { return Diagnostic_Manager::run( [ 'health' ] )['checks']['health']; }
+	public static function core_updates(): array { return Diagnostic_Manager::run( [ 'core-updates' ] )['checks']['core-updates']; }
 	public static function plugins(): array { return Diagnostic_Manager::run( [ 'plugins' ] )['checks']['plugins']; }
 	public static function themes(): array { return Diagnostic_Manager::run( [ 'themes' ] )['checks']['themes']; }
 	public static function errors(): array { return Diagnostic_Manager::run( [ 'errors' ] )['checks']['errors']; }
@@ -203,3 +205,4 @@ final class REST_API {
 		return Diagnostic_Manager::run( $checks );
 	}
 }
+

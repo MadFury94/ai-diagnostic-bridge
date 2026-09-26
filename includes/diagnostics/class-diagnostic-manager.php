@@ -11,6 +11,7 @@ final class Diagnostic_Manager {
 	private const CHECKS = [
 		'site'    => [ Site_Health::class, 'run' ],
 		'health'  => [ self::class, 'health' ],
+        'core-updates' => [ Core_Updates::class, 'run' ],
 		'plugins' => [ Plugins::class, 'run' ],
 		'themes'  => [ Themes::class, 'run' ],
 		'errors'  => [ PHP_Errors::class, 'run' ],
@@ -60,3 +61,4 @@ final class Diagnostic_Manager {
 		];
 	}
 }
+

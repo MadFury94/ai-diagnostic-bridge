@@ -4,10 +4,10 @@ export type Json = null | boolean | number | string | Json[] | { [key: string]: 
 export const object = (value: unknown): Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 const collectionRoutes = new Set(['seo/posts', 'seo/issues', 'images/issues', 'links/issues'])
 export function bridgePath(path: string, params: URLSearchParams) {
-  if (!['health', 'plugins', 'woocommerce', 'seo/site', ...collectionRoutes].includes(path) && !/^seo\/post\/[1-9]\d{0,9}$/.test(path)) throw new ApiError(404, 'route_not_found', 'This diagnostic route is not available.')
+  if (!['health', 'plugins', 'core-updates', 'woocommerce', 'seo/site', ...collectionRoutes].includes(path) && !/^seo\/post\/[1-9]\d{0,9}$/.test(path)) throw new ApiError(404, 'route_not_found', 'This diagnostic route is not available.')
   const query = new URLSearchParams()
   for (const [key, value] of params) {
-    if (!collectionRoutes.has(path) || !['page', 'per_page'].includes(key) || params.getAll(key).length !== 1 || !/^[1-9]\d*$/.test(value) || Number(value) > (key === 'page' ? 1000 : 50)) throw new ApiError(400, 'invalid_query', 'Use page 1–1000 and per_page 1–50 on collection routes only.')
+    if (!collectionRoutes.has(path) || !['page', 'per_page'].includes(key) || params.getAll(key).length !== 1 || !/^[1-9]\d*$/.test(value) || Number(value) > (key === 'page' ? 1000 : 50)) throw new ApiError(400, 'invalid_query', 'Use page 1–1000 and per_page 1â€“50 on collection routes only.')
     query.set(key, value)
   }
   if (collectionRoutes.has(path)) { if (!query.has('page')) query.set('page', '1'); if (!query.has('per_page')) query.set('per_page', '20') }
@@ -102,3 +102,5 @@ export async function fetchBridge(url: string, token: string, route: string, env
     throw new ApiError(502, 'wordpress_network', 'WordPress could not be reached. Check the site and try again.')
   } finally { clearTimeout(timeout) }
 }
+
+
