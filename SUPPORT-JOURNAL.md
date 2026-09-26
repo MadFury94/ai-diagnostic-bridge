@@ -472,3 +472,13 @@ For each available plugin update, the official changelog is combined with bounde
 The plugin AI action was previously rendered only for update rows. That made it disappear when WordPress reported no available update. The dashboard now includes an explicit `Explain` action for installed plugins that are up to date or otherwise have no pending update, while update rows retain the full changelog explanation action.
 
 The local Worker error was configuration-related: Wrangler had no `.dev.vars`. An ignored local file now supplies the existing development secrets without adding credentials to Git. Local mode still needs the site connection configured in its own D1 environment; the deployed dashboard remains the live Anbe path.
+
+## 2026-09-26 — Corrected generic plugin update explanation
+
+**Issue:** A WooCommerce update draft said only that the update might improve security and functionality, without stating what the latest release actually changed or why it mattered to Anbe.
+
+**Cause:** The changelog was available but the AI instructions did not force concrete release-note extraction, and the site context omitted the WooCommerce diagnostic result.
+
+**Correction:** The Worker prompt now requires named changelog changes/version details, site-specific relevance, uncertainty, and concrete post-update verification. The dashboard now includes WooCommerce metadata and findings in the bounded AI context.
+
+**Validation:** Worker type-check and dashboard production build passed; the official WordPress.org WooCommerce API was confirmed to return concrete 11.1.2 release notes, including specific fixes. The updated Worker is deployed.

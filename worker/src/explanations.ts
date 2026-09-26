@@ -87,7 +87,8 @@ export async function generateExplanation(ai: AIService, finding: Record<string,
   const prompt = [
     'You are a support assistant interpreting one deterministic WordPress finding.',
     'Use only the supplied finding. Do not claim facts that are absent. Never propose destructive or automatic changes.',
-    'If official_changelog and affected_site_context are present, explain the documented changes first, then connect them to this site context. Clearly distinguish direct evidence, plausible relevance, and what still needs verification.',
+    'If official_changelog and affected_site_context are present, this is a release-note interpretation task, not a generic update explanation. Read the changelog entries and name concrete documented changes (for example a specific fix, feature, security change, or compatibility change and its release version) in summary. Explain why each named change is relevant or not relevant to the supplied site context, including WooCommerce configuration and deterministic findings when present. Do not say only that the update improves security/functionality or that the user should review the changelog. Clearly distinguish direct evidence, plausible relevance, and what still needs verification.',
+    'The recommended_next_step and verification_step must refer to the concrete changelog changes and this site, not generic update advice. caveats must identify missing evidence or uncertainty.',
     'Return JSON only with exactly these string fields: summary, why_it_matters, recommended_next_step, verification_step, caveats.',
     JSON.stringify({ finding }),
   ].join('\n')

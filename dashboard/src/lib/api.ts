@@ -22,6 +22,7 @@ export type PluginRecord = { name: string; slug: string; version: string; active
 export type PluginEnvelope = { success: boolean; check: { id: string; status: string; timestamp: string }; findings: Finding[]; metadata: { plugins?: PluginRecord[]; total?: number; current_version?: string; available_version?: string | null; [key: string]: unknown } }
 export const scanPlugins = () => api<PluginEnvelope>('bridge/plugins')
 export const scanCoreUpdates = () => api<PluginEnvelope>('bridge/core-updates')
+export const scanWooCommerce = () => api<PluginEnvelope>('bridge/woocommerce')
 export type PluginChangelog = { slug: string; name: string; current_version: string | null; changelog: string; source_url: string }
 export const getPluginChangelog = (slug: string) => api<PluginChangelog>(`plugin-changelog?slug=${encodeURIComponent(slug)}`)
 export type Post = { post_id: number; title: string; post_type: string; findings: Finding[]; check: { status: string }; metadata: Record<string, unknown> }

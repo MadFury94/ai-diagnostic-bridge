@@ -457,3 +457,7 @@ Plugin changelog explanations now include bounded site context: WordPress/site m
 ## 2026-09-26 — Plugin AI visibility and local Worker setup
 
 The dashboard now offers an explanation action for every installed plugin, not only plugins with a pending update. For pending updates it reads the official changelog; for installed/up-to-date plugins it explains the current official release context and site relevance. The local Worker now has an ignored `worker/.dev.vars` populated from the existing private development secrets, so Wrangler local access no longer fails immediately with `Dashboard secrets are not configured`.
+
+## 2026-09-26 — Changelog-specific AI interpretation correction
+
+The first plugin explanation could remain generic even when an official changelog was available. The prompt now treats changelog review as a concrete release-note interpretation task: it must name documented changes and versions, connect them to the site's active plugin/WooCommerce context and deterministic findings, and make verification steps specific. The dashboard now supplies WooCommerce diagnostic context alongside site and plugin context.
