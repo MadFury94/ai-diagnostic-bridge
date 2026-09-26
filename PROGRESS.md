@@ -461,3 +461,7 @@ The dashboard now offers an explanation action for every installed plugin, not o
 ## 2026-09-26 — Changelog-specific AI interpretation correction
 
 The first plugin explanation could remain generic even when an official changelog was available. The prompt now treats changelog review as a concrete release-note interpretation task: it must name documented changes and versions, connect them to the site's active plugin/WooCommerce context and deterministic findings, and make verification steps specific. The dashboard now supplies WooCommerce diagnostic context alongside site and plugin context.
+
+## 2026-09-26 — Elementor builder-plugin orphan detection
+
+Added the extensible `builder-plugin-inactive` finding. Published posts/pages are checked for Elementor metadata (`_elementor_data` or `_elementor_edit_mode`); when that content exists without `elementor/elementor.php` active, the diagnostic reports high severity with the post/page title, ID, and detected metadata keys. The recommended next step is: `Reactivate Elementor, or this page will not render correctly for visitors.` The builder definition is structured for later Divi/Beaver Builder additions.

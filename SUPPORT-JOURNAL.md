@@ -482,3 +482,12 @@ The local Worker error was configuration-related: Wrangler had no `.dev.vars`. A
 **Correction:** The Worker prompt now requires named changelog changes/version details, site-specific relevance, uncertainty, and concrete post-update verification. The dashboard now includes WooCommerce metadata and findings in the bounded AI context.
 
 **Validation:** Worker type-check and dashboard production build passed; the official WordPress.org WooCommerce API was confirmed to return concrete 11.1.2 release notes, including specific fixes. The updated Worker is deployed.
+
+**Real incident: Anbe site broken by inactive Elementor**
+Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactivated or missing. This was discovered manually, not caught by the diagnostic tool, since no check existed for page-builder content orphaned by an inactive builder plugin. Resolved by reinstalling and reactivating Elementor and Elementor Pro. This gap is what prompted the new `builder-plugin-inactive` finding above.
+
+**Timed comparison: SEO meta description detection (two manual methods)**
+- Manual method 1 (Yoast dashboard ? Content type filter ? issues list): attempted for over 2 minutes, abandoned without locating the specific cause. This path surfaces pages with general SEO problems (red/green indicators) but does not state the specific issue without opening each page individually.
+- Manual method 2 (open the specific page directly, check the Yoast meta box in the editor): 34 seconds, once the correct page was known, but the tester did not already know which page or what was broken going in.
+- Tool (AI Diagnostic Bridge dashboard): 18.79 seconds, named the exact finding, meta description missing, with evidence, on first attempt.
+- Note: manual method choice materially affects the result, the dashboard-issues-list approach failed to resolve in reasonable time, while directly checking a known page's editor was faster but still slower than the tool, and required already suspecting which page and what to look for.

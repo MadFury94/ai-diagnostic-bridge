@@ -13,12 +13,24 @@ use BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Indexability_Analysis;
 use PHPUnit\Framework\TestCase;
 
 final class PostAnalysisFixture extends Post_Analysis_Context {
-	public function __construct(private readonly ?\WP_Post $post, private readonly array $meta = []) {}
+	public function __construct(private readonly ?\WP_Post $post, private readonly array $meta = [], private readonly array $active = []) {}
 	public function get(int $post_id): ?\WP_Post { return $this->post; }
 	public function meta(int $post_id, string $key): string { return (string) ($this->meta[$key] ?? ''); }
+	public function active_plugins(): array { return $this->active; }
 }
 
 final class PostAnalysisTest extends TestCase {
+	public function test_elementor_content_requires_active_elementor_plugin(): void {
+		$post = new \WP_Post((object) [ 'ID' => 91, 'post_type' => 'page', 'post_status' => 'publish', 'post_password' => '', 'post_title' => 'Builder page', 'post_name' => 'builder-page', 'post_content' => '' ]);
+		$context = new PostAnalysisFixture($post, [ '_elementor_data' => '[{"elType":"section"}]', '_elementor_edit_mode' => 'builder' ], []);
+		$result = PostAnalysis::run(91, $context);
+		$finding = array_values(array_filter($result['findings'], static fn (array $item): bool => 'builder-plugin-inactive' === $item['id']))[0] ?? null;
+		$this->assertNotNull($finding);
+		$this->assertSame('high', $finding['severity']);
+		$this->assertSame(['_elementor_data', '_elementor_edit_mode'], $finding['evidence']['meta_keys']);
+		$active = new PostAnalysisFixture($post, [ '_elementor_data' => '[{"elType":"section"}]' ], ['elementor/elementor.php']);
+		$this->assertNotContains('builder-plugin-inactive', array_column(PostAnalysis::run(91, $active)['findings'], 'id'));
+	}
 	public function test_title_checks_are_configurable_and_bounded(): void {
 		$findings = Title_Checks::findings('A', 'a', ['A', 'A'], ['min_length' => 5, 'max_length' => 20]);
 		$ids = array_column($findings, 'id');

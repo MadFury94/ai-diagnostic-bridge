@@ -14,6 +14,7 @@ class Post_Analysis_Context {
 	public function meta(int $post_id, string $key): string {
 		return (string) get_post_meta($post_id, $key, true);
 	}
+	public function active_plugins(): array { return (array) get_option('active_plugins', []); }
 
 	public function featured_image_id(int $post_id): int { return (int) get_post_thumbnail_id($post_id); }
 	public function attachment_id(string $url): int { return function_exists('attachment_url_to_postid') ? (int) attachment_url_to_postid($url) : 0; }
@@ -43,6 +44,7 @@ final class Post_Analysis {
 		$content_analysis = Content_Analysis::analyze((string) $post->post_content);
 		$image_details = Image_Analysis::analyze((string) $post->post_content, (int) $post->ID, $context);
 		$content_analysis['images'] = $image_details['observations'];
+		$builder = Builder_Content_Analysis::analyze($post, $context);
 
 		return SEO_Manager::result(
 			(int) $post->ID,
@@ -58,13 +60,38 @@ final class Post_Analysis {
 				'images' => $content_analysis['images'],
 				'links' => $content_analysis['links'],
 			],
-			array_merge($title_findings, $description_findings, $indexability['findings'], $content_analysis['findings'], $image_details['findings']),
+			array_merge($title_findings, $description_findings, $indexability['findings'], $content_analysis['findings'], $image_details['findings'], $builder['findings']),
 			['post_type' => sanitize_key((string) $post->post_type)]
 		);
 	}
 
 	private static function length(string $value): int {
 		return function_exists('mb_strlen') ? mb_strlen($value) : strlen($value);
+	}
+}
+
+/** Extensible page-builder checks. Add another builder definition without changing post analysis flow. */
+final class Builder_Content_Analysis {
+	private const BUILDERS = [
+		'elementor' => [ 'plugin' => 'elementor/elementor.php', 'meta' => [ '_elementor_data', '_elementor_edit_mode' ] ],
+	];
+
+	public static function analyze(\WP_Post $post, Post_Analysis_Context $context): array {
+		$findings = [];
+		foreach (self::BUILDERS as $builder => $definition) {
+			$found = [];
+			foreach ($definition['meta'] as $key) {
+				if ('' !== trim($context->meta((int) $post->ID, $key))) { $found[] = $key; }
+			}
+			if (!empty($found) && !in_array($definition['plugin'], $context->active_plugins(), true)) {
+				$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding(
+					'builder-plugin-inactive', 'high', 'builder', 'Page-builder content has no active builder plugin',
+					'Reactivate Elementor, or this page will not render correctly for visitors.',
+					[ 'builder' => $builder, 'post_id' => (int) $post->ID, 'post_title' => sanitize_text_field((string) $post->post_title), 'meta_keys' => $found, 'required_plugin' => $definition['plugin'] ], 'builder_content'
+				);
+			}
+		}
+		return [ 'findings' => $findings ];
 	}
 }
 
