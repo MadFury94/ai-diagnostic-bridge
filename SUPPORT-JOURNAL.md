@@ -466,3 +466,9 @@ The site-specific AI explanation action now reads the official WordPress.org cha
 The dashboard no longer makes the user infer plugin state from a short update list. The first signed-in view now presents counts and a complete installed-plugin table with clear status badges, followed by the core/plugin review area.
 
 For each available plugin update, the official changelog is combined with bounded Anbe context (site facts, active plugin versions, and deterministic findings). The AI explanation is now expected to state what the changelog documents, why it may matter to Anbe, what is only a possibility, and how to verify the result after updating. No credentials or post/customer/order/payment content is included, and no update is automatic.
+
+## 2026-09-26 — Fixed missing plugin AI action and local dashboard startup
+
+The plugin AI action was previously rendered only for update rows. That made it disappear when WordPress reported no available update. The dashboard now includes an explicit `Explain` action for installed plugins that are up to date or otherwise have no pending update, while update rows retain the full changelog explanation action.
+
+The local Worker error was configuration-related: Wrangler had no `.dev.vars`. An ignored local file now supplies the existing development secrets without adding credentials to Git. Local mode still needs the site connection configured in its own D1 environment; the deployed dashboard remains the live Anbe path.

@@ -453,3 +453,7 @@ The `Explain this update for my site` action now retrieves the official WordPres
 The signed-in overview was reorganized so update status is visible immediately: summary cards show installed plugin count, updates needing review, and known vulnerabilities; the installed-plugin table labels every plugin as active/inactive and up to date/update available/vulnerable; core updates and plugin reviews are grouped under one review panel.
 
 Plugin changelog explanations now include bounded site context: WordPress/site metadata, active plugin inventory, and relevant deterministic findings. The AI prompt explicitly separates documented changelog facts, likely relevance to this site, and verification steps. The explanation remains a draft until human verification or correction.
+
+## 2026-09-26 — Plugin AI visibility and local Worker setup
+
+The dashboard now offers an explanation action for every installed plugin, not only plugins with a pending update. For pending updates it reads the official changelog; for installed/up-to-date plugins it explains the current official release context and site relevance. The local Worker now has an ignored `worker/.dev.vars` populated from the existing private development secrets, so Wrangler local access no longer fails immediately with `Dashboard secrets are not configured`.
