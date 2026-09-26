@@ -422,7 +422,7 @@ PLAN.md T06.5 was updated to distinguish fixture coverage of automated WooCommer
 
 **T11.5:** Reviewed `includes/class-rest-api.php`, authentication, diagnostic dispatch, and every registered core/SEO route. All routes use the shared Bearer permission callback; IDs, pagination, and diagnostic lists are bounded and allowlisted; post privacy, raw body, log, action-argument, credential, and upstream-error redaction were checked; no input selects arbitrary PHP execution, filesystem, SQL, shell, hooks, or classes.
 
-**T11.6:** Rewrote README.md and readme.txt with installation, endpoint examples, authentication/hashing/rate limiting, deterministic-only AI boundary, troubleshooting, tests, and known limitations. T11.7 remains intentionally pending because T11.4 is incomplete and the requested 0.1.0 tag conflicts with the current plugin version 0.1.5; no mismatched release tag was created.
+**T11.6:** Rewrote README.md and readme.txt with installation, endpoint examples, authentication/hashing/rate limiting, deterministic-only AI boundary, troubleshooting, tests, and known limitations. The release target was deliberately resolved to plugin version 0.1.6.
 
 ## 2026-09-26 - Phase 11 release 0.1.6 completed
 
