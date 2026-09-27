@@ -500,3 +500,12 @@ Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactiva
 **Repair:** Findings now sort Critical → High → Medium → Low → Informational, show sticky counted severity headers that can be collapsed, provide responsive severity jump links, and support optional grouping by page/post. Existing severity, category, post/page, search, and Actionable only filters remain available.
 
 **Validation:** Dashboard TypeScript and production builds passed. The responsive layout uses horizontal scrolling for quick-jump pills on narrow screens and keeps severity labels visible alongside color.
+
+
+## 2026-09-27 — Elementor Pro and unavailable-site messaging
+
+**Symptom:** Deactivating Elementor Pro produced no finding even though Anbe pages use Pro components. The existing Elementor-core warning also needed to state plainly that the affected page was broken.
+
+**Repair:** Added evidence-gated Elementor Pro widget detection from the saved Elementor data. When Pro is inactive, the finding identifies the required Pro plugin and states that the page is broken or incomplete until it is reactivated. The tool reports the observed inactive dependency; it does not claim whether a user, update, or host caused the change.
+
+**Unavailable site behavior:** When WordPress cannot be reached, the dashboard now states that no current findings are available and directs the user to check hosting status, DNS, SSL, firewall rules, and the saved site URL.

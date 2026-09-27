@@ -104,7 +104,7 @@ export async function fetchBridge(url: string, token: string, route: string, env
     return sanitizeEnvelope(await boundedJson(response, 1024 * 1024), [token, env.DASHBOARD_PASSWORD, env.SESSION_KEY, env.CREDENTIAL_KEY])
   } catch (error) {
     if (error instanceof ApiError) throw error
-    throw new ApiError(502, 'wordpress_network', 'WordPress could not be reached. Check the site and try again.')
+		throw new ApiError(502, 'wordpress_network', 'The WordPress site could not be reached, so no current findings are available. Check hosting status, DNS, SSL, firewall rules, and the saved site URL.')
   } finally { clearTimeout(timeout) }
 }
 

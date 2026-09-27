@@ -470,3 +470,8 @@ Added the extensible `builder-plugin-inactive` finding. Published posts/pages ar
 ## 2026-09-27 — Findings triage layout
 
 Actual dashboard use during the SEO meta-description timed comparison exposed a UX gap: a flat findings list made urgent issues harder to reach as more finding types were added. Findings now sort and group by severity by default with collapsible counted tiers, a responsive quick-jump row, and an optional By page/post grouping mode. Existing filters are preserved. Dashboard TypeScript and production builds passed.
+
+
+## 2026-09-27 — Elementor Pro dependency coverage
+
+The builder check now recognizes evidence of Elementor Pro widgets in Elementor data and reports a high-severity uilder-plugin-inactive finding when elementor-pro/elementor-pro.php is inactive. The message explicitly states that the page is broken or incomplete and names the plugin to reactivate. The diagnostic does not infer who caused the deactivation. If WordPress cannot be reached, the dashboard now reports that current findings are unavailable and points the user to hosting, DNS, SSL, firewall, and URL checks.

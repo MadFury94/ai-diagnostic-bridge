@@ -74,24 +74,51 @@ final class Post_Analysis {
 final class Builder_Content_Analysis {
 	private const BUILDERS = [
 		'elementor' => [ 'plugin' => 'elementor/elementor.php', 'meta' => [ '_elementor_data', '_elementor_edit_mode' ] ],
+		'elementor-pro' => [
+			'plugin' => 'elementor-pro/elementor-pro.php',
+			'meta' => [ '_elementor_data' ],
+			'pro_widget_prefixes' => [ 'theme-', 'woocommerce-', 'loop-', 'form', 'posts', 'portfolio', 'gallery', 'slides', 'login', 'nav-menu', 'search', 'media-carousel', 'reviews', 'price-', 'flip-box', 'call-to-action', 'countdown', 'share-buttons', 'off-canvas', 'mega-menu' ],
+		],
 	];
 
 	public static function analyze(\WP_Post $post, Post_Analysis_Context $context): array {
 		$findings = [];
 		foreach (self::BUILDERS as $builder => $definition) {
 			$found = [];
+			$raw = '';
 			foreach ($definition['meta'] as $key) {
-				if ('' !== trim($context->meta((int) $post->ID, $key))) { $found[] = $key; }
+				$value = trim($context->meta((int) $post->ID, $key));
+				if ('' !== $value) { $found[] = $key; $raw .= $value; }
 			}
+			if ('elementor-pro' === $builder && empty(self::pro_widgets($raw, $definition['pro_widget_prefixes'] ?? []))) { continue; }
 			if (!empty($found) && !in_array($definition['plugin'], $context->active_plugins(), true)) {
+				$is_pro = 'elementor-pro' === $builder;
 				$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding(
-					'builder-plugin-inactive', 'high', 'builder', 'Page-builder content has no active builder plugin',
-					'Reactivate Elementor, or this page will not render correctly for visitors.',
-					[ 'builder' => $builder, 'post_id' => (int) $post->ID, 'post_title' => sanitize_text_field((string) $post->post_title), 'meta_keys' => $found, 'required_plugin' => $definition['plugin'] ], 'builder_content'
+					'builder-plugin-inactive', 'high', 'builder',
+					$is_pro ? 'This page is broken or incomplete because Elementor Pro components are inactive' : 'This page is broken because its Elementor builder plugin is inactive',
+					$is_pro ? 'Reactivate Elementor Pro. The Elementor Pro components on this page will not render correctly for visitors until it is active.' : 'Reactivate Elementor. This page will not render correctly for visitors until the builder is active.',
+					[ 'builder' => $builder, 'post_id' => (int) $post->ID, 'post_title' => sanitize_text_field((string) $post->post_title), 'meta_keys' => $found, 'required_plugin' => $definition['plugin'], 'pro_widget_types' => $is_pro ? self::pro_widgets($raw, $definition['pro_widget_prefixes'] ?? []) : [] ], 'builder_content'
 				);
 			}
 		}
 		return [ 'findings' => $findings ];
+	}
+
+	private static function pro_widgets(string $raw, array $prefixes): array {
+		if (strlen($raw) > 1000000) { return []; }
+		$data = json_decode($raw, true);
+		$found = [];
+		$walk = static function ($value) use (&$walk, &$found, $prefixes): void {
+			if (!is_array($value)) { return; }
+			if (isset($value['widgetType']) && is_string($value['widgetType'])) {
+				foreach ($prefixes as $prefix) {
+					if (str_starts_with($value['widgetType'], $prefix)) { $found[] = $value['widgetType']; break; }
+				}
+			}
+			foreach ($value as $child) { $walk($child); }
+		};
+		$walk($data);
+		return array_values(array_unique($found));
 	}
 }
 
