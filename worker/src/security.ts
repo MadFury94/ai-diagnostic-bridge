@@ -41,7 +41,8 @@ export async function decryptToken(row: { iv: string; ciphertext: string; url: s
 export function siteOrigin(input: unknown, allowed: string) {
   try {
     const url = new URL(String(input))
-    if (url.protocol !== 'https:' || url.origin !== allowed || url.username || url.password || url.search || url.hash || url.pathname !== '/') throw new Error()
+    const localHttp = allowed.startsWith('http://') && ['127.0.0.1', 'localhost'].includes(url.hostname)
+    if ((!localHttp && url.protocol !== 'https:') || url.origin !== allowed || url.username || url.password || url.search || url.hash || url.pathname !== '/') throw new Error()
     return url.origin
   } catch { throw new ApiError(400, 'invalid_site', 'Use the configured HTTPS WordPress site URL.') }
 }
