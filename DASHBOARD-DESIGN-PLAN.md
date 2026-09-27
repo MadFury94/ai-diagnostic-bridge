@@ -1,6 +1,6 @@
 ﻿# AI Diagnostic Bridge Dashboard Design Plan
 
-## Implementation status â€” 2026-09-24
+## Implementation status — 2026-09-24
 
 Worker implementation (M2) is deployed at https://ai-diagnostic-bridge.onochieazukaeme.workers.dev. The dashboard is served with Worker Static Assets on the same origin as the API, replacing the separate Pages hosting proposal. Authentication, encrypted D1 credentials, real save/test/disconnect, bounded read-only proxying, rate limits, redaction, and safe logs are implemented. Dashboard mocks were replaced with API integration and unconfigured/loading/error/stale/incomplete states. Type-checks, production build, 32 Worker tests, deployed HTTP checks, and browser checks passed.
 
@@ -156,14 +156,14 @@ The UI must label this as an interpretation, keep the original deterministic fin
 
 ## Implementation milestones
 
-### M1 â€” Dashboard shell
+### M1 — Dashboard shell
 
 - React application with routing and responsive layout
 - Mock data matching the plugin response contract
 - Overview, findings list, and finding detail screens
 - Loading, empty, stale, and error states
 
-### M2 â€” Cloudflare Worker proxy
+### M2 — Cloudflare Worker proxy
 
 - Single-site connection form with write-only token entry
 - Server-side WordPress site configuration and encrypted secret storage
@@ -171,20 +171,20 @@ The UI must label this as an interpretation, keep the original deterministic fin
 - Authentication, rate limiting, bounds, redaction, and request logging
 - Local development configuration without committed secrets
 
-### M3 â€” Live Anbe connection
+### M3 — Live Anbe connection
 
 - Connect the dashboard to Anbe through the Worker
 - Verify titles, post types, findings, pagination, and failure states
 - Confirm the browser network never contains the WordPress token
 
-### M4 â€” AI explanation workflow
+### M4 — AI explanation workflow
 
 - [x] Add a Worker-side AI request using the structured evidence object
 - [x] Render explanation, next step, and verification guidance
 - [x] Add human verification/correction capture
 - [x] Record a concrete support case in `SUPPORT-JOURNAL.md`
 
-### M5 â€” Hardening and release
+### M5 — Hardening and release
 
 - Accessibility and keyboard review
 - Response-size and rate-limit testing

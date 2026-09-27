@@ -1,8 +1,8 @@
-﻿# AI Diagnostic Bridge ï¿½ Implementation Plan
+﻿# AI Diagnostic Bridge - Implementation Plan
 
 ## Support evidence and application preparation
 
-Read [APPLICATION-CONTEXT.md](APPLICATION-CONTEXT.md) alongside this plan. After meaningful work, update [SUPPORT-JOURNAL.md](SUPPORT-JOURNAL.md) with the symptom, hypothesis, AI verification/correction, repair, validation, customer explanation, and actual timing (or ï¿½not measuredï¿½). Maintain this evidence through January 2027 without claiming unfinished work is shipped or fixture results are real-store outcomes. Keep Missus unchanged.
+Read [APPLICATION-CONTEXT.md](APPLICATION-CONTEXT.md) alongside this plan. After meaningful work, update [SUPPORT-JOURNAL.md](SUPPORT-JOURNAL.md) with the symptom, hypothesis, AI verification/correction, repair, validation, customer explanation, and actual timing (or -not measured-). Maintain this evidence through January 2027 without claiming unfinished work is shipped or fixture results are real-store outcomes. Keep Missus unchanged.
 
 - [ ] Set up a small real WooCommerce test store with synthetic products and test-mode payments.
 - [ ] Complete and document deliberate WordPress/WooCommerce break/diagnose/repair exercises from the journal.
@@ -31,7 +31,7 @@ The plugin will provide observed facts and deterministic findings only. It will 
 
 ## Delivery phases
 
-### Phase 1 ï¿½ Repository and plugin foundation
+### Phase 1 - Repository and plugin foundation
 
 Create the standalone repository with:
 
@@ -43,30 +43,30 @@ ai-diagnostic-bridge/
 +-- uninstall.php
 +-- .gitignore
 +-- includes/
-ï¿½   +-- class-plugin.php
-ï¿½   +-- class-auth.php
-ï¿½   +-- class-rest-api.php
-ï¿½   +-- class-response.php
-ï¿½   +-- class-activity-log.php
-ï¿½   +-- diagnostics/
-ï¿½   ï¿½   +-- class-diagnostic-manager.php
-ï¿½   ï¿½   +-- class-site-health.php
-ï¿½   ï¿½   +-- class-php-errors.php
-ï¿½   ï¿½   +-- class-plugins.php
-ï¿½   ï¿½   +-- class-themes.php
-ï¿½   ï¿½   +-- class-rest-api-check.php
-ï¿½   ï¿½   +-- class-woocommerce.php
-ï¿½   ï¿½   +-- class-performance.php
-ï¿½   ï¿½   +-- class-security.php
-ï¿½   +-- seo/
-ï¿½       +-- class-seo-manager.php
-ï¿½       +-- class-post-analysis.php
-ï¿½       +-- class-link-analysis.php
-ï¿½       +-- class-image-analysis.php
-ï¿½       +-- class-indexability.php
+-   +-- class-plugin.php
+-   +-- class-auth.php
+-   +-- class-rest-api.php
+-   +-- class-response.php
+-   +-- class-activity-log.php
+-   +-- diagnostics/
+-   -   +-- class-diagnostic-manager.php
+-   -   +-- class-site-health.php
+-   -   +-- class-php-errors.php
+-   -   +-- class-plugins.php
+-   -   +-- class-themes.php
+-   -   +-- class-rest-api-check.php
+-   -   +-- class-woocommerce.php
+-   -   +-- class-performance.php
+-   -   +-- class-security.php
+-   +-- seo/
+-       +-- class-seo-manager.php
+-       +-- class-post-analysis.php
+-       +-- class-link-analysis.php
+-       +-- class-image-analysis.php
+-       +-- class-indexability.php
 +-- admin/
-ï¿½   +-- class-admin.php
-ï¿½   +-- views/settings.php
+-   +-- class-admin.php
+-   +-- views/settings.php
 +-- tests/
     +-- bootstrap.php
     +-- unit/
@@ -75,7 +75,7 @@ ai-diagnostic-bridge/
 
 Use the namespace `BrianAzukaeme\AIDiagnosticBridge`. The bootstrap file should define plugin constants, load classes, register activation/deactivation hooks, and start the plugin on `plugins_loaded`. Activation should create only the minimum options needed for credentials and logging.
 
-### Phase 2 ï¿½ Authentication and activity logging
+### Phase 2 - Authentication and activity logging
 
 Implement `class-auth.php` with a site-specific credential workflow:
 
@@ -92,7 +92,7 @@ Implement `class-activity-log.php` using a bounded option or small custom table 
 
 All diagnostic REST permission callbacks must authenticate first. WordPress nonces apply to same-origin admin actions; external API calls use the site credential and must not receive a credential through public JavaScript.
 
-### Phase 3 ï¿½ Response contract and REST controller
+### Phase 3 - Response contract and REST controller
 
 Implement `class-response.php` so every response includes:
 
@@ -130,7 +130,7 @@ Register namespace `/ai-diagnostic/v1` in `class-rest-api.php`. Use an allowlist
 
 `POST /diagnostic` accepts only an allowlisted `checks` array, validates pagination and limits, runs only the selected modules, and returns a combined response. `GET /diagnostic` may use a safe default scope or require an explicit allowlisted scope; it must never interpret request values as PHP functions, SQL, shell commands, file paths, or hooks.
 
-### Phase 4 ï¿½ Core deterministic diagnostics
+### Phase 4 - Core deterministic diagnostics
 
 Implement each module behind a common manager interface returning normalized findings and metadata.
 
@@ -150,7 +150,7 @@ Implement each module behind a common manager interface returning normalized fin
 
 **Security**: Report deterministic hardening observations (HTTPS, debug exposure, update status, user-facing REST restrictions where detectable) without changing security settings or exposing secrets.
 
-### Phase 5 ï¿½ SEO analysis
+### Phase 5 - SEO analysis
 
 Create reusable analyzers that operate only during explicit requests.
 
@@ -166,11 +166,11 @@ Implement pagination for `/seo/posts`, `/images/issues`, and `/links/issues` wit
 
 `/seo/issues` aggregates stable issue types and severity counts, preserving evidence and post IDs. It must not generate AI recommendations or alter metadata.
 
-### Phase 6 ï¿½ Admin settings screen
+### Phase 6 - Admin settings screen
 
 Add a small Settings ? AI Diagnostic Bridge screen using capability checks, admin URLs, nonces, sanitization, and escaped output. Show plugin/version, namespace, credential status (never the stored credential), generation/revocation/regeneration actions, last successful/failed authentication, logging status/retention, and available modules. Show a one-time credential notice after generation and require explicit confirmation for revocation/regeneration.
 
-### Phase 7 ï¿½ Tests and quality gates
+### Phase 7 - Tests and quality gates
 
 Add PHPUnit-compatible tests with WordPress test bootstrap when available, plus isolated fixtures/mocks for environments without a full WordPress install. Cover:
 
@@ -187,7 +187,7 @@ Add PHPUnit-compatible tests with WordPress test bootstrap when available, plus 
 
 Run `php -l` across all PHP files, PHPUnit if configured, WordPress coding standards/static checks if available, and a manual REST smoke test against a disposable WordPress site. Fix all syntax, activation, permission, and response-contract errors before release.
 
-### Phase 8 ï¿½ Documentation and release
+### Phase 8 - Documentation and release
 
 Document installation, activation, credential handling, HTTPS/proxy requirements, all endpoints, request/response examples, pagination, rate limiting, module behavior, privacy boundaries, logging retention, and troubleshooting. Include an **AI Architecture** section describing:
 
@@ -252,7 +252,7 @@ Use this section as the implementation tracker. Complete tasks in order unless a
 
 Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` blocked.
 
-### Phase 0 ï¿½ Workspace and decisions
+### Phase 0 - Workspace and decisions
 
 - [x] **T00.1** Confirm the plugin is developed only in this standalone directory/repository and does not modify or install into the existing WordPress/Next.js project.
 - [~] **T00.2** Confirmed on `https://anbenigeria.com`: PHP 8.2.33, WordPress 7.1.1, and HTTPS. Local PHP, PHPUnit, WP-CLI, and coding tools remain unavailable in this shell.
@@ -261,7 +261,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** clean standalone repository, documented environment assumptions, no secrets tracked.
 
-### Phase 1 ï¿½ Plugin bootstrap
+### Phase 1 - Plugin bootstrap
 
 - [x] **T01.1** Create `ai-diagnostic-bridge.php` with plugin headers, constants, PHP/WordPress version guards, namespace bootstrap, and activation/deactivation hooks.
 - [x] **T01.2** Create `includes/class-plugin.php` and load classes only after `plugins_loaded`.
@@ -271,7 +271,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** activation produces no PHP errors and no frontend request performs diagnostics.
 
-### Phase 2 ï¿½ Response and error primitives
+### Phase 2 - Response and error primitives
 
 - [x] **T02.1** Implement `class-response.php` with the standard success/error envelope, plugin metadata, timestamp, check status, findings, and metadata.
 - [x] **T02.2** Define finding builders for stable ID, severity, category, title, factual message, evidence, source, and optional inference fields.
@@ -281,7 +281,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** fixtures can produce a valid response without loading a diagnostic module.
 
-### Phase 3 ï¿½ Credential authentication and logging
+### Phase 3 - Credential authentication and logging
 
 - [x] **T03.1** Implement `class-auth.php` to generate a cryptographically random token, show it once, hash it, and store only the hash and lifecycle metadata.
 - [x] **T03.2** Authenticate HTTPS REST requests using a Bearer token; reject missing, malformed, invalid, and revoked credentials with generic 401 responses.
@@ -292,7 +292,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** authentication tests pass and a generated token is displayed exactly once.
 
-### Phase 4 ï¿½ REST controller and diagnostic manager
+### Phase 4 - REST controller and diagnostic manager
 
 - [x] **T04.1** Implement `class-diagnostic-manager.php` with a registry mapping allowlisted check IDs to diagnostic classes.
 - [x] **T04.2** Implement `class-rest-api.php` and register `/ai-diagnostic/v1` routes with authentication permission callbacks.
@@ -304,7 +304,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** all routes register, unauthenticated calls fail, and only allowlisted modules execute.
 
-### Phase 5 ï¿½ Site and WordPress health modules
+### Phase 5 - Site and WordPress health modules
 
 - [x] **T05.1** Implement `class-site-health.php` for safe WordPress/PHP/database versions, URLs, HTTPS, multisite, permalinks, timezone, locale, limits, active theme/plugins, debug state, cron, and REST availability.
 - [x] **T05.2** Implement deterministic health findings and statuses without exposing configuration contents or private data.
@@ -316,7 +316,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** `/site`, `/health`, `/errors`, `/rest-api`, `/performance`, and `/security` return factual structured findings.
 
-### Phase 6 ï¿½ Plugin, theme, and WooCommerce modules
+### Phase 6 - Plugin, theme, and WooCommerce modules
 
 - [x] **T06.1** Implement `class-plugins.php` using WordPress plugin APIs for installed, active/network-active, version, author, slug, updates, and deterministic observations.
 - [x] **T06.2** Implement `class-themes.php` for active, parent/child, version, stylesheet metadata, directory, and update observations with path redaction.
@@ -326,7 +326,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** module behavior is graceful with and without WooCommerce.
 
-### Phase 7 ï¿½ SEO post analyzers
+### Phase 7 - SEO post analyzers
 
 - [x] **T07.1** Implement `class-seo-manager.php` and a shared post-analysis result contract.
 - [x] **T07.2** Implement `class-post-analysis.php` for public post/page title, slug, excerpt, word count, content, and metadata observations.
@@ -339,7 +339,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** one post can be analyzed deterministically without making edits.
 
-### Phase 8 ï¿½ SEO headings, images, and links
+### Phase 8 - SEO headings, images, and links
 
 - [x] **T08.1** Add heading parsing for H1 count, missing/multiple H1s, hierarchy jumps, empty headings, and long headings.
 - [x] **T08.2** Implement `class-image-analysis.php` for attachment ID, URL, filename, alt presence/length, and featured-image state. Implemented within the post-analysis module.
@@ -350,7 +350,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** image, heading, and link issues are factual, bounded, and paginated.
 
-### Phase 9 ï¿½ SEO collections and aggregation
+### Phase 9 - SEO collections and aggregation
 
 - [x] **T09.1** Implement paginated `GET /seo/posts?per_page=&page=` without loading all posts into memory.
 - [x] **T09.2** Implement `GET /seo/issues` with stable issue types and critical/high/medium/low summary counts.
@@ -359,7 +359,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** SEO dashboard endpoints provide predictable collection and summary contracts.
 
-### Phase 10 ï¿½ Admin settings
+### Phase 10 - Admin settings
 
 - [x] **T10.1** Implement `admin/class-admin.php` and `admin/views/settings.php` under an appropriate capability.
 - [x] **T10.2** Add credential generate/revoke/regenerate actions protected by WordPress nonces and escaped notices.
@@ -368,7 +368,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** administrators can manage credentials safely without frontend exposure.
 
-### Phase 11 ï¿½ Quality gates and documentation
+### Phase 11 - Quality gates and documentation
 
 - [x] **T11.1** Ran `php -l` across 40 plugin/project PHP files (excluding disposable WordPress/tool vendor trees) on 2026-09-25; zero syntax errors.
 - [x] **T11.2** Full local WordPress PHPUnit run passed on 2026-09-25: 81 tests, 804 assertions, one expected WooCommerce-absent skip, exit 0 (PHP 8.3.33, PHPUnit 10.5.64).
@@ -380,7 +380,7 @@ Status values: `[ ]` not started, `[~]` in progress, `[x]` complete, `[!]` block
 
 **Exit evidence:** reproducible test report, clean package, complete documentation, and versioned `0.1.6` release candidate.
 
-## Phase 12 ï¿½ Read-only React dashboard and AI support layer (post-0.1.6)
+## Phase 12 - Read-only React dashboard and AI support layer (post-0.1.6)
 
 The WordPress plugin remains a deterministic evidence source. The dashboard and AI layer are separate from the plugin release and must not receive or store the WordPress diagnostic token in the browser.
 
@@ -394,7 +394,7 @@ The WordPress plugin remains a deterministic evidence source. The dashboard and 
 
 - [x] **T12.6** Added dashboard plugin/core update review: WordPress plugin update transient data, installed-version vulnerability findings, official changelog links, core update urgency, and human-reviewed site-specific release-note explanations. No automatic updates or heuristic bug claims.\n\n## Handoff record`n- [x] **T12.7** Added the evidence-gated `builder-plugin-inactive` Elementor detection and recorded the real incident and timed SEO comparison in SUPPORT-JOURNAL.md.
 
-### Local setup verification ï¿½ 2026-09-21
+### Local setup verification - 2026-09-21
 
 - Local PHP/SQLite write probe passed; WP-CLI confirms WordPress is installed. The previous tooling/write-access blocker is resolved.
 - AI Diagnostic Bridge 0.1.6 copied and activated locally; PHP server started at `http://127.0.0.1:8085`.
@@ -405,7 +405,7 @@ Update this block at the end of each session so another AI can continue safely.
 
 - **Current task:** Phase 12 AI explanation and human verification workflow completed on 2026-09-26; post-release dashboard work remains separate.
 - **Last completed task:** `T11.7` (2026-09-26): local lifecycle verification passed and release `0.1.6` was tagged.
-- **Deployment:** https://ai-diagnostic-bridge.onochieazukaeme.workers.dev ï¿½ version `b32a1199-7267-44d1-8cea-b2f7884c35c3` (includes the verified system-font fallback fix).
+- **Deployment:** https://ai-diagnostic-bridge.onochieazukaeme.workers.dev - version `b32a1199-7267-44d1-8cea-b2f7884c35c3` (includes the verified system-font fallback fix).
 - **Files changed in this session:** `worker/`, dashboard API/auth/connection/findings integration and build fixes, `.gitignore`, and task/evidence records; subsequently added plugin update detection, advisory matcher/tests, and fixed test database shutdown ordering.
 - **Tests/checks run:** Worker type-check, 32 automated tests, dashboard TypeScript/Vite production build, Wrangler dry run, deployed API checks, and headless Edge checks passed. Browser checks cover login/logout, unconfigured state, rejected unapproved URL, cleared token field, mobile overflow, same-origin requests, and known-credential exclusion.
 - **Connection status:** Anbe is now configured in the deployed encrypted store. API/browser smoke scripts passed. Root `.env` still targets local WordPress and was not imported as Anbe. Dashboard sign-in key is in ignored `worker/.private/dashboard-access.txt`; never print it.
