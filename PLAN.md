@@ -392,7 +392,12 @@ The WordPress plugin remains a deterministic evidence source. The dashboard and 
 
 **Exit evidence:** a read-only dashboard can inspect Anbe and the local site through the Worker, and AI explanations are clearly separated from deterministic WordPress evidence.
 
-- [x] **T12.6** Added dashboard plugin/core update review: WordPress plugin update transient data, installed-version vulnerability findings, official changelog links, core update urgency, and human-reviewed site-specific release-note explanations. No automatic updates or heuristic bug claims.\n\n## Handoff record`n- [x] **T12.7** Added the evidence-gated `builder-plugin-inactive` Elementor detection and recorded the real incident and timed SEO comparison in SUPPORT-JOURNAL.md.
+- [x] **T12.6** Added dashboard plugin/core update review: WordPress plugin update transient data, installed-version vulnerability findings, official changelog links, core update urgency, and human-reviewed site-specific release-note explanations. No automatic updates or heuristic bug claims.
+
+- [x] **T12.7** Added the evidence-gated builder-plugin-inactive Elementor detection and recorded the real incident and timed SEO comparison in SUPPORT-JOURNAL.md.
+- [x] **T12.8** Implemented the findings-list UX redesign: severity-first grouped sections, sticky counted collapsible headers, responsive quick-jump navigation, and By severity/By page-post grouping.
+
+## Handoff record
 
 ### Local setup verification - 2026-09-21
 

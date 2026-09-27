@@ -58,6 +58,8 @@ curl -X POST -H 'Authorization: Bearer YOUR_TOKEN' \
 
 Responses use a stable envelope with `success`, `plugin`, `check`, `findings`, and `metadata`. Findings contain bounded evidence rather than raw post bodies, credentials, customer data, action arguments, or PHP log lines.
 
+Deterministic finding coverage includes SEO title/meta/indexability, headings, images, links, plugin updates and known vulnerabilities, WordPress core updates, and `builder-plugin-inactive`. The builder check currently covers Elementor and Elementor Pro: it reports inactive dependencies when published pages contain recognized builder content, and reports site-wide Elementor Pro header/footer templates when Pro is inactive. It does not claim who caused a deactivation.
+
 ## Security model
 
 REST authentication uses a generated 256-bit random token. WordPress stores only a password hash; the raw token is displayed once through the admin screen. Revoke and regenerate invalidate the previous credential. Failed authentication is rate-limited per client and route for five minutes after ten failures. Activity logging records only endpoint, result, duration, timestamp, and authentication outcome; request headers, bodies, query values, and response contents are excluded.
