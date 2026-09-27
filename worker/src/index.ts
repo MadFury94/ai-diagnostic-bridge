@@ -135,6 +135,7 @@ export default {
     if (url.pathname.startsWith('/api/')) {
       let response: Response
       try { response = await api(request, env) } catch (error) {
+        if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') console.error(JSON.stringify({ event: 'local_api_error', message: error instanceof Error ? error.message : String(error) }))
         const known = error instanceof ApiError ? error : new ApiError(500, 'internal_error', 'The dashboard service is unavailable. Please try again.')
         response = json({ success: false, error: { code: known.code, message: known.message } }, known.status, known.status === 429 ? { 'Retry-After': '60' } : {})
       }
