@@ -57,6 +57,12 @@ Connection setup must verify the URL and token with a read-only health request, 
 
 ### Findings list
 
+Findings are arranged for triage rather than insertion order. The default view groups them by severity in this order: Critical, High, Medium, Low, and Informational. Each severity tier has a sticky, collapsible header with its count; Informational starts collapsed because it is non-actionable by default. The first visible tier is therefore always the most urgent result.
+
+A compact sticky quick-jump row links to each severity tier. On narrow screens it remains a horizontally scrollable pill row. The existing filters remain unchanged: severity, category, finding type, post/page, search by title or ID, and Actionable only.
+
+An optional Group by control switches between By severity and By page/post. By page/post keeps each record's findings together, which is useful when several findings affect one page. Findings remain stacked cards on mobile and use the existing wider row treatment on desktop. Severity always includes a text label alongside color.
+
 Each row shows:
 
 - Title

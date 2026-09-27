@@ -491,3 +491,12 @@ Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactiva
 - Manual method 2 (open the specific page directly, check the Yoast meta box in the editor): 34 seconds, once the correct page was known, but the tester did not already know which page or what was broken going in.
 - Tool (AI Diagnostic Bridge dashboard): 18.79 seconds, named the exact finding, meta description missing, with evidence, on first attempt.
 - Note: manual method choice materially affects the result, the dashboard-issues-list approach failed to resolve in reasonable time, while directly checking a known page's editor was faster but still slower than the tool, and required already suspecting which page and what to look for.
+
+
+## 2026-09-27 — Findings list scannability gap and repair
+
+**Symptom:** During the real SEO meta-description timed comparison, the dashboard named the issue quickly but the flat findings list required more scrolling as additional finding types accumulated. Urgent findings were not surfaced as a clear first tier.
+
+**Repair:** Findings now sort Critical → High → Medium → Low → Informational, show sticky counted severity headers that can be collapsed, provide responsive severity jump links, and support optional grouping by page/post. Existing severity, category, post/page, search, and Actionable only filters remain available.
+
+**Validation:** Dashboard TypeScript and production builds passed. The responsive layout uses horizontal scrolling for quick-jump pills on narrow screens and keeps severity labels visible alongside color.

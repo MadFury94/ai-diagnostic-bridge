@@ -465,3 +465,8 @@ The first plugin explanation could remain generic even when an official changelo
 ## 2026-09-26 — Elementor builder-plugin orphan detection
 
 Added the extensible `builder-plugin-inactive` finding. Published posts/pages are checked for Elementor metadata (`_elementor_data` or `_elementor_edit_mode`); when that content exists without `elementor/elementor.php` active, the diagnostic reports high severity with the post/page title, ID, and detected metadata keys. The recommended next step is: `Reactivate Elementor, or this page will not render correctly for visitors.` The builder definition is structured for later Divi/Beaver Builder additions.
+
+
+## 2026-09-27 â€” Findings triage layout
+
+Actual dashboard use during the SEO meta-description timed comparison exposed a UX gap: a flat findings list made urgent issues harder to reach as more finding types were added. Findings now sort and group by severity by default with collapsible counted tiers, a responsive quick-jump row, and an optional By page/post grouping mode. Existing filters are preserved. Dashboard TypeScript and production builds passed.
