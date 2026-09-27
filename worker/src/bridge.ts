@@ -86,7 +86,12 @@ export async function fetchBridge(url: string, token: string, route: string, env
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 12000)
   try {
-    const response = await fetch(`${origin}/wp-json/ai-diagnostic/v1/${route}`, {
+    const localRoute = origin.startsWith('http://127.0.0.1') || origin.startsWith('http://localhost')
+    const [routePath, routeQuery] = route.split('?')
+    const endpoint = localRoute
+      ? `${origin}/index.php?rest_route=/ai-diagnostic/v1/${routePath}${routeQuery ? `&${routeQuery}` : ''}`
+      : `${origin}/wp-json/ai-diagnostic/v1/${route}`
+    const response = await fetch(endpoint, {
       method: 'GET', headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       redirect: 'manual', signal: controller.signal,
     })
