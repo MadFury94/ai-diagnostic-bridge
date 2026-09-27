@@ -95,9 +95,9 @@ final class Builder_Content_Analysis {
 				$is_pro = 'elementor-pro' === $builder;
 				$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding(
 					'builder-plugin-inactive', 'high', 'builder',
-					$is_pro ? 'This page is broken or incomplete because Elementor Pro components are inactive' : 'This page is broken because its Elementor builder plugin is inactive',
-					$is_pro ? 'Reactivate Elementor Pro. The Elementor Pro components on this page will not render correctly for visitors until it is active.' : 'Reactivate Elementor. This page will not render correctly for visitors until the builder is active.',
-					[ 'builder' => $builder, 'post_id' => (int) $post->ID, 'post_title' => sanitize_text_field((string) $post->post_title), 'meta_keys' => $found, 'required_plugin' => $definition['plugin'], 'pro_widget_types' => $is_pro ? self::pro_widgets($raw, $definition['pro_widget_prefixes'] ?? []) : [], 'cause' => 'not_determined', 'cause_note' => 'The diagnostic confirms the required plugin is inactive but cannot determine whether a user action, update, or hosting event caused it.' ], 'builder_content'
+					$is_pro ? 'Elementor Pro is inactive; site-wide components may be missing' : 'This page is broken because its Elementor builder plugin is inactive',
+					$is_pro ? 'Reactivate Elementor Pro to restore site-wide templates such as the header and footer, then verify this page and other affected pages.' : 'Reactivate Elementor. This page will not render correctly for visitors until the builder is active.',
+					[ 'builder' => $builder, 'post_id' => (int) $post->ID, 'post_title' => sanitize_text_field((string) $post->post_title), 'meta_keys' => $found, 'required_plugin' => $definition['plugin'], 'scope' => $is_pro ? 'site_and_page' : 'page', 'scope_note' => $is_pro ? 'Elementor Pro commonly supplies site-wide templates such as headers and footers; this page also contains recognized Pro components.' : 'The affected page contains builder content.', 'pro_widget_types' => $is_pro ? self::pro_widgets($raw, $definition['pro_widget_prefixes'] ?? []) : [], 'cause' => 'not_determined', 'cause_note' => 'The diagnostic confirms the required plugin is inactive but cannot determine whether a user action, update, or hosting event caused it.' ], 'builder_content'
 				);
 			}
 		}

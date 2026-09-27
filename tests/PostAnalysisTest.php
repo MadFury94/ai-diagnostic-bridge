@@ -38,7 +38,7 @@ final class PostAnalysisTest extends TestCase {
 		$findings = PostAnalysis::run(92, $inactive)['findings'];
 		$pro = array_values(array_filter($findings, static fn (array $item): bool => 'elementor-pro/elementor-pro.php' === ($item['evidence']['required_plugin'] ?? '')))[0] ?? null;
 		$this->assertNotNull($pro);
-		$this->assertSame('This page is broken or incomplete because Elementor Pro components are inactive', $pro['title']);
+		$this->assertSame('Elementor Pro is inactive; site-wide components may be missing', $pro['title']);
 		$this->assertSame(['form'], $pro['evidence']['pro_widget_types']);
 		$active = new PostAnalysisFixture($post, ['_elementor_data' => $data], ['elementor/elementor.php', 'elementor-pro/elementor-pro.php']);
 		$this->assertNotContains('elementor-pro/elementor-pro.php', array_column(PostAnalysis::run(92, $active)['findings'], 'evidence.required_plugin'));

@@ -509,3 +509,10 @@ Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactiva
 **Repair:** Added evidence-gated Elementor Pro widget detection from the saved Elementor data. When Pro is inactive, the finding identifies the required Pro plugin and states that the page is broken or incomplete until it is reactivated. The tool reports the observed inactive dependency; it does not claim whether a user, update, or host caused the change.
 
 **Unavailable site behavior:** When WordPress cannot be reached, the dashboard now states that no current findings are available and directs the user to check hosting status, DNS, SSL, firewall rules, and the saved site URL.
+
+
+## 2026-09-27 — Correction: Elementor Pro scope
+
+**Finding:** The first Elementor Pro warning named the Contact Us page as broken. Live review showed that Elementor Pro primarily controls site-wide header/footer templates, so that wording was too narrow.
+
+**Correction:** The finding now says Elementor Pro is inactive; site-wide components may be missing, records scope: site_and_page, identifies the page's recognized Pro components, and tells the reviewer to verify the site-wide header/footer and affected pages. It no longer attributes the whole failure to the named page alone.

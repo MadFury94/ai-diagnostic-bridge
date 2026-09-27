@@ -475,3 +475,6 @@ Actual dashboard use during the SEO meta-description timed comparison exposed a 
 ## 2026-09-27 — Elementor Pro dependency coverage
 
 The builder check now recognizes evidence of Elementor Pro widgets in Elementor data and reports a high-severity uilder-plugin-inactive finding when elementor-pro/elementor-pro.php is inactive. The message explicitly states that the page is broken or incomplete and names the plugin to reactivate. The diagnostic does not infer who caused the deactivation. If WordPress cannot be reached, the dashboard now reports that current findings are unavailable and points the user to hosting, DNS, SSL, firewall, and URL checks.
+
+
+The Elementor Pro finding wording was corrected after live review: Pro commonly controls site-wide header/footer templates, so the finding now reports a site-and-page scope and does not claim that the named Contact Us page alone is broken. It identifies the page's recognized Pro components while directing the user to verify site-wide header/footer rendering.
