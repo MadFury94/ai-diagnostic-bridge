@@ -516,3 +516,10 @@ Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactiva
 **Finding:** The first Elementor Pro warning named the Contact Us page as broken. Live review showed that Elementor Pro primarily controls site-wide header/footer templates, so that wording was too narrow.
 
 **Correction:** The finding now says Elementor Pro is inactive; site-wide components may be missing, records scope: site_and_page, identifies the page's recognized Pro components, and tells the reviewer to verify the site-wide header/footer and affected pages. It no longer attributes the whole failure to the named page alone.
+
+
+## 2026-09-27 — Site-wide Elementor Pro template detection
+
+**Follow-up:** Page-level Pro component evidence alone was insufficient because Elementor Pro commonly owns the global header and footer.
+
+**Repair:** The SEO site check now looks for published Elementor Theme Builder header/footer templates. If Elementor Pro is inactive, it reports a site-wide high finding with affected template types and count. The /findings view shows this observation before page-level findings, so the user sees that all public pages may be affected.

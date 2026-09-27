@@ -37,9 +37,49 @@ final class SEO_Collections {
 
 	public static function site(): array {
 		$public = '1' === (string) get_option('blog_public', '1');
-		return Response::success('seo-site', $public ? 'ok' : 'warning', $public ? [] : [Response::finding('seo-site-not-public', 'medium', 'seo-indexability', 'Site discourages search indexing', 'WordPress is configured to discourage search engines from indexing the site.', [], 'seo')], [
+		$findings = $public ? [] : [Response::finding('seo-site-not-public', 'medium', 'seo-indexability', 'Site discourages search indexing', 'WordPress is configured to discourage search engines from indexing the site.', [], 'seo')];
+		$findings = array_merge($findings, self::builder_site_findings());
+		return Response::success('seo-site', empty($findings) ? 'ok' : 'warning', $findings, [
 			'indexability' => ['public' => $public, 'sitemap' => ['determinable' => false, 'included' => null]],
 		]);
+	}
+
+	/** Detect site-wide Elementor Pro templates whose dependency is inactive. */
+	private static function builder_site_findings(): array {
+		if (in_array('elementor-pro/elementor-pro.php', (array) get_option('active_plugins', []), true)) { return []; }
+		$query = new \WP_Query([
+			'post_type' => 'elementor_library',
+			'post_status' => 'publish',
+			'posts_per_page' => 50,
+			'fields' => 'ids',
+			'no_found_rows' => false,
+			'meta_query' => [
+				'relation' => 'OR',
+				['key' => '_elementor_template_type', 'value' => 'header'],
+				['key' => '_elementor_template_type', 'value' => 'footer'],
+			],
+		]);
+		if (empty($query->posts)) { return []; }
+		$types = [];
+		foreach ((array) $query->posts as $id) {
+			$type = sanitize_key((string) get_post_meta((int) $id, '_elementor_template_type', true));
+			if (in_array($type, ['header', 'footer'], true)) { $types[] = $type; }
+		}
+		$types = array_values(array_unique($types));
+		return [Response::finding(
+			'builder-plugin-inactive', 'high', 'builder', 'Elementor Pro is inactive; site-wide components may be missing',
+			'Elementor Pro site templates are published while Elementor Pro is inactive. Headers and footers may be missing across public pages until the plugin is restored.',
+			[
+				'builder' => 'elementor-pro',
+				'required_plugin' => 'elementor-pro/elementor-pro.php',
+				'scope' => 'site-wide',
+				'affected_components' => $types,
+				'template_count' => count($query->posts),
+				'cause' => 'not_determined',
+				'cause_note' => 'The diagnostic confirms the dependency is inactive but cannot determine whether a user action, update, or hosting event caused it.',
+			],
+			'builder_site_templates'
+		)];
 	}
 
 	private static function query(int $page, int $per_page): \WP_Query|\WP_Error {

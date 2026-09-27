@@ -478,3 +478,6 @@ The builder check now recognizes evidence of Elementor Pro widgets in Elementor 
 
 
 The Elementor Pro finding wording was corrected after live review: Pro commonly controls site-wide header/footer templates, so the finding now reports a site-and-page scope and does not claim that the named Contact Us page alone is broken. It identifies the page's recognized Pro components while directing the user to verify site-wide header/footer rendering.
+
+
+The Elementor Pro check now also inspects published Elementor Theme Builder header/footer templates. If Pro is inactive while those site-wide templates exist, the diagnostic emits a site-level high finding stating that headers/footers may be missing across public pages. The dashboard shows site-wide observations before page-level findings on /findings.
