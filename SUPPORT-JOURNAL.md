@@ -530,3 +530,8 @@ Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactiva
 **Requested behavior:** A hosting outage, blank response, server error, or PHP resource problem should be visible instead of looking like an empty clean scan.
 
 **Implementation:** Worker errors now distinguish unreachable/timeout, HTTP 5xx, and blank or invalid diagnostic responses. The dashboard shows WordPress site unavailable, marks the state high severity with no current findings, explains that the cause cannot be assigned without a valid response, and lists hosting, DNS, SSL, firewall, PHP-log, and URL checks. When WordPress is reachable, the site-health check reports PHP memory limits below 128 MB as medium and below 64 MB as high, with the observed value and threshold in evidence.
+
+
+## 2026-09-27 — Official documentation in builder explanations
+
+The Elementor Pro finding now carries an official Elementor troubleshooting URL. The finding detail renders that link directly, and click-only AI explanations are instructed to explain the evidence in simple English and include the supplied official URL in the repair or verification step.

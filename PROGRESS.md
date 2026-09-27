@@ -486,3 +486,6 @@ The Elementor Pro check now also inspects published Elementor Theme Builder head
 ## 2026-09-27 — Site availability and resource failure reporting
 
 The Worker now distinguishes network/DNS/SSL/firewall reachability failures, request timeouts, HTTP 5xx server responses, and blank/invalid diagnostic responses. The dashboard displays a high-severity WordPress unavailable card with the observed error and checks to perform, without assigning blame. The WordPress site-health check now reports low PHP memory limits as medium or high severity with the observed limit and threshold evidence.
+
+
+AI builder explanations now receive the official Elementor troubleshooting URL from deterministic evidence. The finding detail also renders that link directly, and the AI prompt is required to explain the evidence in simple English and include the official URL when available.
