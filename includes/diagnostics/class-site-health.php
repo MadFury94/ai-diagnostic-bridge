@@ -28,6 +28,12 @@ final class Site_Health {
 			$findings[] = Response::finding( 'plain-permalinks', 'low', 'configuration', 'Plain permalinks are enabled', 'The installation has no custom permalink structure configured.', [ 'permalink_structure' => '' ], 'wordpress' );
 		}
 
+		$memory_bytes = function_exists( 'wp_convert_hr_to_bytes' ) ? (int) wp_convert_hr_to_bytes( (string) $memory_limit ) : 0;
+		if ( $memory_bytes > 0 && $memory_bytes < 128 * 1024 * 1024 ) {
+			$severity = $memory_bytes < 64 * 1024 * 1024 ? 'high' : 'medium';
+			$findings[] = Response::finding( 'php-memory-limit-low', $severity, 'performance', 'PHP memory limit may be too low', 'The PHP memory limit is below the level commonly needed by a plugin-heavy WordPress site and can contribute to failed requests or blank/error pages.', [ 'memory_limit' => sanitize_text_field( (string) $memory_limit ), 'bytes' => $memory_bytes, 'recommended_minimum_bytes' => 128 * 1024 * 1024 ], 'wordpress' );
+		}
+
 		return Response::success(
 			$check_id,
 			empty( $findings ) ? 'ok' : 'warning',

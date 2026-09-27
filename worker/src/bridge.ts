@@ -15,7 +15,7 @@ export function bridgePath(path: string, params: URLSearchParams) {
 }
 
 // Only known, bounded diagnostic observation fields survive the proxy.
-const safeKeys = new Set(('contract contract_version available post id post_id post_type title value length min_length max_length check status timestamp observations slug excerpt present character_count word_count meta_description source indexability public password_protected noindex canonical sitemap determinable included headings images links count missing_alt_count featured_image attachment_id items url filename alt_present alt_length featured internal external missing_href malformed duplicate h1_count empty_count long_count hierarchy_jumps truncated pagination page per_page total pages issue_counts site home_url wp_version php_version database_version multisite https permalink_structure timezone locale memory_limit max_upload_size max_post_size active_theme active_theme_version active_plugin_count debug cron_disabled signal duplicates title_slug slug_matches_title image_count missing_alt heading_count level previous_level href index bytes_read plugins name version active network_active author update vulnerability available_version version_jump last_checked installed_version plugin advisory_id advisory_url cves affected_ranges cvss_score advisory_severity feed_updated unverifiable_advisories checked_at cache_age_seconds served_from_cache vulnerability_lookup_limit min max inclusive installed currency database_update_needed cart_page_id checkout_page_id shop_page_id pages published_page payment_gateway_count enabled_payment_gateway_count shipping enabled zone_count enabled_method_count scheduled_actions scope overdue_grace_seconds failed overdue count hpos_enabled observed_count').split(' '))
+const safeKeys = new Set(('contract contract_version available post id post_id post_type title value length min_length max_length check status timestamp observations slug excerpt present character_count word_count meta_description source indexability public password_protected noindex canonical sitemap determinable included headings images links count missing_alt_count featured_image attachment_id items url filename alt_present alt_length featured internal external missing_href malformed duplicate h1_count empty_count long_count hierarchy_jumps truncated pagination page per_page total pages issue_counts site home_url wp_version php_version database_version multisite https permalink_structure timezone locale memory_limit bytes recommended_minimum_bytes max_upload_size max_post_size active_theme active_theme_version active_plugin_count debug cron_disabled signal duplicates title_slug slug_matches_title image_count missing_alt heading_count level previous_level href index bytes_read plugins name version active network_active author update vulnerability available_version version_jump last_checked installed_version plugin advisory_id advisory_url cves affected_ranges cvss_score advisory_severity feed_updated unverifiable_advisories checked_at cache_age_seconds served_from_cache vulnerability_lookup_limit min max inclusive installed currency database_update_needed cart_page_id checkout_page_id shop_page_id pages published_page payment_gateway_count enabled_payment_gateway_count shipping enabled zone_count enabled_method_count scheduled_actions scope overdue_grace_seconds failed overdue count hpos_enabled observed_count template_count affected_components cause cause_note scope_note required_plugin pro_widget_types').split(' '))
 for (const field of ['match_count', 'hierarchy_jump_count', 'long_alt_count', 'internal_count', 'external_count', 'missing_href_count', 'malformed_count', 'duplicate_count']) safeKeys.add(field)
 function cleanText(value: string, secrets: string[]) {
   let result = value
@@ -63,7 +63,7 @@ function findings(value: unknown, secrets: string[]): Json[] {
 }
 export function sanitizeEnvelope(value: unknown, secrets: string[]) {
   const data = object(value)
-  if (data.success !== true || object(data.plugin).name !== 'AI Diagnostic Bridge' || !['ok', 'warning', 'error', 'not_applicable', 'unknown'].includes(String(object(data.check).status))) throw new ApiError(502, 'invalid_contract', 'The site did not return the expected diagnostic response.')
+  if (data.success !== true || object(data.plugin).name !== 'AI Diagnostic Bridge' || !['ok', 'warning', 'error', 'not_applicable', 'unknown'].includes(String(object(data.check).status))) throw new ApiError(502, 'invalid_contract', 'WordPress responded, but the response was blank or not a valid AI Diagnostic Bridge result. Check for a PHP/server error, plugin configuration issue, or hosting response problem.')
   const original = object(data.metadata)
   const metadata = object(safeValue(original, secrets))
   if (Array.isArray(original.items)) metadata.items = original.items.map(item => {
@@ -99,11 +99,13 @@ export async function fetchBridge(url: string, token: string, route: string, env
       await response.body?.cancel()
       if ([401, 403].includes(response.status)) throw new ApiError(502, 'wordpress_auth', 'WordPress refused the credential. Replace the token in Site connection.')
       if (response.status === 429) throw new ApiError(429, 'wordpress_rate_limit', 'WordPress is rate limiting requests. Wait a minute before retrying.')
-      throw new ApiError(502, 'wordpress_route', 'The WordPress diagnostic route is unavailable. Check the plugin and site URL.')
+      if (response.status >= 500) throw new ApiError(502, 'wordpress_server_error', `WordPress returned HTTP ${response.status}. The site or hosting server may be experiencing a server-side failure; no current findings are available.`)
+      throw new ApiError(502, 'wordpress_route', `WordPress returned HTTP ${response.status} for the diagnostic route. Check the plugin, site URL, and hosting configuration.`)
     }
     return sanitizeEnvelope(await boundedJson(response, 1024 * 1024), [token, env.DASHBOARD_PASSWORD, env.SESSION_KEY, env.CREDENTIAL_KEY])
   } catch (error) {
-    if (error instanceof ApiError) throw error
+		if (error instanceof ApiError) throw error
+		if (error instanceof DOMException && error.name === 'AbortError') throw new ApiError(504, 'wordpress_timeout', 'WordPress did not respond within 12 seconds. The site or hosting server may be slow or unavailable; no current findings are available.')
 		throw new ApiError(502, 'wordpress_network', 'The WordPress site could not be reached, so no current findings are available. Check hosting status, DNS, SSL, firewall rules, and the saved site URL.')
   } finally { clearTimeout(timeout) }
 }

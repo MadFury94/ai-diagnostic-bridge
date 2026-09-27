@@ -523,3 +523,10 @@ Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactiva
 **Follow-up:** Page-level Pro component evidence alone was insufficient because Elementor Pro commonly owns the global header and footer.
 
 **Repair:** The SEO site check now looks for published Elementor Theme Builder header/footer templates. If Elementor Pro is inactive, it reports a site-wide high finding with affected template types and count. The /findings view shows this observation before page-level findings, so the user sees that all public pages may be affected.
+
+
+## 2026-09-27 — Site unavailable and PHP resource reporting
+
+**Requested behavior:** A hosting outage, blank response, server error, or PHP resource problem should be visible instead of looking like an empty clean scan.
+
+**Implementation:** Worker errors now distinguish unreachable/timeout, HTTP 5xx, and blank or invalid diagnostic responses. The dashboard shows WordPress site unavailable, marks the state high severity with no current findings, explains that the cause cannot be assigned without a valid response, and lists hosting, DNS, SSL, firewall, PHP-log, and URL checks. When WordPress is reachable, the site-health check reports PHP memory limits below 128 MB as medium and below 64 MB as high, with the observed value and threshold in evidence.

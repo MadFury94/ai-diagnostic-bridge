@@ -481,3 +481,8 @@ The Elementor Pro finding wording was corrected after live review: Pro commonly 
 
 
 The Elementor Pro check now also inspects published Elementor Theme Builder header/footer templates. If Pro is inactive while those site-wide templates exist, the diagnostic emits a site-level high finding stating that headers/footers may be missing across public pages. The dashboard shows site-wide observations before page-level findings on /findings.
+
+
+## 2026-09-27 — Site availability and resource failure reporting
+
+The Worker now distinguishes network/DNS/SSL/firewall reachability failures, request timeouts, HTTP 5xx server responses, and blank/invalid diagnostic responses. The dashboard displays a high-severity WordPress unavailable card with the observed error and checks to perform, without assigning blame. The WordPress site-health check now reports low PHP memory limits as medium or high severity with the observed limit and threshold evidence.
