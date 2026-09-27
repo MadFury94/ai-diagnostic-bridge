@@ -97,7 +97,7 @@ final class Builder_Content_Analysis {
 					'builder-plugin-inactive', 'high', 'builder',
 					$is_pro ? 'This page is broken or incomplete because Elementor Pro components are inactive' : 'This page is broken because its Elementor builder plugin is inactive',
 					$is_pro ? 'Reactivate Elementor Pro. The Elementor Pro components on this page will not render correctly for visitors until it is active.' : 'Reactivate Elementor. This page will not render correctly for visitors until the builder is active.',
-					[ 'builder' => $builder, 'post_id' => (int) $post->ID, 'post_title' => sanitize_text_field((string) $post->post_title), 'meta_keys' => $found, 'required_plugin' => $definition['plugin'], 'pro_widget_types' => $is_pro ? self::pro_widgets($raw, $definition['pro_widget_prefixes'] ?? []) : [] ], 'builder_content'
+					[ 'builder' => $builder, 'post_id' => (int) $post->ID, 'post_title' => sanitize_text_field((string) $post->post_title), 'meta_keys' => $found, 'required_plugin' => $definition['plugin'], 'pro_widget_types' => $is_pro ? self::pro_widgets($raw, $definition['pro_widget_prefixes'] ?? []) : [], 'cause' => 'not_determined', 'cause_note' => 'The diagnostic confirms the required plugin is inactive but cannot determine whether a user action, update, or hosting event caused it.' ], 'builder_content'
 				);
 			}
 		}
