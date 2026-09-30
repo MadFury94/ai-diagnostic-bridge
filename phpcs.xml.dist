@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset name="AI Diagnostic Bridge">
+    <description>WordPress Coding Standards for the shipped PHP plugin.</description>
+    <file>ai-diagnostic-bridge.php</file>
+    <file>uninstall.php</file>
+    <file>admin</file>
+    <file>includes</file>
+    <arg name="extensions" value="php"/>
+    <arg value="s"/>
+    <rule ref="WordPress"/>
+</ruleset>

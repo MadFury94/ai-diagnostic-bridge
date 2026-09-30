@@ -1,4 +1,11 @@
 <?php
+/**
+ * Render credential settings in the scope supplied by Admin::render().
+ *
+ * @package AIDiagnosticBridge
+ * @var mixed $token One-time transient value, or false when absent.
+ * @var array{configured:bool,created_at:string,revoked_at:string,last_auth_success:string,last_auth_failure:string} $status Credential status from Auth::status().
+ */
 
 declare(strict_types=1);
 
@@ -22,8 +29,8 @@ $notice = isset( $_GET['aidb_notice'] ) ? sanitize_key( wp_unslash( $_GET['aidb_
 		<tr><th scope="row">Plugin version</th><td><?php echo esc_html( \BrianAzukaeme\AIDiagnosticBridge\Plugin::version() ); ?></td></tr>
 		<tr><th scope="row">REST namespace</th><td><code>/wp-json/ai-diagnostic/v1/</code></td></tr>
 		<tr><th scope="row">Credential status</th><td><?php echo ! empty( $status['configured'] ) ? esc_html__( 'Configured', 'ai-diagnostic-bridge' ) : esc_html__( 'Not configured', 'ai-diagnostic-bridge' ); ?></td></tr>
-		<tr><th scope="row">Last successful request</th><td><?php echo esc_html( $status['last_auth_success'] ?: 'Never' ); ?></td></tr>
-		<tr><th scope="row">Last failed authentication</th><td><?php echo esc_html( $status['last_auth_failure'] ?: 'Never' ); ?></td></tr>
+		<tr><th scope="row">Last successful request</th><td><?php echo esc_html( $status['last_auth_success'] ? $status['last_auth_success'] : 'Never' ); ?></td></tr>
+		<tr><th scope="row">Last failed authentication</th><td><?php echo esc_html( $status['last_auth_failure'] ? $status['last_auth_failure'] : 'Never' ); ?></td></tr>
 	</table>
 	<h2><?php echo esc_html__( 'Credential management', 'ai-diagnostic-bridge' ); ?></h2>
 	<p><?php echo esc_html__( 'Keep this credential in your Cloudflare Worker or other server-side secret store. Do not place it in a browser application.', 'ai-diagnostic-bridge' ); ?></p>

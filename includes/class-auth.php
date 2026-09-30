@@ -8,26 +8,26 @@ use WP_REST_Request;
 
 final class Auth {
 	private const RATE_LIMIT_PREFIX = 'aidb_auth_fail_';
-	private const RATE_LIMIT_MAX     = 10;
-	private const RATE_LIMIT_WINDOW  = 300;
+	private const RATE_LIMIT_MAX    = 10;
+	private const RATE_LIMIT_WINDOW = 300;
 
 	/** @return array{token:string,created_at:string} */
 	public static function generate(): array {
-		$token   = bin2hex( random_bytes( 32 ) );
-		$settings = Plugin::settings();
+		$token                             = bin2hex( random_bytes( 32 ) );
+		$settings                          = Plugin::settings();
 		$settings['credential_hash']       = password_hash( $token, PASSWORD_DEFAULT );
 		$settings['credential_created_at'] = gmdate( DATE_ATOM );
 		$settings['credential_revoked_at'] = '';
 		Plugin::update_settings( $settings );
 
-		return [
+		return array(
 			'token'      => $token,
 			'created_at' => $settings['credential_created_at'],
-		];
+		);
 	}
 
 	public static function revoke(): bool {
-		$settings = Plugin::settings();
+		$settings                          = Plugin::settings();
 		$settings['credential_hash']       = '';
 		$settings['credential_revoked_at'] = gmdate( DATE_ATOM );
 		return Plugin::update_settings( $settings );
@@ -62,13 +62,13 @@ final class Auth {
 
 	public static function status(): array {
 		$settings = Plugin::settings();
-		return [
-			'configured'          => ! empty( $settings['credential_hash'] ) && empty( $settings['credential_revoked_at'] ),
-			'created_at'          => (string) ( $settings['credential_created_at'] ?? '' ),
-			'revoked_at'          => (string) ( $settings['credential_revoked_at'] ?? '' ),
-			'last_auth_success'   => (string) ( $settings['last_auth_success'] ?? '' ),
-			'last_auth_failure'   => (string) ( $settings['last_auth_failure'] ?? '' ),
-		];
+		return array(
+			'configured'        => ! empty( $settings['credential_hash'] ) && empty( $settings['credential_revoked_at'] ),
+			'created_at'        => (string) ( $settings['credential_created_at'] ?? '' ),
+			'revoked_at'        => (string) ( $settings['credential_revoked_at'] ?? '' ),
+			'last_auth_success' => (string) ( $settings['last_auth_success'] ?? '' ),
+			'last_auth_failure' => (string) ( $settings['last_auth_failure'] ?? '' ),
+		);
 	}
 
 	private static function request_identifier( WP_REST_Request $request ): string {
@@ -82,11 +82,10 @@ final class Auth {
 
 	private static function record_failure( string $identifier ): void {
 		$key   = self::RATE_LIMIT_PREFIX . $identifier;
-	$count = (int) get_transient( $key ) + 1;
+		$count = (int) get_transient( $key ) + 1;
 		set_transient( $key, $count, self::RATE_LIMIT_WINDOW );
-		$settings                     = Plugin::settings();
+		$settings                      = Plugin::settings();
 		$settings['last_auth_failure'] = gmdate( DATE_ATOM );
 		Plugin::update_settings( $settings );
 	}
 }
-

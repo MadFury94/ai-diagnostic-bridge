@@ -17,97 +17,151 @@ final class REST_API {
 	private static ?\WeakMap $requests = null;
 
 	public static function register(): void {
-		add_filter( 'rest_request_before_callbacks', [ self::class, 'start_activity' ], 10, 3 );
-		add_filter( 'rest_request_after_callbacks', [ self::class, 'finish_activity' ], 10, 3 );
-		$routes = [
-			'site'    => [ 'callback' => [ self::class, 'site' ] ],
-			'health'  => [ 'callback' => [ self::class, 'health' ] ],
-            'core-updates' => [ 'callback' => [ self::class, 'core_updates' ] ],
-			'plugins' => [ 'callback' => [ self::class, 'plugins' ] ],
-			'themes'  => [ 'callback' => [ self::class, 'themes' ] ],
-			'errors'  => [ 'callback' => [ self::class, 'errors' ] ],
-			'rest-api' => [ 'callback' => [ self::class, 'rest_api' ] ],
-			'performance' => [ 'callback' => [ self::class, 'performance' ] ],
-			'security' => [ 'callback' => [ self::class, 'security' ] ],
-			'woocommerce' => [ 'callback' => [ self::class, 'woocommerce' ] ],
-		];
+		add_filter( 'rest_request_before_callbacks', array( self::class, 'start_activity' ), 10, 3 );
+		add_filter( 'rest_request_after_callbacks', array( self::class, 'finish_activity' ), 10, 3 );
+		$routes = array(
+			'site'         => array( 'callback' => array( self::class, 'site' ) ),
+			'health'       => array( 'callback' => array( self::class, 'health' ) ),
+			'core-updates' => array( 'callback' => array( self::class, 'core_updates' ) ),
+			'plugins'      => array( 'callback' => array( self::class, 'plugins' ) ),
+			'themes'       => array( 'callback' => array( self::class, 'themes' ) ),
+			'errors'       => array( 'callback' => array( self::class, 'errors' ) ),
+			'rest-api'     => array( 'callback' => array( self::class, 'rest_api' ) ),
+			'performance'  => array( 'callback' => array( self::class, 'performance' ) ),
+			'security'     => array( 'callback' => array( self::class, 'security' ) ),
+			'woocommerce'  => array( 'callback' => array( self::class, 'woocommerce' ) ),
+		);
 
 		foreach ( $routes as $route => $args ) {
-			register_rest_route( 'ai-diagnostic/v1', '/' . $route, [
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => $args['callback'],
-				'permission_callback' => [ self::class, 'permission' ],
-				'aidb_endpoint'       => $route,
-			] );
+			register_rest_route(
+				'ai-diagnostic/v1',
+				'/' . $route,
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => $args['callback'],
+					'permission_callback' => array( self::class, 'permission' ),
+					'aidb_endpoint'       => $route,
+				)
+			);
 		}
 
-		register_rest_route( 'ai-diagnostic/v1', '/seo/post/(?P<id>\\d+)', [
-			'methods'             => WP_REST_Server::READABLE,
-			'callback'            => [ self::class, 'seo_post' ],
-			'permission_callback' => [ self::class, 'permission' ],
-			'aidb_endpoint'       => 'seo/post',
-			'args'                => [
-				'id' => [
-					'required' => true,
-					'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value > 0,
-				],
-			],
-		] );
-		register_rest_route( 'ai-diagnostic/v1', '/images/issues', [
-			'methods' => WP_REST_Server::READABLE,
-			'callback' => [ self::class, 'image_issues' ],
-			'permission_callback' => [ self::class, 'permission' ],
-			'aidb_endpoint' => 'images/issues',
-			'args' => [
-				'page' => [ 'default' => 1, 'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 1000 ],
-				'per_page' => [ 'default' => 20, 'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 50 ],
-			],
-		] );
-		register_rest_route( 'ai-diagnostic/v1', '/links/issues', [
-			'methods' => WP_REST_Server::READABLE,
-			'callback' => [ self::class, 'link_issues' ],
-			'permission_callback' => [ self::class, 'permission' ],
-			'aidb_endpoint' => 'links/issues',
-			'args' => [
-				'page' => [ 'default' => 1, 'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 1000 ],
-				'per_page' => [ 'default' => 20, 'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 50 ],
-			],
-		] );
-		foreach ( ['seo/posts' => 'seo_posts', 'seo/issues' => 'seo_issues'] as $route => $callback ) {
-			register_rest_route( 'ai-diagnostic/v1', '/' . $route, [
-				'methods' => WP_REST_Server::READABLE,
-				'callback' => [ self::class, $callback ],
-				'permission_callback' => [ self::class, 'permission' ],
-				'aidb_endpoint' => $route,
-				'args' => [
-					'page' => [ 'default' => 1, 'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 1000 ],
-					'per_page' => [ 'default' => 20, 'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 50 ],
-				],
-			] );
-		}
-		register_rest_route( 'ai-diagnostic/v1', '/seo/site', [ 'methods' => WP_REST_Server::READABLE, 'callback' => [ self::class, 'seo_site' ], 'permission_callback' => [ self::class, 'permission' ], 'aidb_endpoint' => 'seo/site' ] );
-
-		register_rest_route( 'ai-diagnostic/v1', '/diagnostic', [
-			[
+		register_rest_route(
+			'ai-diagnostic/v1',
+			'/seo/post/(?P<id>\\d+)',
+			array(
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ self::class, 'diagnostic_get' ],
-				'aidb_endpoint'       => 'diagnostic',
-				'permission_callback' => [ self::class, 'permission' ],
-			],
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ self::class, 'diagnostic_post' ],
-				'aidb_endpoint'       => 'diagnostic',
-				'permission_callback' => [ self::class, 'permission' ],
-			],
-		] );
+				'callback'            => array( self::class, 'seo_post' ),
+				'permission_callback' => array( self::class, 'permission' ),
+				'aidb_endpoint'       => 'seo/post',
+				'args'                => array(
+					'id' => array(
+						'required'          => true,
+						'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value > 0,
+					),
+				),
+			)
+		);
+		register_rest_route(
+			'ai-diagnostic/v1',
+			'/images/issues',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( self::class, 'image_issues' ),
+				'permission_callback' => array( self::class, 'permission' ),
+				'aidb_endpoint'       => 'images/issues',
+				'args'                => array(
+					'page'     => array(
+						'default'           => 1,
+						'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value >= 1 && (int) $value <= 1000,
+					),
+					'per_page' => array(
+						'default'           => 20,
+						'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value >= 1 && (int) $value <= 50,
+					),
+				),
+			)
+		);
+		register_rest_route(
+			'ai-diagnostic/v1',
+			'/links/issues',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( self::class, 'link_issues' ),
+				'permission_callback' => array( self::class, 'permission' ),
+				'aidb_endpoint'       => 'links/issues',
+				'args'                => array(
+					'page'     => array(
+						'default'           => 1,
+						'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value >= 1 && (int) $value <= 1000,
+					),
+					'per_page' => array(
+						'default'           => 20,
+						'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value >= 1 && (int) $value <= 50,
+					),
+				),
+			)
+		);
+		foreach ( array(
+			'seo/posts'  => 'seo_posts',
+			'seo/issues' => 'seo_issues',
+		) as $route => $callback ) {
+			register_rest_route(
+				'ai-diagnostic/v1',
+				'/' . $route,
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( self::class, $callback ),
+					'permission_callback' => array( self::class, 'permission' ),
+					'aidb_endpoint'       => $route,
+					'args'                => array(
+						'page'     => array(
+							'default'           => 1,
+							'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value >= 1 && (int) $value <= 1000,
+						),
+						'per_page' => array(
+							'default'           => 20,
+							'validate_callback' => static fn ( $value ): bool => is_numeric( $value ) && (int) $value >= 1 && (int) $value <= 50,
+						),
+					),
+				)
+			);
+		}
+		register_rest_route(
+			'ai-diagnostic/v1',
+			'/seo/site',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( self::class, 'seo_site' ),
+				'permission_callback' => array( self::class, 'permission' ),
+				'aidb_endpoint'       => 'seo/site',
+			)
+		);
+
+		register_rest_route(
+			'ai-diagnostic/v1',
+			'/diagnostic',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( self::class, 'diagnostic_get' ),
+					'aidb_endpoint'       => 'diagnostic',
+					'permission_callback' => array( self::class, 'permission' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( self::class, 'diagnostic_post' ),
+					'aidb_endpoint'       => 'diagnostic',
+					'permission_callback' => array( self::class, 'permission' ),
+				),
+			)
+		);
 	}
 
 	public static function permission( WP_REST_Request $request ) {
 		$authenticated = Auth::authenticate( $request );
 		if ( isset( self::$requests[ $request ] ) ) {
-			$context = self::$requests[ $request ];
-			$context['authenticated'] = $authenticated;
+			$context                    = self::$requests[ $request ];
+			$context['authenticated']   = $authenticated;
 			self::$requests[ $request ] = $context;
 		}
 
@@ -119,13 +173,13 @@ final class REST_API {
 	}
 
 	public static function start_activity( $response, array $handler, WP_REST_Request $request ) {
-		if ( ( $handler['permission_callback'] ?? null ) === [ self::class, 'permission' ] && isset( $handler['aidb_endpoint'] ) ) {
-			self::$requests ??= new \WeakMap();
-			self::$requests[ $request ] = [
-				'endpoint' => $handler['aidb_endpoint'],
-				'started' => hrtime( true ),
+		if ( ( $handler['permission_callback'] ?? null ) === array( self::class, 'permission' ) && isset( $handler['aidb_endpoint'] ) ) {
+			self::$requests           ??= new \WeakMap();
+			self::$requests[ $request ] = array(
+				'endpoint'      => $handler['aidb_endpoint'],
+				'started'       => hrtime( true ),
 				'authenticated' => false,
-			];
+			);
 		}
 		return $response;
 	}
@@ -137,9 +191,9 @@ final class REST_API {
 		$context = self::$requests[ $request ];
 		unset( self::$requests[ $request ] );
 		$normalized = rest_ensure_response( $response );
-		$success = ! is_wp_error( $normalized );
+		$success    = ! is_wp_error( $normalized );
 		if ( $success ) {
-			$data = $normalized->get_data();
+			$data    = $normalized->get_data();
 			$success = $normalized->get_status() < 400 && ( ! is_array( $data ) || ( $data['success'] ?? true ) !== false );
 		}
 		Activity_Log::record(
@@ -151,31 +205,44 @@ final class REST_API {
 		return $response;
 	}
 
-	public static function site(): array { return Diagnostic_Manager::run( [ 'site' ] )['checks']['site']; }
-	public static function health(): array { return Diagnostic_Manager::run( [ 'health' ] )['checks']['health']; }
-	public static function core_updates(): array { return Diagnostic_Manager::run( [ 'core-updates' ] )['checks']['core-updates']; }
-	public static function plugins(): array { return Diagnostic_Manager::run( [ 'plugins' ] )['checks']['plugins']; }
-	public static function themes(): array { return Diagnostic_Manager::run( [ 'themes' ] )['checks']['themes']; }
-	public static function errors(): array { return Diagnostic_Manager::run( [ 'errors' ] )['checks']['errors']; }
-	public static function rest_api(): array { return Diagnostic_Manager::run( [ 'rest-api' ] )['checks']['rest-api']; }
-	public static function performance(): array { return Diagnostic_Manager::run( [ 'performance' ] )['checks']['performance']; }
-	public static function security(): array { return Diagnostic_Manager::run( [ 'security' ] )['checks']['security']; }
-	public static function woocommerce(): array { return Diagnostic_Manager::run( [ 'woocommerce' ] )['checks']['woocommerce']; }
+	public static function site(): array {
+		return Diagnostic_Manager::run( array( 'site' ) )['checks']['site']; }
+	public static function health(): array {
+		return Diagnostic_Manager::run( array( 'health' ) )['checks']['health']; }
+	public static function core_updates(): array {
+		return Diagnostic_Manager::run( array( 'core-updates' ) )['checks']['core-updates']; }
+	public static function plugins(): array {
+		return Diagnostic_Manager::run( array( 'plugins' ) )['checks']['plugins']; }
+	public static function themes(): array {
+		return Diagnostic_Manager::run( array( 'themes' ) )['checks']['themes']; }
+	public static function errors(): array {
+		return Diagnostic_Manager::run( array( 'errors' ) )['checks']['errors']; }
+	public static function rest_api(): array {
+		return Diagnostic_Manager::run( array( 'rest-api' ) )['checks']['rest-api']; }
+	public static function performance(): array {
+		return Diagnostic_Manager::run( array( 'performance' ) )['checks']['performance']; }
+	public static function security(): array {
+		return Diagnostic_Manager::run( array( 'security' ) )['checks']['security']; }
+	public static function woocommerce(): array {
+		return Diagnostic_Manager::run( array( 'woocommerce' ) )['checks']['woocommerce']; }
 	public static function seo_post( WP_REST_Request $request ): array {
 		return Post_Analysis::run( (int) $request['id'] );
 	}
 	public static function image_issues( WP_REST_Request $request ): array|\WP_Error {
-		return Image_Issues::run( (int) $request->get_param('page'), (int) $request->get_param('per_page') );
+		return Image_Issues::run( (int) $request->get_param( 'page' ), (int) $request->get_param( 'per_page' ) );
 	}
 	public static function link_issues( WP_REST_Request $request ): array|\WP_Error {
-		return Link_Issues::run( (int) $request->get_param('page'), (int) $request->get_param('per_page') );
+		return Link_Issues::run( (int) $request->get_param( 'page' ), (int) $request->get_param( 'per_page' ) );
 	}
-	public static function seo_posts( WP_REST_Request $request ): array|\WP_Error { return SEO_Collections::posts((int) $request->get_param('page'), (int) $request->get_param('per_page')); }
-	public static function seo_issues( WP_REST_Request $request ): array|\WP_Error { return SEO_Collections::issues((int) $request->get_param('page'), (int) $request->get_param('per_page')); }
-	public static function seo_site(): array { return SEO_Collections::site(); }
+	public static function seo_posts( WP_REST_Request $request ): array|\WP_Error {
+		return SEO_Collections::posts( (int) $request->get_param( 'page' ), (int) $request->get_param( 'per_page' ) ); }
+	public static function seo_issues( WP_REST_Request $request ): array|\WP_Error {
+		return SEO_Collections::issues( (int) $request->get_param( 'page' ), (int) $request->get_param( 'per_page' ) ); }
+	public static function seo_site(): array {
+		return SEO_Collections::site(); }
 
 	public static function diagnostic_get( WP_REST_Request $request ): array|\WP_Error {
-		$checks = $request->has_param( 'checks' ) ? $request->get_param( 'checks' ) : [];
+		$checks = $request->has_param( 'checks' ) ? $request->get_param( 'checks' ) : array();
 		return self::run_checks( $checks );
 	}
 
@@ -205,4 +272,3 @@ final class REST_API {
 		return Diagnostic_Manager::run( $checks );
 	}
 }
-

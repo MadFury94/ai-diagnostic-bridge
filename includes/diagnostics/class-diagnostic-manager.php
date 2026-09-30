@@ -8,18 +8,18 @@ use BrianAzukaeme\AIDiagnosticBridge\Response;
 
 final class Diagnostic_Manager {
 	/** @var array<string, callable> */
-	private const CHECKS = [
-		'site'    => [ Site_Health::class, 'run' ],
-		'health'  => [ self::class, 'health' ],
-        'core-updates' => [ Core_Updates::class, 'run' ],
-		'plugins' => [ Plugins::class, 'run' ],
-		'themes'  => [ Themes::class, 'run' ],
-		'errors'  => [ PHP_Errors::class, 'run' ],
-		'rest-api' => [ REST_API_Check::class, 'run' ],
-		'performance' => [ Performance::class, 'run' ],
-		'security' => [ Security::class, 'run' ],
-		'woocommerce' => [ WooCommerce::class, 'run' ],
-	];
+	private const CHECKS = array(
+		'site'         => array( Site_Health::class, 'run' ),
+		'health'       => array( self::class, 'health' ),
+		'core-updates' => array( Core_Updates::class, 'run' ),
+		'plugins'      => array( Plugins::class, 'run' ),
+		'themes'       => array( Themes::class, 'run' ),
+		'errors'       => array( PHP_Errors::class, 'run' ),
+		'rest-api'     => array( REST_API_Check::class, 'run' ),
+		'performance'  => array( Performance::class, 'run' ),
+		'security'     => array( Security::class, 'run' ),
+		'woocommerce'  => array( WooCommerce::class, 'run' ),
+	);
 
 	public static function available_checks(): array {
 		return array_keys( self::CHECKS );
@@ -41,24 +41,29 @@ final class Diagnostic_Manager {
 		$requested = array_values( array_unique( $checks ) );
 		$unknown   = array_values( array_diff( $requested, self::available_checks() ) );
 		if ( empty( $requested ) ) {
-			$requested = [ 'site' ];
+			$requested = array( 'site' );
 		}
 
 		if ( ! empty( $unknown ) ) {
 			return Response::error( 'invalid_checks', 'One or more requested diagnostic checks are not available.', 400 );
 		}
 
-		$results = [];
+		$results = array();
 		foreach ( $requested as $check ) {
 			$results[ $check ] = call_user_func( self::CHECKS[ $check ] );
 		}
 
-		return [
-			'success' => true,
-			'plugin'  => [ 'name' => 'AI Diagnostic Bridge', 'version' => \BrianAzukaeme\AIDiagnosticBridge\Plugin::version() ],
-			'checks'  => $results,
-			'metadata' => [ 'requested' => $requested, 'timestamp' => gmdate( DATE_ATOM ) ],
-		];
+		return array(
+			'success'  => true,
+			'plugin'   => array(
+				'name'    => 'AI Diagnostic Bridge',
+				'version' => \BrianAzukaeme\AIDiagnosticBridge\Plugin::version(),
+			),
+			'checks'   => $results,
+			'metadata' => array(
+				'requested' => $requested,
+				'timestamp' => gmdate( DATE_ATOM ),
+			),
+		);
 	}
 }
-

@@ -1,0 +1,61 @@
+{
+  "totals": {
+    "errors": 0,
+    "file_errors": 6
+  },
+  "files": {
+    "includes/diagnostics/class-seo-manager.php": {
+      "errors": 1,
+      "messages": [
+        {
+          "message": "Parameter #1 $array (list<array<string, mixed>>) of array_values is already a list, call has no effect.",
+          "line": 89,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "arrayValues.list"
+        }
+      ]
+    },
+    "includes/diagnostics/class-woocommerce.php": {
+      "errors": 5,
+      "messages": [
+        {
+          "message": "Ternary operator condition is always true.",
+          "line": 16,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "ternary.alwaysTrue"
+        },
+        {
+          "message": "Call to function is_callable() with array{WooCommerce, 'payment_gateways'} will always evaluate to true.",
+          "line": 25,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "function.alreadyNarrowedType"
+        },
+        {
+          "message": "Call to function is_callable() with array{WC_Payment_Gateways, 'payment_gateways'} will always evaluate to true.",
+          "line": 28,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "function.alreadyNarrowedType"
+        },
+        {
+          "message": "Call to function is_object() with WC_Payment_Gateways will always evaluate to true.",
+          "line": 28,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "function.alreadyNarrowedType"
+        },
+        {
+          "message": "Ternary operator condition is always true.",
+          "line": 58,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "ternary.alwaysTrue"
+        }
+      ]
+    }
+  },
+  "errors": []
+}

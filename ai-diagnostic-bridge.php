@@ -8,6 +8,8 @@
  * Requires at least: 6.5
  * Requires PHP: 8.1
  * License: GPL-2.0-or-later
+ *
+ * @package AIDiagnosticBridge
  */
 
 declare(strict_types=1);
@@ -66,5 +68,3 @@ add_action(
 		Plugin::instance()->boot();
 	}
 );
-
-

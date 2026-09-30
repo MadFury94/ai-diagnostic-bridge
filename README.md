@@ -80,7 +80,17 @@ Run the local WordPress suite with the disposable environment:
 .tools/php/php.exe -d auto_prepend_file=tests/local-bootstrap.php .tools/phpunit.phar -c phpunit.xml.dist
 ```
 
-The verified 2026-09-25 result is 81 tests, 804 assertions, one expected WooCommerce-absent skip. PHP syntax checks covered 40 project/plugin PHP files with zero errors. PHPCS and PHPStan were not installed or configured in this workspace.
+The verified 2026-09-30 result is **84 tests, 820 assertions, and one expected WooCommerce-absent skip**, with no failures or errors. Before this pass, the suite had 84 tests, 812 assertions, and two errors caused by misspelled class references in the Elementor tests. Worker tests passed 37/37 before and after; Worker type-checking, the dashboard production build, and syntax checks for all 42 project PHP files passed.
+
+Development analysis tools are installed through the committed Composer lockfile:
+
+```bash
+composer install
+composer lint
+composer analyse
+```
+
+PHPCS runs the full WordPress Coding Standards ruleset on the 26 shipped PHP files. PHPStan runs at level 5 with WordPress/WooCommerce definitions and a 3 GB memory allowance. The T11.3 analysis and safe-fix pass is complete, **but neither static gate is clean**: PHPCS decreased from 2,526 errors/487 warnings on committed source to 210 errors/8 warnings, and the first complete framework-aware PHPStan run decreased from 12 findings to 6. Both commands still exit nonzero; no findings are hidden by a baseline or disabled rules. Remaining documentation, file-organization, and behavioral review items are listed in [QUALITY-REPORT.md](QUALITY-REPORT.md), with full portable reports in `quality/`.
 
 ## Troubleshooting and limitations
 

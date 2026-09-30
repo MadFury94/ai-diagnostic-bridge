@@ -23,25 +23,25 @@ final class PostAnalysisTest extends TestCase {
 	public function test_elementor_content_requires_active_elementor_plugin(): void {
 		$post = new \WP_Post((object) [ 'ID' => 91, 'post_type' => 'page', 'post_status' => 'publish', 'post_password' => '', 'post_title' => 'Builder page', 'post_name' => 'builder-page', 'post_content' => '' ]);
 		$context = new PostAnalysisFixture($post, [ '_elementor_data' => '[{"elType":"section"}]', '_elementor_edit_mode' => 'builder' ], []);
-		$result = PostAnalysis::run(91, $context);
+		$result = Post_Analysis::run(91, $context);
 		$finding = array_values(array_filter($result['findings'], static fn (array $item): bool => 'builder-plugin-inactive' === $item['id']))[0] ?? null;
 		$this->assertNotNull($finding);
 		$this->assertSame('high', $finding['severity']);
 		$this->assertSame(['_elementor_data', '_elementor_edit_mode'], $finding['evidence']['meta_keys']);
 		$active = new PostAnalysisFixture($post, [ '_elementor_data' => '[{"elType":"section"}]' ], ['elementor/elementor.php']);
-		$this->assertNotContains('builder-plugin-inactive', array_column(PostAnalysis::run(91, $active)['findings'], 'id'));
+		$this->assertNotContains('builder-plugin-inactive', array_column(Post_Analysis::run(91, $active)['findings'], 'id'));
 	}
 	public function test_elementor_pro_widget_requires_active_elementor_pro_plugin(): void {
 		$post = new \WP_Post((object) [ 'ID' => 92, 'post_type' => 'page', 'post_status' => 'publish', 'post_password' => '', 'post_title' => 'Pro builder page', 'post_name' => 'pro-builder-page', 'post_content' => '' ]);
 		$data = wp_json_encode([['elType' => 'widget', 'widgetType' => 'form']]);
 		$inactive = new PostAnalysisFixture($post, ['_elementor_data' => $data], ['elementor/elementor.php']);
-		$findings = PostAnalysis::run(92, $inactive)['findings'];
+		$findings = Post_Analysis::run(92, $inactive)['findings'];
 		$pro = array_values(array_filter($findings, static fn (array $item): bool => 'elementor-pro/elementor-pro.php' === ($item['evidence']['required_plugin'] ?? '')))[0] ?? null;
 		$this->assertNotNull($pro);
 		$this->assertSame('Elementor Pro is inactive; site-wide components may be missing', $pro['title']);
 		$this->assertSame(['form'], $pro['evidence']['pro_widget_types']);
 		$active = new PostAnalysisFixture($post, ['_elementor_data' => $data], ['elementor/elementor.php', 'elementor-pro/elementor-pro.php']);
-		$this->assertNotContains('elementor-pro/elementor-pro.php', array_column(PostAnalysis::run(92, $active)['findings'], 'evidence.required_plugin'));
+		$this->assertNotContains('elementor-pro/elementor-pro.php', array_column(array_column(Post_Analysis::run(92, $active)['findings'], 'evidence'), 'required_plugin'));
 	}
 	public function test_title_checks_are_configurable_and_bounded(): void {
 		$findings = Title_Checks::findings('A', 'a', ['A', 'A'], ['min_length' => 5, 'max_length' => 20]);

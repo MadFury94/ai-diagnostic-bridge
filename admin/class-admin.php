@@ -9,13 +9,13 @@ use BrianAzukaeme\AIDiagnosticBridge\Plugin;
 
 final class Admin {
 	public static function register(): void {
-		add_options_page( 'AI Diagnostic Bridge', 'AI Diagnostic Bridge', 'manage_options', 'ai-diagnostic-bridge', [ self::class, 'render' ] );
+		add_options_page( 'AI Diagnostic Bridge', 'AI Diagnostic Bridge', 'manage_options', 'ai-diagnostic-bridge', array( self::class, 'render' ) );
 		self::register_actions();
 	}
 
 	public static function register_actions(): void {
-		add_action( 'admin_post_aidb_generate', [ self::class, 'generate' ] );
-		add_action( 'admin_post_aidb_revoke', [ self::class, 'revoke' ] );
+		add_action( 'admin_post_aidb_generate', array( self::class, 'generate' ) );
+		add_action( 'admin_post_aidb_revoke', array( self::class, 'revoke' ) );
 	}
 
 	public static function render(): void {
@@ -36,14 +36,30 @@ final class Admin {
 		self::verify_request( 'aidb_generate' );
 		$result = Auth::generate();
 		set_transient( 'aidb_new_token_' . get_current_user_id(), $result['token'], MINUTE_IN_SECONDS );
-		wp_safe_redirect( add_query_arg( [ 'page' => 'ai-diagnostic-bridge', 'aidb_notice' => 'generated' ], admin_url( 'options-general.php' ) ) );
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'        => 'ai-diagnostic-bridge',
+					'aidb_notice' => 'generated',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
 		exit;
 	}
 
 	public static function revoke(): void {
 		self::verify_request( 'aidb_revoke' );
 		Auth::revoke();
-		wp_safe_redirect( add_query_arg( [ 'page' => 'ai-diagnostic-bridge', 'aidb_notice' => 'revoked' ], admin_url( 'options-general.php' ) ) );
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'        => 'ai-diagnostic-bridge',
+					'aidb_notice' => 'revoked',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
 		exit;
 	}
 

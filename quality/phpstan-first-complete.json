@@ -1,0 +1,113 @@
+{
+  "totals": {
+    "errors": 0,
+    "file_errors": 12
+  },
+  "files": {
+    "admin/class-admin.php": {
+      "errors": 1,
+      "messages": [
+        {
+          "message": "Constant AI_DIAGNOSTIC_BRIDGE_DIR not found.",
+          "line": 32,
+          "ignorable": true,
+          "tip": "Learn more at https://phpstan.org/user-guide/discovering-symbols",
+          "identifier": "constant.notFound"
+        }
+      ]
+    },
+    "admin/views/settings.php": {
+      "errors": 3,
+      "messages": [
+        {
+          "message": "Variable $token might not be defined.",
+          "line": 18,
+          "ignorable": true,
+          "identifier": "variable.undefined"
+        },
+        {
+          "message": "Variable $status might not be defined.",
+          "line": 25,
+          "ignorable": true,
+          "identifier": "variable.undefined"
+        },
+        {
+          "message": "Variable $status might not be defined.",
+          "line": 26,
+          "ignorable": true,
+          "identifier": "variable.undefined"
+        }
+      ]
+    },
+    "includes/diagnostics/class-post-analysis.php": {
+      "errors": 2,
+      "messages": [
+        {
+          "message": "Offset 'pro_widget_prefixes' on array{plugin: 'elementor-pro…', meta: array{'_elementor_data'}, pro_widget_prefixes: array{'theme-', 'woocommerce-', 'loop-', 'form', 'posts', 'portfolio', 'gallery', 'slides', ...}} on left side of ?? always exists and is not nullable.",
+          "line": 120,
+          "ignorable": true,
+          "identifier": "nullCoalesce.offset"
+        },
+        {
+          "message": "Offset 'pro_widget_prefixes' on array{plugin: 'elementor-pro…', meta: array{'_elementor_data'}, pro_widget_prefixes: array{'theme-', 'woocommerce-', 'loop-', 'form', 'posts', 'portfolio', 'gallery', 'slides', ...}} on left side of ?? always exists and is not nullable.",
+          "line": 138,
+          "ignorable": true,
+          "identifier": "nullCoalesce.offset"
+        }
+      ]
+    },
+    "includes/diagnostics/class-seo-manager.php": {
+      "errors": 1,
+      "messages": [
+        {
+          "message": "Parameter #1 $array (list<array<string, mixed>>) of array_values is already a list, call has no effect.",
+          "line": 89,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "arrayValues.list"
+        }
+      ]
+    },
+    "includes/diagnostics/class-woocommerce.php": {
+      "errors": 5,
+      "messages": [
+        {
+          "message": "Ternary operator condition is always true.",
+          "line": 16,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "ternary.alwaysTrue"
+        },
+        {
+          "message": "Call to function is_callable() with array{WooCommerce, 'payment_gateways'} will always evaluate to true.",
+          "line": 25,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "function.alreadyNarrowedType"
+        },
+        {
+          "message": "Call to function is_callable() with array{WC_Payment_Gateways, 'payment_gateways'} will always evaluate to true.",
+          "line": 28,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "function.alreadyNarrowedType"
+        },
+        {
+          "message": "Call to function is_object() with WC_Payment_Gateways will always evaluate to true.",
+          "line": 28,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "function.alreadyNarrowedType"
+        },
+        {
+          "message": "Ternary operator condition is always true.",
+          "line": 58,
+          "ignorable": true,
+          "tip": "Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your %configurationFile%.",
+          "identifier": "ternary.alwaysTrue"
+        }
+      ]
+    }
+  },
+  "errors": []
+}

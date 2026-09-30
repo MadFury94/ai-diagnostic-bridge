@@ -14,32 +14,43 @@ final class Site_Health {
 		$https        = is_ssl() || 0 === strpos( strtolower( $home_url ), 'https://' );
 		$theme        = wp_get_theme();
 		$permalink    = get_option( 'permalink_structure', '' );
-		$findings     = [];
+		$findings     = array();
 
 		if ( ! $https ) {
-			$findings[] = Response::finding( 'site-not-https', 'high', 'security', 'HTTPS is not detected', 'The site URL does not indicate an HTTPS connection.', [ 'home_url' => $home_url ], 'wordpress' );
+			$findings[] = Response::finding( 'site-not-https', 'high', 'security', 'HTTPS is not detected', 'The site URL does not indicate an HTTPS connection.', array( 'home_url' => $home_url ), 'WordPress' );
 		}
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$findings[] = Response::finding( 'debug-enabled', 'medium', 'configuration', 'WordPress debug mode is enabled', 'WP_DEBUG is enabled on this installation.', [ 'wp_debug' => true ], 'wordpress' );
+			$findings[] = Response::finding( 'debug-enabled', 'medium', 'configuration', 'WordPress debug mode is enabled', 'WP_DEBUG is enabled on this installation.', array( 'wp_debug' => true ), 'WordPress' );
 		}
 
 		if ( '' === (string) $permalink ) {
-			$findings[] = Response::finding( 'plain-permalinks', 'low', 'configuration', 'Plain permalinks are enabled', 'The installation has no custom permalink structure configured.', [ 'permalink_structure' => '' ], 'wordpress' );
+			$findings[] = Response::finding( 'plain-permalinks', 'low', 'configuration', 'Plain permalinks are enabled', 'The installation has no custom permalink structure configured.', array( 'permalink_structure' => '' ), 'WordPress' );
 		}
 
 		$memory_bytes = function_exists( 'wp_convert_hr_to_bytes' ) ? (int) wp_convert_hr_to_bytes( (string) $memory_limit ) : 0;
 		if ( $memory_bytes > 0 && $memory_bytes < 128 * 1024 * 1024 ) {
-			$severity = $memory_bytes < 64 * 1024 * 1024 ? 'high' : 'medium';
-			$findings[] = Response::finding( 'php-memory-limit-low', $severity, 'performance', 'PHP memory limit may be too low', 'The PHP memory limit is below the level commonly needed by a plugin-heavy WordPress site and can contribute to failed requests or blank/error pages.', [ 'memory_limit' => sanitize_text_field( (string) $memory_limit ), 'bytes' => $memory_bytes, 'recommended_minimum_bytes' => 128 * 1024 * 1024 ], 'wordpress' );
+			$severity   = $memory_bytes < 64 * 1024 * 1024 ? 'high' : 'medium';
+			$findings[] = Response::finding(
+				'php-memory-limit-low',
+				$severity,
+				'performance',
+				'PHP memory limit may be too low',
+				'The PHP memory limit is below the level commonly needed by a plugin-heavy WordPress site and can contribute to failed requests or blank/error pages.',
+				array(
+					'memory_limit'              => sanitize_text_field( (string) $memory_limit ),
+					'bytes'                     => $memory_bytes,
+					'recommended_minimum_bytes' => 128 * 1024 * 1024,
+				),
+				'WordPress'
+			);
 		}
-
 		return Response::success(
 			$check_id,
 			empty( $findings ) ? 'ok' : 'warning',
 			$findings,
-			[
-				'site' => [
+			array(
+				'site' => array(
 					'url'                  => esc_url_raw( $site_url ),
 					'home_url'             => esc_url_raw( $home_url ),
 					'wp_version'           => get_bloginfo( 'version' ),
@@ -55,11 +66,11 @@ final class Site_Health {
 					'max_post_size'        => sanitize_text_field( (string) ini_get( 'post_max_size' ) ),
 					'active_theme'         => $theme->get( 'Name' ),
 					'active_theme_version' => $theme->get( 'Version' ),
-					'active_plugin_count'  => count( (array) get_option( 'active_plugins', [] ) ),
-					'debug'               => defined( 'WP_DEBUG' ) && WP_DEBUG,
+					'active_plugin_count'  => count( (array) get_option( 'active_plugins', array() ) ),
+					'debug'                => defined( 'WP_DEBUG' ) && WP_DEBUG,
 					'cron_disabled'        => defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON,
-				],
-			]
+				),
+			)
 		);
 	}
 

@@ -1,0 +1,2126 @@
+{
+  "totals": {
+    "errors": 210,
+    "warnings": 8,
+    "fixable": 0
+  },
+  "files": {
+    "ai-diagnostic-bridge.php": {
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    "uninstall.php": {
+      "errors": 1,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        }
+      ]
+    },
+    "admin/class-admin.php": {
+      "errors": 8,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Admin",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function register()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 11,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function register_actions()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 16,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function render()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 21,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function generate()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 35,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function revoke()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 51,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function verify_request()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 66,
+          "column": 20
+        }
+      ]
+    },
+    "admin/views/settings.php": {
+      "errors": 0,
+      "warnings": 2,
+      "messages": [
+        {
+          "message": "Processing form data without nonce verification.",
+          "source": "WordPress.Security.NonceVerification.Recommended",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 16,
+          "column": 18
+        },
+        {
+          "message": "Processing form data without nonce verification.",
+          "source": "WordPress.Security.NonceVerification.Recommended",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 16,
+          "column": 69
+        }
+      ]
+    },
+    "includes/class-activity-log.php": {
+      "errors": 4,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Activity_Log",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 7,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function record()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function clear()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 33,
+          "column": 19
+        }
+      ]
+    },
+    "includes/class-auth.php": {
+      "errors": 9,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Auth",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing short description in doc comment",
+          "source": "Generic.Commenting.DocComment.MissingShort",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 14,
+          "column": 5
+        },
+        {
+          "message": "Missing doc comment for function revoke()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 29,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function authenticate()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 36,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function status()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 63,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function request_identifier()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 74,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function rate_limited()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 79,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function record_failure()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 83,
+          "column": 20
+        }
+      ]
+    },
+    "includes/class-plugin.php": {
+      "errors": 12,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Plugin",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 7,
+          "column": 7
+        },
+        {
+          "message": "Missing member variable doc comment",
+          "source": "Squiz.Commenting.VariableComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 26
+        },
+        {
+          "message": "Missing member variable doc comment",
+          "source": "Squiz.Commenting.VariableComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 18
+        },
+        {
+          "message": "Missing doc comment for function __construct()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 12,
+          "column": 13
+        },
+        {
+          "message": "Missing doc comment for function instance()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 14,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function activate()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 22,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function deactivate()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 44,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function boot()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 48,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function settings()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 60,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function update_settings()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 65,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function version()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 69,
+          "column": 19
+        }
+      ]
+    },
+    "includes/class-response.php": {
+      "errors": 7,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Response",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function success()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function error()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 27,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function finding()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 42,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function status()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 54,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function severity()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 59,
+          "column": 20
+        }
+      ]
+    },
+    "includes/class-rest-api.php": {
+      "errors": 26,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class REST_API",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 15,
+          "column": 7
+        },
+        {
+          "message": "Missing short description in doc comment",
+          "source": "Generic.Commenting.DocComment.MissingShort",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 16,
+          "column": 5
+        },
+        {
+          "message": "Missing doc comment for function register()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 19,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function permission()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 160,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function start_activity()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 175,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function finish_activity()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 187,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function site()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 208,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function health()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 210,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function core_updates()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 212,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function plugins()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 214,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function themes()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 216,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function errors()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 218,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function rest_api()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 220,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function performance()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 222,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function security()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 224,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function woocommerce()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 226,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function seo_post()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 228,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function image_issues()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 231,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function link_issues()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 234,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function seo_posts()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 237,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function seo_issues()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 239,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function seo_site()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 241,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function diagnostic_get()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 244,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function diagnostic_post()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 249,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function run_checks()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 262,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-core-updates.php": {
+      "errors": 3,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Core_Updates",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        }
+      ]
+    },
+    "includes/diagnostics/class-diagnostic-manager.php": {
+      "errors": 6,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Diagnostic_Manager",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing short description in doc comment",
+          "source": "Generic.Commenting.DocComment.MissingShort",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 5
+        },
+        {
+          "message": "Missing doc comment for function available_checks()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 24,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function health()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 28,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 32,
+          "column": 19
+        }
+      ]
+    },
+    "includes/diagnostics/class-image-issues.php": {
+      "errors": 3,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Image_Issues",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        }
+      ]
+    },
+    "includes/diagnostics/class-link-issues.php": {
+      "errors": 3,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Link_Issues",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        }
+      ]
+    },
+    "includes/diagnostics/class-performance.php": {
+      "errors": 3,
+      "warnings": 2,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Performance",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 7,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 8,
+          "column": 19
+        },
+        {
+          "message": "Use of a direct database call is discouraged.",
+          "source": "WordPress.DB.DirectDatabaseQuery.DirectQuery",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 12,
+          "column": 31
+        },
+        {
+          "message": "Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().",
+          "source": "WordPress.DB.DirectDatabaseQuery.NoCaching",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 12,
+          "column": 31
+        }
+      ]
+    },
+    "includes/diagnostics/class-php-errors.php": {
+      "errors": 5,
+      "warnings": 3,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class PHP_Errors",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 7,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 8,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function inspect()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 12,
+          "column": 20
+        },
+        {
+          "message": "Silencing errors is strongly discouraged. Use proper error checking instead. Found: @fopen( $path,...",
+          "source": "WordPress.PHP.NoSilencedErrors.Discouraged",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 25,
+          "column": 19
+        },
+        {
+          "message": "File operations should use WP_Filesystem methods instead of direct PHP filesystem calls. Found: fopen().",
+          "source": "WordPress.WP.AlternativeFunctions.file_system_operations_fopen",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 25,
+          "column": 20
+        },
+        {
+          "message": "File operations should use WP_Filesystem methods instead of direct PHP filesystem calls. Found: fclose().",
+          "source": "WordPress.WP.AlternativeFunctions.file_system_operations_fclose",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 37,
+          "column": 13
+        },
+        {
+          "message": "Missing doc comment for function unavailable()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 82,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-plugin-vulnerability-matcher.php": {
+      "errors": 7,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Doc comment for parameter \"$installed\" missing",
+          "source": "Squiz.Commenting.FunctionComment.MissingParamTag",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 5
+        },
+        {
+          "message": "Doc comment for parameter \"$range\" missing",
+          "source": "Squiz.Commenting.FunctionComment.MissingParamTag",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 5
+        },
+        {
+          "message": "Doc comment for parameter \"$slug\" missing",
+          "source": "Squiz.Commenting.FunctionComment.MissingParamTag",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 33,
+          "column": 5
+        },
+        {
+          "message": "Doc comment for parameter \"$installed\" missing",
+          "source": "Squiz.Commenting.FunctionComment.MissingParamTag",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 33,
+          "column": 5
+        },
+        {
+          "message": "Doc comment for parameter \"$advisories\" missing",
+          "source": "Squiz.Commenting.FunctionComment.MissingParamTag",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 33,
+          "column": 5
+        },
+        {
+          "message": "Missing doc comment for function advisory_url()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 110,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-plugin-vulnerability-source.php": {
+      "errors": 9,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing member variable doc comment",
+          "source": "Squiz.Commenting.VariableComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 12,
+          "column": 26
+        },
+        {
+          "message": "Missing doc comment for function reset_cache()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 14,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function transient_key()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 16,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function fetch()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 19,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function mark_cache()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 89,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function normalize()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 97,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function bound()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 145,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function https_url()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 158,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-plugins.php": {
+      "errors": 14,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Class file names should be based on the class name with \"class-\" prepended. Expected class-plugins-context.php, but found class-plugins.php.",
+          "source": "WordPress.Files.FileName.InvalidClassFileName",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for function installed()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 11,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function active()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 17,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function network_active()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 19,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function updates()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 21,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function vulnerabilities()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 23,
+          "column": 12
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 27,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class Plugins",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 27,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 28,
+          "column": 19
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 126,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function version()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 127,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function inspect()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 131,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function jump()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 163,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-post-analysis.php": {
+      "errors": 47,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Class file names should be based on the class name with \"class-\" prepended. Expected class-post-analysis-context.php, but found class-post-analysis.php.",
+          "source": "WordPress.Files.FileName.InvalidClassFileName",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for function get()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function meta()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 14,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function active_plugins()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 17,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function featured_image_id()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 20,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function attachment_id()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 22,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function attachment_url()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 24,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function attachment_filename()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 26,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function attachment_alt()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 28,
+          "column": 12
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 32,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class Post_Analysis",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 32,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 33,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function length()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 90,
+          "column": 20
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 96,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function analyze()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 109,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function pro_widgets()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 150,
+          "column": 20
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 173,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class SEO_Metadata",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 173,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function description()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 180,
+          "column": 19
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 198,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class Indexability_Analysis",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 198,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function analyze()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 199,
+          "column": 19
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 242,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class Content_Analysis",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 242,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function analyze()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 245,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function headings()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 259,
+          "column": 20
+        },
+        {
+          "message": "Object property \"$nodeName\" is not in valid snake_case format, try \"$node_name\"",
+          "source": "WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 268,
+          "column": 56
+        },
+        {
+          "message": "Object property \"$textContent\" is not in valid snake_case format, try \"$text_content\"",
+          "source": "WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 274,
+          "column": 62
+        },
+        {
+          "message": "Missing doc comment for function images()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 302,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function links()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 320,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function finding()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 362,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function length()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 366,
+          "column": 20
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 370,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class Image_Analysis",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 370,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function analyze()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 371,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function length()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 436,
+          "column": 20
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 440,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class Meta_Description_Checks",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 440,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function findings()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 441,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function threshold()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 470,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function length()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 475,
+          "column": 20
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 480,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class Title_Checks",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 480,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function findings()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 481,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function threshold()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 526,
+          "column": 20
+        },
+        {
+          "message": "Missing doc comment for function length()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 531,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-rest-api-check.php": {
+      "errors": 3,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class REST_API_Check",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 7,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 8,
+          "column": 19
+        }
+      ]
+    },
+    "includes/diagnostics/class-security.php": {
+      "errors": 3,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Security",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 7,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 8,
+          "column": 19
+        }
+      ]
+    },
+    "includes/diagnostics/class-seo-collections.php": {
+      "errors": 9,
+      "warnings": 1,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class SEO_Collections",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function posts()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function issues()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 29,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function site()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 48,
+          "column": 19
+        },
+        {
+          "message": "Detected usage of meta_query, possible slow query.",
+          "source": "WordPress.DB.SlowDBQuery.slow_db_query_meta_query",
+          "severity": 5,
+          "fixable": false,
+          "type": "WARNING",
+          "line": 79,
+          "column": 17
+        },
+        {
+          "message": "Missing doc comment for function query()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 122,
+          "column": 20
+        },
+        {
+          "message": "Missing short description in doc comment",
+          "source": "Generic.Commenting.DocComment.MissingShort",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 138,
+          "column": 5
+        },
+        {
+          "message": "Doc comment for parameter \"$post_id\" missing",
+          "source": "Squiz.Commenting.FunctionComment.MissingParamTag",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 138,
+          "column": 5
+        },
+        {
+          "message": "Missing doc comment for function collection()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 148,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-seo-manager.php": {
+      "errors": 3,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing short description in doc comment",
+          "source": "Generic.Commenting.DocComment.MissingShort",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 19,
+          "column": 5
+        },
+        {
+          "message": "Doc comment for parameter \"$post_id\" missing",
+          "source": "Squiz.Commenting.FunctionComment.MissingParamTag",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 33,
+          "column": 5
+        }
+      ]
+    },
+    "includes/diagnostics/class-site-health.php": {
+      "errors": 4,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Site_Health",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        },
+        {
+          "message": "Missing doc comment for function database_version()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 77,
+          "column": 20
+        }
+      ]
+    },
+    "includes/diagnostics/class-themes.php": {
+      "errors": 3,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for class Themes",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 10,
+          "column": 19
+        }
+      ]
+    },
+    "includes/diagnostics/class-woocommerce.php": {
+      "errors": 18,
+      "warnings": 0,
+      "messages": [
+        {
+          "message": "Class file names should be based on the class name with \"class-\" prepended. Expected class-woocommerce-context.php, but found class-woocommerce.php.",
+          "source": "WordPress.Files.FileName.InvalidClassFileName",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing file doc comment",
+          "source": "Squiz.Commenting.FileComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 1,
+          "column": 1
+        },
+        {
+          "message": "Missing doc comment for function available()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 9,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function version()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 11,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function database_version()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 13,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function database_update_needed()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 15,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function currency()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 17,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function page_id()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 19,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function page_valid()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 21,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function gateways()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 23,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function shipping_enabled()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 30,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function zone_ids()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 32,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function shipping_methods()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 40,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function action_ids()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 42,
+          "column": 12
+        },
+        {
+          "message": "Missing doc comment for function hpos_enabled()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 56,
+          "column": 12
+        },
+        {
+          "message": "Only one object structure is allowed in a file",
+          "source": "Generic.Files.OneObjectStructurePerFile.MultipleFound",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 62,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for class WooCommerce",
+          "source": "Squiz.Commenting.ClassComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 62,
+          "column": 7
+        },
+        {
+          "message": "Missing doc comment for function run()",
+          "source": "Squiz.Commenting.FunctionComment.Missing",
+          "severity": 5,
+          "fixable": false,
+          "type": "ERROR",
+          "line": 63,
+          "column": 19
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 5
+    phpVersion: 80100
+    bootstrapFiles:
+        - tests/static-analysis/bootstrap.php
+    paths:
+        - ai-diagnostic-bridge.php
+        - uninstall.php
+        - admin
+        - includes
+    scanFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+    tmpDir: .tools/phpstan-cache
+    parallel:
+        maximumNumberOfProcesses: 1

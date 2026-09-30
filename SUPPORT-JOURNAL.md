@@ -535,3 +535,20 @@ Anbe Nigeria's live site broke because Elementor and Elementor Pro were deactiva
 ## 2026-09-27 — Official documentation in builder explanations
 
 The Elementor Pro finding now carries an official Elementor troubleshooting URL. The finding detail renders that link directly, and click-only AI explanations are instructed to explain the evidence in simple English and include the supplied official URL in the repair or verification step.
+
+
+## 2026-09-30 — Elementor regression tests did not exercise their assertions
+
+**Scope:** A confirmed test-suite defect found while establishing the T11.3 baseline. This was not a live-store incident or a production diagnostic failure.
+
+**Symptom and baseline:** The full local WordPress suite ran 84 tests and 812 assertions with two errors and one expected WooCommerce-absent skip. Both new Elementor tests stopped with a missing `Tests\PostAnalysis` class before checking their intended results.
+
+**Hypothesis and verification:** The tests imported `Diagnostics\Post_Analysis` but called `PostAnalysis::run()` in four places. Source inspection confirmed the spelling mismatch. The Pro test also used `array_column(..., 'evidence.required_plugin')`; PHP array_column does not resolve dotted nested keys, so that assertion would read an empty column and fail to check the actual required-plugin values.
+
+**AI proposal and correction:** Corrected the calls to the imported class and explicitly extracted the `evidence` column followed by `required_plugin`. The production implementation and expected finding behavior were preserved. This restores existing regression coverage; it does not prove a live Elementor repair or Brian's independent reproduction.
+
+**Validation:** Full final suite: **84 tests, 820 assertions, zero errors/failures, one expected skip**, exit 0. The eight extra assertions are the checks now reached by those two tests. Worker tests remained 37/37; PHP syntax checks, Worker type-check, and dashboard build passed. Static-analysis review found no confirmed production bug; its remaining findings are separately documented in QUALITY-REPORT.md.
+
+**Customer-ready explanation:** Two automated checks were broken, so they were not verifying the Elementor warnings as intended. The checks now run successfully. This repair improves the evidence behind the diagnostics; it does not change your website or claim that a live site was repaired.
+
+**Timing:** Investigation/repair time and support time saved were not measured. The final PHP suite took 15.954 seconds, which is test runtime only.

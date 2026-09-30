@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace BrianAzukaeme\AIDiagnosticBridge;
 
 final class Plugin {
-	private const OPTION_KEY = 'aidb_settings';
+	private const OPTION_KEY       = 'aidb_settings';
 	private static ?self $instance = null;
-	private bool $booted = false;
+	private bool $booted           = false;
 
 	private function __construct() {}
 
@@ -28,15 +28,15 @@ final class Plugin {
 		if ( false === get_option( self::OPTION_KEY, false ) ) {
 			add_option(
 				self::OPTION_KEY,
-				[
+				array(
 					'credential_hash'       => '',
 					'credential_created_at' => '',
 					'credential_revoked_at' => '',
-					'last_auth_success'    => '',
-					'last_auth_failure'    => '',
-					'logging_enabled'      => true,
-					'log_retention'        => 100,
-				]
+					'last_auth_success'     => '',
+					'last_auth_failure'     => '',
+					'logging_enabled'       => true,
+					'log_retention'         => 100,
+				)
 			);
 		}
 	}
@@ -51,15 +51,15 @@ final class Plugin {
 		}
 
 		$this->booted = true;
-		add_action( 'rest_api_init', [ REST_API::class, 'register' ] );
-		add_action( 'admin_menu', [ \BrianAzukaeme\AIDiagnosticBridge\Admin\Admin::class, 'register' ] );
-		add_action( 'init', [ \BrianAzukaeme\AIDiagnosticBridge\Admin\Admin::class, 'register_actions' ] );
+		add_action( 'rest_api_init', array( REST_API::class, 'register' ) );
+		add_action( 'admin_menu', array( \BrianAzukaeme\AIDiagnosticBridge\Admin\Admin::class, 'register' ) );
+		add_action( 'init', array( \BrianAzukaeme\AIDiagnosticBridge\Admin\Admin::class, 'register_actions' ) );
 		do_action( 'aidb_loaded', $this );
 	}
 
 	public static function settings(): array {
-		$settings = get_option( self::OPTION_KEY, [] );
-		return is_array( $settings ) ? $settings : [];
+		$settings = get_option( self::OPTION_KEY, array() );
+		return is_array( $settings ) ? $settings : array();
 	}
 
 	public static function update_settings( array $settings ): bool {

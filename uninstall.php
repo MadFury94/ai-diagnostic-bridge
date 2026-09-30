@@ -8,4 +8,3 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 delete_option( 'aidb_settings' );
 delete_option( 'aidb_activity_log' );
-
