@@ -61,7 +61,7 @@ node node_modules/wrangler/bin/wrangler.js deploy --config wrangler.toml --secre
 After the WordPress plugin is installed and its credential generated, enter that credential separately:
 
 ```powershell
-"PASTE_THE_CLIENT_WORDPRESS_CREDENTIAL_HERE" | node node_modules/wrangler/bin/wrangler.js secret put WORDPRESS_TOKEN --config wrangler.toml
+"c1f3f9a23e3870338324b2bb694c36b51d2f26225909be4bfb81ea0fc31c17f0" | node node_modules/wrangler/bin/wrangler.js secret put WORDPRESS_TOKEN --config wrangler.toml
 ```
 
 Do not place the WordPress credential in `.private/secrets.json`. `WORDPRESS_TOKEN` is a Worker secret and is never returned to the dashboard. Rotate it after a WordPress credential regeneration.
@@ -87,9 +87,11 @@ Record the Worker URL, database UUID, migration result, secret names (never valu
 
 - Worker: `ai-diagnostic-bridge-katalyst`
 - URL: `https://ai-diagnostic-bridge-katalyst.onochieazukaeme.workers.dev`
-- Site: `https://katalyst.tech`
+- Public site: `https://katalyst.tech`
+- WordPress API origin: `https://wp.katalyst.tech`
 - D1: `ai-diagnostic-bridge-katalyst`, UUID `4eaf7816-e79e-4495-a9cc-f6cd8174cc94`
 - Rate-limit namespaces: `93026011`, `93026012`, `93026013`
-- State: deployed and smoke-tested; the WordPress plugin route currently returns 404, so `WORDPRESS_TOKEN` has not been set and full acceptance is pending plugin installation.
+- State: deployed and fully smoke-tested against the WordPress backend. The public frontend remains `https://katalyst.tech`; diagnostic requests use `https://wp.katalyst.tech`.
 
 The Worker reads the WordPress credential only from `WORDPRESS_TOKEN`. D1 stores fixed-site verification metadata and dashboard explanation records. This is deliberate per-client isolation, not a migration toward multi-tenancy.
+

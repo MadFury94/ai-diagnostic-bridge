@@ -10,7 +10,7 @@ const envelope = { success: true, plugin: { name: 'AI Diagnostic Bridge', versio
 const limiter = () => ({ limit: vi.fn(async () => ({ success: true })) })
 function environment(): Env {
   return {
-    ALLOWED_SITE_ORIGIN: 'https://katalyst.tech', SITE_NAME: 'Katalyst', WORDPRESS_TOKEN: 'synthetic-katalyst-token-0123456789',
+    ALLOWED_SITE_ORIGIN: 'https://wp.katalyst.tech', SITE_NAME: 'Katalyst', WORDPRESS_TOKEN: 'synthetic-katalyst-token-0123456789',
     SESSION_KEY: 'test-session-secret', DASHBOARD_PASSWORD: 'test-dashboard-secret',
     AI: { run: vi.fn(async () => ({ response: JSON.stringify({ summary: 'summary', why_it_matters: 'why', recommended_next_step: 'next', verification_step: 'verify', caveats: 'caveat' }) })) } as unknown as Ai,
     LOGIN_LIMIT: limiter(), API_LIMIT: limiter(), CONNECTION_LIMIT: limiter(),
@@ -23,9 +23,9 @@ afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
 describe('credential and session security', () => {
   it('encrypts credentials and authenticates the site association', async () => {
-    const encrypted = await encryptToken('private-token', key, 'https://katalyst.tech')
+    const encrypted = await encryptToken('private-token', key, 'https://wp.katalyst.tech')
     expect(JSON.stringify(encrypted)).not.toContain('private-token')
-    expect(await decryptToken({ ...encrypted, url: 'https://katalyst.tech' }, key)).toBe('private-token')
+    expect(await decryptToken({ ...encrypted, url: 'https://wp.katalyst.tech' }, key)).toBe('private-token')
     await expect(decryptToken({ ...encrypted, url: 'https://other.example' }, key)).rejects.toThrow()
   })
   it('rejects forged and expired sessions', async () => {
@@ -36,8 +36,8 @@ describe('credential and session security', () => {
     expect(await validSession(await createSession('key', Date.now() - 1), 'key')).toBe(false)
     expect(await passwordMatches('wrong', 'right', 'key')).toBe(false)
   })
-  it.each(['http://katalyst.tech', 'https://evil.example', 'https://user:pass@katalyst.tech', 'https://katalyst.tech/path', 'https://127.0.0.1', 'https://katalyst.tech?token=x'])('blocks unapproved destination %s', value => {
-    expect(() => siteOrigin(value, 'https://katalyst.tech')).toThrow()
+  it.each(['http://katalyst.tech', 'https://evil.example', 'https://user:pass@katalyst.tech', 'https://wp.katalyst.tech/path', 'https://127.0.0.1', 'https://wp.katalyst.tech?token=x'])('blocks unapproved destination %s', value => {
+    expect(() => siteOrigin(value, 'https://wp.katalyst.tech')).toThrow()
   })
   it('requires authentication before accessing WordPress or storage', async () => {
     const env = environment()
@@ -89,9 +89,9 @@ describe('bounded read-only proxy', () => {
     const session = await createSession(env.SESSION_KEY)
     const response = await worker.fetch(request('/api/connection', 'POST', {}, { Cookie: `__Host-aidb_katalyst_session=${session}` }), env)
     expect(response.status).toBe(200)
-    expect(outbound).toHaveBeenCalledWith('https://katalyst.tech/wp-json/ai-diagnostic/v1/health', expect.objectContaining({ headers: { Authorization: `Bearer ${env.WORDPRESS_TOKEN}`, Accept: 'application/json' }, redirect: 'manual' }))
+    expect(outbound).toHaveBeenCalledWith('https://wp.katalyst.tech/wp-json/ai-diagnostic/v1/health', expect.objectContaining({ headers: { Authorization: `Bearer ${env.WORDPRESS_TOKEN}`, Accept: 'application/json' }, redirect: 'manual' }))
     expect(run).toHaveBeenCalledOnce()
-    expect(statement.bind.mock.calls[0].slice(0, 2)).toEqual(['Katalyst', 'https://katalyst.tech'])
+    expect(statement.bind.mock.calls[0].slice(0, 2)).toEqual(['Katalyst', 'https://wp.katalyst.tech'])
     expect(JSON.stringify(statement.bind.mock.calls)).not.toContain(env.WORDPRESS_TOKEN)
     expect(await response.text()).not.toContain(env.WORDPRESS_TOKEN)
   })
@@ -129,7 +129,7 @@ describe('bounded read-only proxy', () => {
     env.DB.prepare = vi.fn(() => statement as unknown as D1PreparedStatement)
     const session = await createSession(env.SESSION_KEY)
     expect((await worker.fetch(request('/api/connection', 'POST', { url: 'https://other-client.example', token: 'other-client-secret' }, { Cookie: `__Host-aidb_katalyst_session=${session}` }), env)).status).toBe(200)
-    expect(outbound.mock.calls[0][0]).toBe('https://katalyst.tech/wp-json/ai-diagnostic/v1/health')
+    expect(outbound.mock.calls[0][0]).toBe('https://wp.katalyst.tech/wp-json/ai-diagnostic/v1/health')
   })
   it.each(['diagnostic', 'themes', '../health', 'https://evil.example', 'seo/post/0', 'seo/post/-1'])('rejects route %s', path => {
     expect(() => bridgePath(path, new URLSearchParams())).toThrow()
@@ -171,13 +171,13 @@ describe('bounded read-only proxy', () => {
   it('does not follow redirects or return raw upstream errors', async () => {
     const outbound = vi.fn<typeof fetch>(async () => new Response('private response', { status: 302, headers: { Location: 'https://evil.example' } }))
     vi.stubGlobal('fetch', outbound)
-    await expect(fetchBridge('https://katalyst.tech', 'private-token', 'health', environment())).rejects.toMatchObject({ code: 'wordpress_route' })
+    await expect(fetchBridge('https://wp.katalyst.tech', 'private-token', 'health', environment())).rejects.toMatchObject({ code: 'wordpress_route' })
     expect(outbound).toHaveBeenCalledOnce()
     expect(outbound.mock.calls[0]?.[1]).toMatchObject({ redirect: 'manual' })
   })
   it('does not forward browser cookies or headers to WordPress', async () => {
     const outbound = vi.fn<typeof fetch>(async () => Response.json(envelope)); vi.stubGlobal('fetch', outbound)
-    await fetchBridge('https://katalyst.tech', 'private-token', 'health', environment())
+    await fetchBridge('https://wp.katalyst.tech', 'private-token', 'health', environment())
     expect(outbound.mock.calls[0]?.[1]).toMatchObject({ method: 'GET', headers: { Authorization: 'Bearer private-token', Accept: 'application/json' } })
     expect(Object.keys(outbound.mock.calls[0]?.[1]?.headers ?? {})).toEqual(['Authorization', 'Accept'])
   })
@@ -188,3 +188,4 @@ describe('bounded read-only proxy', () => {
     expect(response.status).toBe(405); expect(env.DB.prepare).not.toHaveBeenCalled()
   })
 })
+

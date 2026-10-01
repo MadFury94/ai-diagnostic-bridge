@@ -25,7 +25,7 @@ export function Connection() {
     <Card><CardHeader><CardTitle>{info.data?.name ?? 'Katalyst'}</CardTitle>
       <CardDescription>This dashboard is dedicated to one WordPress site.</CardDescription>
     </CardHeader><CardContent className='space-y-4'>
-      <p>{info.data?.url ?? 'https://katalyst.tech'}</p>
+      <p>{info.data?.url ?? 'https://wp.katalyst.tech'}</p>
       <p>{info.data?.configured ? 'The site credential is configured.' : 'Awaiting site setup. Ask your deployment administrator to finish connecting WordPress.'}</p>
       <p className='text-sm text-muted-foreground'>{info.data?.verified_at ? `Last verified: ${new Date(info.data.verified_at).toLocaleString()}` : 'The connection has not been verified yet.'}</p>
       <Button disabled={busy || !info.data?.configured} onClick={() => void verify()}>{busy ? 'Verifying…' : 'Verify connection'}</Button>

@@ -8,7 +8,7 @@ interface __BaseEnv_Env {
 	CONNECTION_LIMIT: RateLimit;
 	AI: Ai;
 	ASSETS: Fetcher;
-	ALLOWED_SITE_ORIGIN: "https://katalyst.tech";
+	ALLOWED_SITE_ORIGIN: "https://wp.katalyst.tech";
 	SITE_NAME: "Katalyst";
 	DASHBOARD_PASSWORD: string;
 	SESSION_KEY: string;
@@ -15763,3 +15763,4 @@ declare abstract class WorkflowInstance {
      */
     public subscribe(options?: WorkflowInstanceSubscribeOptions): Promise<WorkflowInstanceSubscription>;
 }
+

@@ -16,7 +16,7 @@ run_worker_first = true
 binding = "AI"
 
 [vars]
-ALLOWED_SITE_ORIGIN = "https://katalyst.tech"
+ALLOWED_SITE_ORIGIN = "https://wp.katalyst.tech"
 SITE_NAME = "Katalyst"
 
 [secrets]
