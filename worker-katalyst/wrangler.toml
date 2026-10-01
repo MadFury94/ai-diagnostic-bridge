@@ -1,0 +1,50 @@
+name = "ai-diagnostic-bridge-katalyst"
+account_id = "e260983617003d3a7092441acdfcd4f4"
+main = "src/index.ts"
+compatibility_date = "2026-09-30"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = "./dashboard/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[ai]
+binding = "AI"
+
+[vars]
+ALLOWED_SITE_ORIGIN = "https://katalyst.tech"
+SITE_NAME = "Katalyst"
+
+[secrets]
+required = ["DASHBOARD_PASSWORD", "SESSION_KEY"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-diagnostic-bridge-katalyst"
+database_id = "4eaf7816-e79e-4495-a9cc-f6cd8174cc94"
+migrations_dir = "migrations"
+
+[[ratelimits]]
+name = "LOGIN_LIMIT"
+namespace_id = "93026011"
+simple = { limit = 5, period = 60 }
+
+[[ratelimits]]
+name = "API_LIMIT"
+namespace_id = "93026012"
+simple = { limit = 60, period = 60 }
+
+[[ratelimits]]
+name = "CONNECTION_LIMIT"
+namespace_id = "93026013"
+simple = { limit = 5, period = 60 }
+
+[observability]
+enabled = true
+[observability.logs]
+enabled = true
+invocation_logs = false

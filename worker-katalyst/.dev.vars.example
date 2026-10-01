@@ -1,0 +1,4 @@
+DASHBOARD_PASSWORD=generate-a-unique-local-dashboard-key
+SESSION_KEY=generate-a-separate-local-session-key
+# Add WORDPRESS_TOKEN locally only when explicitly testing this client.
+# WORDPRESS_TOKEN=client-specific-plugin-credential

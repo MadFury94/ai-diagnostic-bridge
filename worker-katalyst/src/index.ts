@@ -1,0 +1,147 @@
+import { bridgePath, fetchBridge, object } from './bridge'
+import { ApiError, boundedJson, createSession, passwordMatches, siteOrigin, validSession } from './security'
+import { ExplanationFields, ExplanationRecord, generateExplanation, parseFields, rowToRecord, safeFinding } from './explanations'
+
+type Site = { id: string; name: string; url: string; verified_at: string }
+const cookieName = '__Host-aidb_katalyst_session'
+const json = (data: unknown, status = 200, headers = {}) => Response.json(data, { status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...headers } })
+const cookie = (value: string, age: number) => `${cookieName}=${value}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=${age}`
+const getSite = (env: Env) => env.DB.prepare("SELECT * FROM sites WHERE id = 'default'").first<Site>()
+const summary = (row: Site | null, env: Env) => ({
+  id: 'default', configured: Boolean(env.WORDPRESS_TOKEN), name: env.SITE_NAME,
+  url: env.ALLOWED_SITE_ORIGIN, verified_at: row?.url === env.ALLOWED_SITE_ORIGIN ? row.verified_at : null,
+})
+const wordpressToken = (env: Env) => {
+  if (!env.WORDPRESS_TOKEN || !/^[\x21-\x7e]{32,512}$/.test(env.WORDPRESS_TOKEN)) {
+    throw new ApiError(409, 'not_connected', 'The site connection is awaiting setup by the deployment administrator.')
+  }
+  return env.WORDPRESS_TOKEN
+}
+const explanationResponse = (record: ExplanationRecord) => ({ explanation: record })
+const parseNote = (value: unknown) => typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 500) || null : null
+const explanationInsert = async (env: Env, finding: Record<string, unknown>, original: ExplanationFields, id = crypto.randomUUID()) => {
+  const now = new Date().toISOString()
+  await env.DB.prepare('INSERT INTO explanations (id, site_id, finding_id, finding_snapshot, original_output, current_output, status, reviewer_note, reviewer_identity, reviewed_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL, ?, ?)')
+    .bind(id, 'default', String(finding.id), JSON.stringify(finding), JSON.stringify(original), JSON.stringify(original), 'draft', now, now).run()
+  const row = await env.DB.prepare('SELECT * FROM explanations WHERE id = ?').bind(id).first<Record<string, unknown>>()
+  if (!row) throw new ApiError(500, 'storage_error', 'The explanation could not be saved.')
+  return rowToRecord(row)
+}
+const pluginSlug = (value: string) => /^[a-z0-9][a-z0-9-]{1,90}$/.test(value) ? value : null
+const officialChangelog = async (slug: string) => {
+  const safe = pluginSlug(slug)
+  if (!safe) throw new ApiError(400, 'invalid_plugin', 'A valid WordPress.org plugin slug is required.')
+  const response = await fetch(`https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=${encodeURIComponent(safe)}`, { headers: { Accept: 'application/json' } })
+  if (!response.ok) throw new ApiError(502, 'changelog_unavailable', 'The official plugin changelog is unavailable.')
+  const data = object(await boundedJson(response, 256 * 1024))
+  const sections = object(data.sections)
+  const html = typeof sections.changelog === 'string' ? sections.changelog : ''
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/\s+/g, ' ').trim().slice(0, 12000)
+  return { slug: safe, name: typeof data.name === 'string' ? data.name.slice(0, 200) : safe, current_version: typeof data.version === 'string' ? data.version.slice(0, 80) : null, changelog: text, source_url: `https://wordpress.org/plugins/${safe}/#developers` }
+}
+
+async function api(request: Request, env: Env) {
+  const url = new URL(request.url)
+  if (!env.SESSION_KEY || !env.DASHBOARD_PASSWORD) throw new ApiError(503, 'setup_required', 'Dashboard secrets are not configured.')
+  if (request.headers.get('Sec-Fetch-Site') === 'cross-site') throw new ApiError(403, 'cross_origin', 'Open the dashboard directly to continue.')
+  if (!['GET', 'HEAD'].includes(request.method)) {
+    if (request.headers.get('Origin') !== url.origin) throw new ApiError(403, 'cross_origin', 'This request must come from the dashboard.')
+    if (!request.headers.get('Content-Type')?.startsWith('application/json')) throw new ApiError(415, 'content_type', 'Send a JSON request.')
+  }
+  if (url.pathname === '/api/login' && request.method === 'POST') {
+    const { success } = await env.LOGIN_LIMIT.limit({ key: 'single-account-login' })
+    if (!success) throw new ApiError(429, 'rate_limit', 'Too many sign-in attempts. Wait a minute and try again.')
+    const body = object(await boundedJson(request, 4096))
+    if (typeof body.password !== 'string' || !await passwordMatches(body.password, env.DASHBOARD_PASSWORD, env.SESSION_KEY)) throw new ApiError(401, 'unauthorized', 'The dashboard access key is incorrect.')
+    return json({ authenticated: true }, 200, { 'Set-Cookie': cookie(await createSession(env.SESSION_KEY), 28800) })
+  }
+  const session = request.headers.get('Cookie')?.split(';').map(s => s.trim()).find(s => s.startsWith(`${cookieName}=`))?.slice(cookieName.length + 1) ?? ''
+  if (!await validSession(session, env.SESSION_KEY)) throw new ApiError(401, 'unauthorized', 'Sign in to the dashboard to continue.')
+  if (url.pathname === '/api/session' && request.method === 'GET') return json({ authenticated: true })
+  if (url.pathname === '/api/logout' && request.method === 'POST') return json({ authenticated: false }, 200, { 'Set-Cookie': cookie('', 0) })
+  if (!(await env.API_LIMIT.limit({ key: 'default' })).success) throw new ApiError(429, 'rate_limit', 'Too many requests. Wait a minute and try again.')
+  if (url.pathname === '/api/connection') {
+    if (request.method === 'GET') return json(summary(await getSite(env), env))
+    if (request.method !== 'POST') throw new ApiError(405, 'managed_connection', 'This site connection is managed by the deployment administrator. Use POST to verify it.')
+    if (!(await env.CONNECTION_LIMIT.limit({ key: 'default' })).success) throw new ApiError(429, 'rate_limit', 'Too many connection attempts. Wait a minute and try again.')
+    const origin = siteOrigin(env.ALLOWED_SITE_ORIGIN, env.ALLOWED_SITE_ORIGIN)
+    await fetchBridge(origin, wordpressToken(env), 'health', env)
+    const verified = new Date().toISOString()
+    await env.DB.prepare("INSERT INTO sites (id, name, url, verified_at) VALUES ('default', ?, ?, ?) ON CONFLICT(id) DO UPDATE SET name=excluded.name, url=excluded.url, verified_at=excluded.verified_at")
+      .bind(env.SITE_NAME, origin, verified).run()
+    return json(summary({ id: 'default', name: env.SITE_NAME, url: origin, verified_at: verified }, env))
+  }
+  if (url.pathname === '/api/explanations') {
+    if (request.method !== 'GET') throw new ApiError(405, 'method_not_allowed', 'Use GET to read explanations.')
+    const findingId = url.searchParams.get('finding_id') ?? ''
+    if (!/^[a-z0-9][a-z0-9_-]{0,120}$/i.test(findingId)) throw new ApiError(400, 'invalid_finding', 'A finding ID is required.')
+    const row = await env.DB.prepare('SELECT * FROM explanations WHERE site_id = ? AND finding_id = ? ORDER BY updated_at DESC LIMIT 1').bind('default', findingId).first<Record<string, unknown>>()
+    return json(row ? explanationResponse(rowToRecord(row)) : { explanation: null })
+  }
+  if (url.pathname === '/api/explanations/generate' && request.method === 'POST') {
+    if (!env.AI) throw new ApiError(503, 'ai_unavailable', 'AI explanations are not configured.')
+    const body = object(await boundedJson(request, 16000))
+    const finding = safeFinding(body.finding)
+    const output = await generateExplanation(env.AI, finding)
+    return json(explanationResponse(await explanationInsert(env, finding, output)))
+  }
+  if (url.pathname === '/api/plugin-changelog' && request.method === 'GET') {
+    return json(await officialChangelog(url.searchParams.get('slug') ?? ''))
+  }
+  const explanationMatch = url.pathname.match(/^\/api\/explanations\/([0-9a-f-]{20,60})\/(verify|correct|regenerate)$/)
+  if (explanationMatch && request.method === 'POST') {
+    const id = explanationMatch[1]
+    const action = explanationMatch[2]
+    const row = await env.DB.prepare('SELECT * FROM explanations WHERE id = ? AND site_id = ?').bind(id, 'default').first<Record<string, unknown>>()
+    if (!row) throw new ApiError(404, 'explanation_not_found', 'The explanation was not found.')
+    const current = rowToRecord(row)
+    if (action === 'regenerate') {
+      if (!env.AI) throw new ApiError(503, 'ai_unavailable', 'AI explanations are not configured.')
+      const output = await generateExplanation(env.AI, current.finding_snapshot)
+      await env.DB.prepare('DELETE FROM explanations WHERE id = ? AND site_id = ?').bind(id, 'default').run()
+      return json(explanationResponse(await explanationInsert(env, current.finding_snapshot, output)))
+    }
+    const body = object(await boundedJson(request, 10000))
+    const note = parseNote(body.reviewer_note)
+    const status = action === 'verify' ? 'verified-as-is' : 'corrected'
+    const output = action === 'verify' ? current.current_output : parseFields(body.fields)
+    const reviewedAt = new Date().toISOString()
+    await env.DB.prepare('UPDATE explanations SET current_output = ?, status = ?, reviewer_note = ?, reviewer_identity = ?, reviewed_at = ?, updated_at = ? WHERE id = ? AND site_id = ?')
+      .bind(JSON.stringify(output), status, note, 'dashboard-user', reviewedAt, reviewedAt, id, 'default').run()
+    const updated = await env.DB.prepare('SELECT * FROM explanations WHERE id = ? AND site_id = ?').bind(id, 'default').first<Record<string, unknown>>()
+    if (!updated) throw new ApiError(500, 'storage_error', 'The explanation could not be updated.')
+    return json(explanationResponse(rowToRecord(updated)))
+  }
+  if (url.pathname.startsWith('/api/bridge/')) {
+    if (request.method !== 'GET') throw new ApiError(405, 'read_only', 'Diagnostics are read-only. Use GET.')
+    const route = bridgePath(url.pathname.slice('/api/bridge/'.length), url.searchParams)
+    const envelope = await fetchBridge(env.ALLOWED_SITE_ORIGIN, wordpressToken(env), route, env)
+    return json(envelope)
+  }
+  throw new ApiError(404, 'route_not_found', 'This API route is not available.')
+}
+
+export default {
+  async fetch(request: Request, env: Env) {
+    const started = Date.now()
+    const url = new URL(request.url)
+    if (url.pathname.startsWith('/api/')) {
+      let response: Response
+      try { response = await api(request, env) } catch (error) {
+        if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') console.error(JSON.stringify({ event: 'local_api_error', message: error instanceof Error ? error.message : String(error) }))
+        const known = error instanceof ApiError ? error : new ApiError(500, 'internal_error', 'The dashboard service is unavailable. Please try again.')
+        response = json({ success: false, error: { code: known.code, message: known.message } }, known.status, known.status === 429 ? { 'Retry-After': '60' } : {})
+      }
+      // Deliberately omit URL/query, identity, headers, bodies, and exception details.
+      console.log(JSON.stringify({ event: 'api_request', area: url.pathname.startsWith('/api/bridge/') ? 'bridge' : 'account', status: response.status, duration_ms: Date.now() - started }))
+      return response
+    }
+    const asset = await env.ASSETS.fetch(request)
+    const response = new Response(asset.body, asset)
+    response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+    response.headers.set('Referrer-Policy', 'no-referrer')
+    response.headers.set('X-Content-Type-Options', 'nosniff')
+    response.headers.set('X-Frame-Options', 'DENY')
+    return response
+  },
+} satisfies ExportedHandler<Env>

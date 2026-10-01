@@ -1,0 +1,22 @@
+{
+  "name": "ai-diagnostic-bridge-katalyst",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --config wrangler.toml --port 8788",
+    "types": "wrangler types --config wrangler.toml",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "deploy": "node scripts/check-isolation.mjs && wrangler deploy --config wrangler.toml",
+    "build:dashboard": "npm --prefix dashboard run build",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "latest",
+    "@types/node": "latest",
+    "playwright-core": "^1.63.0",
+    "typescript": "~5.8.3",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.130.0"
+  }
+}

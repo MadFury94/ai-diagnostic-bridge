@@ -1,0 +1,8 @@
+node_modules/
+.private/
+.wrangler/
+dist/
+.dev.vars*
+!.dev.vars.example
+dashboard/.tanstack/
+dashboard/.npm-cache/
