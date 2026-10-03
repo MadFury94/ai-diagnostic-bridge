@@ -90,6 +90,10 @@ composer lint
 composer analyse
 ```
 
+### Documentation standards
+
+All PHP files, classes, functions, properties, and parameters carry substantive docblocks describing behavior, inputs, and return shapes. Placeholder comments written only to silence PHPCS sniffs are prohibited; each comment must state what the code actually does.
+
 PHPCS runs the full WordPress Coding Standards ruleset on the 26 shipped PHP files. PHPStan runs at level 5 with WordPress/WooCommerce definitions and a 3 GB memory allowance. The T11.3 analysis and safe-fix pass is complete, **but neither static gate is clean**: PHPCS decreased from 2,526 errors/487 warnings on committed source to 210 errors/8 warnings, and the first complete framework-aware PHPStan run decreased from 12 findings to 6. Both commands still exit nonzero; no findings are hidden by a baseline or disabled rules. Remaining documentation, file-organization, and behavioral review items are listed in [QUALITY-REPORT.md](QUALITY-REPORT.md), with full portable reports in `quality/`.
 
 ## Troubleshooting and limitations
