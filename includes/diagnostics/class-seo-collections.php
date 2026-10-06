@@ -49,6 +49,7 @@ final class SEO_Collections {
 		$public   = '1' === (string) get_option( 'blog_public', '1' );
 		$findings = $public ? array() : array( Response::finding( 'seo-site-not-public', 'medium', 'seo-indexability', 'Site discourages search indexing', 'WordPress is configured to discourage search engines from indexing the site.', array(), 'seo' ) );
 		$findings = array_merge( $findings, self::builder_site_findings() );
+		$findings = array_merge( $findings, self::homepage_accessibility_findings() );
 		return Response::success(
 			'seo-site',
 			empty( $findings ) ? 'ok' : 'warning',
@@ -63,6 +64,21 @@ final class SEO_Collections {
 				),
 			)
 		);
+	}
+
+	/** Fetch only bounded public HTML; inability to retrieve it is not an accessibility finding. */
+	private static function homepage_accessibility_findings(): array {
+		$url      = home_url( '/' );
+		$response = wp_safe_remote_get( $url, array( 'timeout' => 5, 'redirection' => 3, 'headers' => array( 'Accept' => 'text/html' ) ) );
+		if ( is_wp_error( $response ) || (int) wp_remote_retrieve_response_code( $response ) < 200 || (int) wp_remote_retrieve_response_code( $response ) >= 400 ) {
+			return array();
+		}
+		$body = wp_remote_retrieve_body( $response );
+		if ( '' === $body ) {
+			return array();
+		}
+		$analysis = Accessibility_Analysis::site_markup( substr( $body, 0, 100000 ) );
+		return $analysis['findings'];
 	}
 
 	/** Detect site-wide Elementor Pro templates whose dependency is inactive. */

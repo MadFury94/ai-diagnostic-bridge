@@ -47,7 +47,8 @@ final class Post_Analysis {
 		$description                = SEO_Metadata::description( $post->ID, $context );
 		$description_findings       = Meta_Description_Checks::findings( $description['value'], $known_descriptions, $thresholds );
 		$indexability               = Indexability_Analysis::analyze( $post, $context );
-		$content_analysis           = Content_Analysis::analyze( (string) $post->post_content );
+		$commerce_flow              = in_array( $slug, array( 'cart', 'checkout' ), true ) || (bool) preg_match( '/\b(?:cart|checkout)\b/i', $title );
+		$content_analysis           = Content_Analysis::analyze( (string) $post->post_content, $commerce_flow );
 		$image_details              = Image_Analysis::analyze( (string) $post->post_content, (int) $post->ID, $context );
 		$content_analysis['images'] = $image_details['observations'];
 		$builder                    = Builder_Content_Analysis::analyze( $post, $context );
@@ -80,7 +81,8 @@ final class Post_Analysis {
 				'indexability'     => $indexability['observations'],
 				'headings'         => $content_analysis['headings'],
 				'images'           => $content_analysis['images'],
-				'links'            => $content_analysis['links'],
+			'links'            => $content_analysis['links'],
+			'accessibility'    => $content_analysis['accessibility'],
 			),
 			array_merge( $title_findings, $description_findings, $indexability['findings'], $content_analysis['findings'], $image_details['findings'], $builder['findings'] ),
 			array( 'post_type' => sanitize_key( (string) $post->post_type ) )
@@ -89,6 +91,153 @@ final class Post_Analysis {
 
 	private static function length( string $value ): int {
 		return function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value );
+	}
+}
+
+/** Deterministic accessibility checks shared by post and rendered-markup analysis. */
+final class Accessibility_Analysis {
+	public static function tag( array $finding ): array {
+		$categories   = isset( $finding['categories'] ) && is_array( $finding['categories'] ) ? $finding['categories'] : array( $finding['category'] ?? 'accessibility' );
+		$categories[] = 'accessibility';
+		$finding['categories'] = array_values( array_unique( array_map( 'sanitize_key', $categories ) ) );
+		return $finding;
+	}
+
+	public static function analyze( \DOMDocument $document, bool $site_markup = false, bool $commerce_flow = false ): array {
+		$findings = array();
+		$ids      = array();
+		$controls = 0;
+		$unlabeled = 0;
+		$generic_links = 0;
+		$duplicate_ids = 0;
+		$unhelpful_images = 0;
+		foreach ( $document->getElementsByTagName( '*' ) as $node ) {
+			$id = trim( (string) $node->getAttribute( 'id' ) );
+			if ( '' !== $id ) {
+				$key = strtolower( $id );
+				if ( isset( $ids[ $key ] ) ) {
+					++$duplicate_ids;
+				}
+				$ids[ $key ] = true;
+			}
+			if ( in_array( strtolower( $node->nodeName ), array( 'input', 'textarea', 'select' ), true ) && self::requires_label( $node ) ) {
+				++$controls;
+				if ( ! self::has_label( $node, $document ) ) {
+					++$unlabeled;
+				}
+			}
+			if ( 'a' === strtolower( $node->nodeName ) && self::generic_link( $node ) ) {
+				++$generic_links;
+			}
+			if ( 'img' === strtolower( $node->nodeName ) ) {
+				$alt = trim( (string) $node->getAttribute( 'alt' ) );
+				$src = trim( (string) $node->getAttribute( 'src' ) );
+				$filename = '' !== $src ? sanitize_file_name( (string) basename( (string) wp_parse_url( $src, PHP_URL_PATH ) ) ) : '';
+				if ( '' !== $alt && self::unhelpful_alt( $alt, $filename ) ) {
+					++$unhelpful_images;
+				}
+			}
+		}
+		if ( $duplicate_ids > 0 ) {
+			$findings[] = self::finding( 'a11y-duplicate-id', 'medium', 'Duplicate id attributes were observed.', array( 'count' => $duplicate_ids ) );
+		}
+		if ( $unlabeled > 0 ) {
+			$findings[] = self::finding( 'a11y-form-input-no-label', $commerce_flow ? 'high' : 'medium', 'Form controls without associated labels were observed.', array( 'count' => $unlabeled, 'controls_checked' => $controls, 'commerce_flow' => $commerce_flow ) );
+		}
+		if ( $generic_links > 0 ) {
+			$findings[] = self::finding( 'a11y-nondescriptive-link-text', 'low', 'Links with generic text were observed.', array( 'count' => $generic_links ) );
+		}
+		if ( $unhelpful_images > 0 ) {
+			$findings[] = self::finding( 'a11y-alt-text-unhelpful', 'low', 'Unhelpful image alt text was observed.', array( 'count' => $unhelpful_images ) );
+		}
+		if ( $site_markup ) {
+			$html = $document->getElementsByTagName( 'html' )->item( 0 );
+			if ( ! $html || '' === trim( (string) $html->getAttribute( 'lang' ) ) ) {
+				$findings[] = self::finding( 'a11y-missing-lang-attribute', 'medium', 'The HTML language attribute is missing.', array() );
+			}
+		}
+		return array( 'findings' => $findings, 'observations' => array( 'duplicate_id_count' => $duplicate_ids, 'form_control_count' => $controls, 'unlabeled_form_control_count' => $unlabeled, 'nondescriptive_link_count' => $generic_links, 'unhelpful_alt_count' => $unhelpful_images ) );
+	}
+
+	public static function site_markup( string $html ): array {
+		$document = self::document( $html );
+		return self::analyze( $document, true );
+	}
+
+	private static function document( string $html ): \DOMDocument {
+		$document = new \DOMDocument( '1.0', 'UTF-8' );
+		$previous = libxml_use_internal_errors( true );
+		$document->loadHTML( '<?xml encoding="UTF-8">' . substr( $html, 0, 100000 ), LIBXML_HTML_NODEFDTD );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous );
+		return $document;
+	}
+
+	private static function finding( string $id, string $severity, string $message, array $evidence = array() ): array {
+		return self::tag( \BrianAzukaeme\AIDiagnosticBridge\Response::finding( $id, $severity, 'accessibility', $message, $message, $evidence, 'accessibility' ) );
+	}
+
+	private static function requires_label( \DOMElement $node ): bool {
+		if ( 'input' !== strtolower( $node->nodeName ) ) {
+			return true;
+		}
+		return ! in_array( strtolower( trim( $node->getAttribute( 'type' ) ) ), array( 'hidden', 'submit', 'reset', 'button', 'image' ), true );
+	}
+
+	private static function has_label( \DOMElement $node, \DOMDocument $document ): bool {
+		if ( '' !== trim( $node->getAttribute( 'aria-label' ) ) || '' !== trim( $node->getAttribute( 'aria-labelledby' ) ) ) {
+			return true;
+		}
+		$id = trim( $node->getAttribute( 'id' ) );
+		if ( '' !== $id ) {
+			foreach ( $document->getElementsByTagName( 'label' ) as $label ) {
+				if ( $label->getAttribute( 'for' ) === $id ) {
+					return true;
+				}
+			}
+		}
+		for ( $parent = $node->parentNode; $parent instanceof \DOMElement; $parent = $parent->parentNode ) {
+			if ( 'label' === strtolower( $parent->nodeName ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static function generic_link( \DOMElement $node ): bool {
+		if ( '' !== trim( $node->getAttribute( 'aria-label' ) ) || '' !== trim( $node->getAttribute( 'title' ) ) ) {
+			return false;
+		}
+		$text = strtolower( trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) $node->textContent ) ) ) );
+		if ( ! in_array( $text, array( 'click here', 'read more', 'link' ), true ) ) {
+			return false;
+		}
+		$parent = $node->parentNode;
+		if ( ! $parent instanceof \DOMElement ) {
+			return true;
+		}
+		$context = '';
+		for ( $sibling = $node->previousSibling, $steps = 0; $sibling && $steps < 2; $sibling = $sibling->previousSibling, ++$steps ) {
+			$context .= ' ' . (string) $sibling->textContent;
+		}
+		for ( $sibling = $node->nextSibling, $steps = 0; $sibling && $steps < 2; $sibling = $sibling->nextSibling, ++$steps ) {
+			$context .= ' ' . (string) $sibling->textContent;
+		}
+		return '' === trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $context ) ) );
+	}
+
+	private static function unhelpful_alt( string $alt, string $filename ): bool {
+		$normalize = static function ( string $value ): string {
+			$value = strtolower( trim( wp_strip_all_tags( $value ) ) );
+			$value = preg_replace( '/\.[a-z0-9]{2,5}$/i', '', $value ) ?? $value;
+			return preg_replace( '/[^a-z0-9]+/i', '', $value ) ?? $value;
+		};
+		$alt_key = $normalize( $alt );
+		$file_key = $normalize( $filename );
+		if ( '' !== $file_key && $alt_key === $file_key ) {
+			return true;
+		}
+		return (bool) preg_match( '/^(?:img|image|photo|picture|pic)[-_ ]?\d+(?:[-_ ]?\d+)?$/i', trim( $alt ) );
 	}
 }
 
@@ -242,7 +391,7 @@ final class Indexability_Analysis {
 final class Content_Analysis {
 	private const MAX_BYTES = 100000;
 
-	public static function analyze( string $content ): array {
+	public static function analyze( string $content, bool $commerce_flow = false ): array {
 		$content  = substr( $content, 0, self::MAX_BYTES );
 		$document = new \DOMDocument( '1.0', 'UTF-8' );
 		$previous = libxml_use_internal_errors( true );
@@ -253,7 +402,9 @@ final class Content_Analysis {
 		$headings = self::headings( $document, $findings );
 		$images   = self::images( $document );
 		$links    = self::links( $document, $findings );
-		return compact( 'headings', 'images', 'links', 'findings' );
+		$accessibility = Accessibility_Analysis::analyze( $document, false, $commerce_flow );
+		$findings = array_merge( $findings, $accessibility['findings'] );
+		return array( 'headings' => $headings, 'images' => $images, 'links' => $links, 'accessibility' => $accessibility['observations'], 'findings' => $findings );
 	}
 
 	private static function headings( \DOMDocument $document, array &$findings ): array {
@@ -281,15 +432,15 @@ final class Content_Analysis {
 			$previous = $level;
 		}
 		if ( 0 === $h1 && $count > 0 ) {
-			$findings[] = self::finding( 'seo-heading-missing-h1', 'low', 'No H1 heading was observed.' ); }
+			$findings[] = self::accessibility_finding( self::finding( 'seo-heading-missing-h1', 'low', 'No H1 heading was observed.' ) ); }
 		if ( $h1 > 1 ) {
-			$findings[] = self::finding( 'seo-heading-multiple-h1', 'low', 'Multiple H1 headings were observed.', array( 'count' => $h1 ) ); }
+			$findings[] = self::accessibility_finding( self::finding( 'seo-heading-multiple-h1', 'low', 'Multiple H1 headings were observed.', array( 'count' => $h1 ) ) ); }
 		if ( $empty > 0 ) {
-			$findings[] = self::finding( 'seo-heading-empty', 'low', 'Empty headings were observed.', array( 'count' => $empty ) ); }
+			$findings[] = self::accessibility_finding( self::finding( 'seo-heading-empty', 'low', 'Empty headings were observed.', array( 'count' => $empty ) ) ); }
 		if ( $long > 0 ) {
 			$findings[] = self::finding( 'seo-heading-long', 'info', 'Unusually long headings were observed.', array( 'count' => $long ) ); }
 		if ( $jumps > 0 ) {
-			$findings[] = self::finding( 'seo-heading-hierarchy-jump', 'low', 'Heading hierarchy jumps were observed.', array( 'count' => $jumps ) ); }
+			$findings[] = self::accessibility_finding( self::finding( 'seo-heading-hierarchy-jump', 'low', 'Heading hierarchy jumps were observed.', array( 'count' => $jumps ) ) ); }
 		return array(
 			'count'                => $count,
 			'h1_count'             => $h1,
@@ -363,6 +514,10 @@ final class Content_Analysis {
 		return \BrianAzukaeme\AIDiagnosticBridge\Response::finding( $id, $severity, 'seo-content', $message, $message, $evidence, 'seo' );
 	}
 
+	private static function accessibility_finding( array $finding ): array {
+		return Accessibility_Analysis::tag( $finding );
+	}
+
 	private static function length( string $value ): int {
 		return function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value ); }
 }
@@ -414,7 +569,7 @@ final class Image_Analysis {
 			$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding( 'seo-image-missing-featured', 'low', 'seo-image', 'Featured image is not set', 'The public post does not have a featured image configured.', array(), 'seo' );
 		}
 		if ( $missing > 0 ) {
-			$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding( 'seo-image-missing-alt', 'medium', 'seo-image', 'Images without alt text were observed.', 'One or more content images have no alt text.', array( 'count' => $missing ), 'seo' );
+			$findings[] = Accessibility_Analysis::tag( \BrianAzukaeme\AIDiagnosticBridge\Response::finding( 'seo-image-missing-alt', 'medium', 'seo-image', 'Images without alt text were observed.', 'One or more content images have no alt text.', array( 'count' => $missing ), 'seo' ) );
 		}
 		if ( $long > 0 ) {
 			$findings[] = \BrianAzukaeme\AIDiagnosticBridge\Response::finding( 'seo-image-long-alt', 'info', 'seo-image', 'Unusually long image alt text was observed.', 'One or more image alt values exceed the observation threshold.', array( 'count' => $long ), 'seo' );
@@ -431,6 +586,20 @@ final class Image_Analysis {
 			),
 			'findings'     => $findings,
 		);
+	}
+
+	private static function unhelpful_alt( string $alt, string $filename ): bool {
+		$normalize = static function ( string $value ): string {
+			$value = strtolower( trim( wp_strip_all_tags( $value ) ) );
+			$value = preg_replace( '/\.[a-z0-9]{2,5}$/i', '', $value ) ?? $value;
+			return preg_replace( '/[^a-z0-9]+/i', '', $value ) ?? $value;
+		};
+		$alt_key = $normalize( $alt );
+		$file_key = $normalize( $filename );
+		if ( '' !== $file_key && $alt_key === $file_key ) {
+			return true;
+		}
+		return (bool) preg_match( '/^(?:img|image|photo|picture|pic)[-_ ]?\d+(?:[-_ ]?\d+)?$/i', trim( $alt ) );
 	}
 
 	private static function length( string $value ): int {

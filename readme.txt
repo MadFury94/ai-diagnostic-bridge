@@ -2,7 +2,7 @@
 Contributors: brianazukaeme
 Requires at least: 6.5
 Requires PHP: 8.1
-Stable tag: 0.1.6
+Stable tag: 0.1.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,7 +15,7 @@ Read-only, deterministic WordPress support and SEO diagnostics. The plugin repor
 1. Upload the `ai-diagnostic-bridge` directory to `wp-content/plugins/`.
 2. Activate AI Diagnostic Bridge in WordPress admin.
 3. Open Settings -> AI Diagnostic Bridge and generate a credential.
-4. Store the one-time credential in a server-side secret store and send it as `Authorization: Bearer TOKEN`.
+4. Store the one-time credential in a server-side secret store and send it as `X-AI-Diagnostic-Token: TOKEN`. Legacy `Authorization: Bearer TOKEN` remains supported for sites without conflicting JWT authentication.
 
 == REST API ==
 

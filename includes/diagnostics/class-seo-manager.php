@@ -28,6 +28,7 @@ final class SEO_Manager {
 		'headings',
 		'images',
 		'links',
+		'accessibility',
 	);
 
 	/**

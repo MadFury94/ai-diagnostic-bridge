@@ -39,8 +39,13 @@ final class Auth {
 			return false;
 		}
 
-		$header = trim( $request->get_header( 'authorization' ) ?? '' );
-		if ( ! preg_match( '/^Bearer\s+(.+)$/i', $header, $matches ) ) {
+		// A dedicated header avoids interception by headless sites' JWT plugins.
+		$token = $request->get_header( 'x-ai-diagnostic-token' );
+		if ( null === $token ) {
+			$header = trim( $request->get_header( 'authorization' ) ?? '' );
+			$token  = preg_match( '/^Bearer\s+(.+)$/i', $header, $matches ) ? $matches[1] : '';
+		}
+		if ( ! preg_match( '/^[a-f0-9]{64}$/D', $token ) ) {
 			self::record_failure( $identifier );
 			return false;
 		}
@@ -48,7 +53,7 @@ final class Auth {
 		$settings = Plugin::settings();
 		$hash     = (string) ( $settings['credential_hash'] ?? '' );
 		$revoked  = (string) ( $settings['credential_revoked_at'] ?? '' );
-		$valid    = '' !== $hash && '' === $revoked && password_verify( $matches[1], $hash );
+		$valid    = '' !== $hash && '' === $revoked && password_verify( $token, $hash );
 
 		if ( ! $valid ) {
 			self::record_failure( $identifier );
