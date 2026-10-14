@@ -1,6 +1,6 @@
-﻿# AI Diagnostic Bridge
+# AI Diagnostic Bridge
 
-AI Diagnostic Bridge is a read-only WordPress plugin for deterministic support and SEO evidence. It reports structured observations and findings; it does not edit posts, change settings, install or update plugins, or call an AI provider. Version 0.1.6 requires WordPress 6.5+ and PHP 8.1+.
+AI Diagnostic Bridge is a read-only WordPress plugin for deterministic support and SEO evidence. It reports structured observations and findings; it does not edit posts, change settings, install or update plugins, or call an AI provider. Version 0.1.7 requires WordPress 6.5+ and PHP 8.1+.
 
 ## Installation
 
@@ -9,13 +9,33 @@ AI Diagnostic Bridge is a read-only WordPress plugin for deterministic support a
 3. Activate **AI Diagnostic Bridge** in WordPress admin.
 4. Open **Settings -> AI Diagnostic Bridge** and generate a credential.
 5. Copy the credential immediately into a server-side secret store such as a Cloudflare Worker. It is displayed once and is never returned by the REST API.
-6. Send authenticated requests with `Authorization: Bearer <credential>`.
+6. Send authenticated requests with `X-AI-Diagnostic-Token: <credential>` (plugin 0.1.7+). Legacy `Authorization: Bearer <credential>` remains supported.
+
+Headless sites with JWT authentication should use the dedicated header: JWT plugins may intercept the Bearer credential and return `jwt_auth_invalid_token` before diagnostics run. Missus uses the dedicated header and requires plugin 0.1.7+. Anbe and Katalyst retain their existing Bearer transport. Both transports enforce the same token hash, revocation and failure rate limit; no JWT authentication is disabled.
 
 The plugin can also be installed from a packaged release ZIP. Do not put the credential in browser JavaScript, source control, or a public configuration file.
 
+### Optional Worker email alerts
+
+Use the [Anbe and Katalyst email setup guide](EMAIL-ALERTS-SETUP.md) for the per-Worker settings, DNS requirements, migration/deployment commands, current activation status, and future-client pattern.
+
+The dashboard Worker supports finding alerts through **Resend**, an external transactional email service. Create a Resend account and verify a sending domain by adding the DKIM and SPF/return-path DNS records supplied by Resend; see [Resend's domain setup](https://resend.com/docs/dashboard/domains/introduction). Your receiving address can be Gmail, but the sender must use the verified domain.
+
+From `worker/`, apply D1 migrations, store `RESEND_API_KEY` and `ALERT_EMAIL_FROM` with `npx wrangler secret put <NAME>`, and configure the canonical HTTPS `DASHBOARD_ORIGIN`, then build and deploy. Keep the API key out of chat, source control, and browser settings. In **Site connection → Finding email alerts**, configure the recipient and minimum severity. Defaults are `webdeveloperbrian@gmail.com` and high (high + critical); a blank recipient disables alerts.
+
+The first completed scan establishes a silent baseline. Later complete scans email only newly appearing finding IDs; persistent findings do not repeat, while cleared/reappearing findings are new. Failed/incomplete scans do not change the baseline. Emails contain only site name, finding title/severity, UTC timestamp, and an authenticated dashboard detail link; evidence and diagnostic messages stay inside the dashboard. See [Anbe Worker setup](worker/README.md#finding-email-alerts-resend) and [Katalyst Worker setup](worker-katalyst/README.md). Both integrations are implemented. Configure the Resend settings on each Worker separately, using its own dashboard origin, and apply each deployment's migration before deploying.
+
+## Client dashboards
+
+Each client currently has a separate copy and isolated deployment: [Anbe](worker/README.md), [Katalyst](worker-katalyst/README.md), and [Missus Outfits](worker-missus/README.md). Each Worker runs an hourly scheduled scan in addition to manual scans. Missus connects to `https://cms.missusoutfits.com`, the WordPress/WooCommerce backend for its Next.js storefront, and its headless Worker checks the public homepage markup separately. Install the plugin on the backend, then set that Worker's `WORDPRESS_TOKEN` secret. Checkout behavior still requires browser-based testing.
+
+## Public page checks
+
+The Workers can now check selected public pages, same-origin links and image URLs for HTTP failures and redirect loops. Results feed the dashboard and existing complete-scan alert flow. Anbe is deployed and its live scan passed on 2026-10-14. Katalyst and Missus implementations remain local pending deployment/live acceptance. See [Public page checks](PUBLIC-PAGE-CHECKS.md) for configuration, strict bounds, exclusions, incomplete-scan behavior and the controlled repair exercise. The WordPress plugin remains version 0.1.7.
+
 ## REST API
 
-The namespace is `/wp-json/ai-diagnostic/v1/`. Every plugin route requires the diagnostic Bearer credential. Unauthenticated requests return HTTP 401.
+The namespace is `/wp-json/ai-diagnostic/v1/`. Every plugin route requires the diagnostic credential. Unauthenticated requests return HTTP 401.
 
 Core checks:
 
@@ -58,7 +78,7 @@ curl -X POST -H 'Authorization: Bearer YOUR_TOKEN' \
 
 Responses use a stable envelope with `success`, `plugin`, `check`, `findings`, and `metadata`. Findings contain bounded evidence rather than raw post bodies, credentials, customer data, action arguments, or PHP log lines.
 
-Deterministic finding coverage includes SEO title/meta/indexability, headings, images, links, plugin updates and known vulnerabilities, WordPress core updates, and `builder-plugin-inactive`. The builder check currently covers Elementor and Elementor Pro: it reports inactive dependencies when published pages contain recognized builder content, and reports site-wide Elementor Pro header/footer templates when Pro is inactive. It does not claim who caused a deactivation.
+Deterministic finding coverage includes SEO title/meta/indexability, headings, images, links, accessibility markup checks, plugin updates and known vulnerabilities, WordPress core updates, and `builder-plugin-inactive`. Accessibility findings reuse heading and image checks where appropriate and add bounded checks for image alt text, form labels, HTML language attributes, duplicate IDs, and generic link text. The builder check currently covers Elementor and Elementor Pro: it reports inactive dependencies when published pages contain recognized builder content, and reports site-wide Elementor Pro header/footer templates when Pro is inactive. It does not claim who caused a deactivation.
 
 ## Security model
 
@@ -70,7 +90,7 @@ The plugin's vulnerability lookup uses the public keyless WPVulnerability feed. 
 
 ## AI boundary
 
-The plugin supplies deterministic evidence only. It has no AI provider integration and never asks an AI system to write to WordPress. A future dashboard may interpret verified findings and draft support guidance, but any repair remains a separate, human-reviewed action.
+The plugin supplies deterministic evidence only. It has no AI provider integration and never asks an AI system to write to WordPress. The separate Worker dashboards provide click-only AI interpretation with human verification/correction. Any repair remains a separate, human-reviewed action.
 
 ## Tests
 
@@ -80,7 +100,7 @@ Run the local WordPress suite with the disposable environment:
 .tools/php/php.exe -d auto_prepend_file=tests/local-bootstrap.php .tools/phpunit.phar -c phpunit.xml.dist
 ```
 
-The verified 2026-09-30 result is **84 tests, 820 assertions, and one expected WooCommerce-absent skip**, with no failures or errors. Before this pass, the suite had 84 tests, 812 assertions, and two errors caused by misspelled class references in the Elementor tests. Worker tests passed 37/37 before and after; Worker type-checking, the dashboard production build, and syntax checks for all 42 project PHP files passed.
+The verified 2026-10-04 result is **89 tests, 837 assertions, one expected WooCommerce-absent skip, and no failures or errors**. The suite includes local markup violation-and-repair fixtures for the accessibility findings. Worker tests and type checks are run per deployment; dashboard production builds and PHP syntax checks are also required before deployment.
 
 Development analysis tools are installed through the committed Composer lockfile:
 
@@ -99,6 +119,7 @@ PHPCS runs the full WordPress Coding Standards ruleset on the 26 shipped PHP fil
 - WooCommerce present behavior is covered by automated fixtures. Manual break/repair exercises were separately verified against Anbe's live WooCommerce installation. SQLite has a known stock-reservation limitation in the disposable test environment.
 - Error-log reads require `WP_DEBUG` and `WP_DEBUG_LOG`; raw log messages are intentionally withheld.
 - Optional bounded internal-link verification is not implemented. Ordinary link analysis classifies links and never crawls or makes unbounded internal requests.
+- Accessibility findings cover what is deterministically verifiable from markup alone. Color contrast ratios and keyboard focus/interaction behavior require browser rendering and are out of scope for this plugin; tools such as axe-core or Pa11y should be used for those checks.
 - Vulnerability data depends on the availability and coverage of the public WPVulnerability feed. A timeout, malformed response, or incomplete advisory remains unknown and cannot create a clean or vulnerability claim.
 - The plugin does not detect general non-security update bugs, and it does not prove exploitation, compatibility, checkout success, or search-engine indexing.
 

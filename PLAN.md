@@ -1,11 +1,36 @@
 ﻿# AI Diagnostic Bridge - Implementation Plan
 
+
+## Current baseline and diagnostic expansion - 2026-10-13
+
+The recorded shipped baseline includes plugin 0.1.7, three isolated Worker/dashboard deployments, manual and hourly scans, finding email alerts, reviewed click-only AI explanations, and markup accessibility diagnostics with October 6 live observations. Earlier version-specific limitations and historical deployment entries below are not the current status summary. The plugin remains read-only and does not call AI; public network checks run in Workers.
+
+### Phase 14 - Bounded public-page diagnostics
+
+- [x] **T14.1** Reconcile current implementation context and define the bounded public-page release in PUBLIC-PAGE-CHECKS.md.
+- [x] **T14.2** Implement server-configured source pages, same-origin link/image GET checks, validated redirects, deterministic findings, deadline/request/body bounds, and explicit incomplete coverage across the three Workers.
+- [x] **T14.3** Integrate dashboard findings/current evidence, public-specific AI interpretation guidance, and the existing complete-scan notification baseline without WordPress writes.
+- [x] **T14.4** Validated controlled broken-link/image repair, scope/privacy/timeout boundaries, authenticated alert details, all Worker type checks and dashboard builds. Worker suites: Anbe 85, Katalyst 91, Missus 94 passing tests. Browser/dry-run acceptance results are recorded in PROGRESS.md.
+- [~] **T14.5** Anbe deployed and live scan accepted on 2026-10-14: 12 WordPress records, 15 public URLs, complete coverage of configured scope. Katalyst/Missus deployment and live acceptance remain pending. User-run new-error email verification is pending.
+- [ ] **T14.6** Record Brian's independent reproduction and customer explanation in SUPPORT-JOURNAL.md; use synthetic test-store data for subsequent interactive exercises.
+
+### Later phases - not implemented by Phase 14
+
+- [ ] Browser-rendered desktop/mobile checks and failed frontend requests.
+- [ ] Rendered accessibility and explicit keyboard/focus interaction checks.
+- [ ] Product/cart/checkout-loading journeys on a synthetic WooCommerce test store; payment completion only in a separately scoped test-mode exercise.
+- [ ] Carefully specified storefront/backend price and stock comparisons.
+
+Acceptance for Phase 14: bounded initial-HTML HTTP observations, stable IDs and safe evidence, no arbitrary destinations or credentials, incomplete scans never reported as clean, current public evidence available from authenticated notification links, and reproducible failure/repair records. Browser interaction, site-wide crawling, external assets, query-based URLs and automatic repairs are excluded.
+
 ## Support evidence and application preparation
+
+- [x] **T13.1** Add deterministic accessibility findings for markup-only violations, preserve existing SEO categories through additive accessibility tags, validate local violation/fix fixtures, and document the browser-rendering boundary. Completed 2026-10-04; local WordPress fixture suite passed 89 tests with 837 assertions (one existing warning and one expected skip).
 
 Read [APPLICATION-CONTEXT.md](APPLICATION-CONTEXT.md) alongside this plan. After meaningful work, update [SUPPORT-JOURNAL.md](SUPPORT-JOURNAL.md) with the symptom, hypothesis, AI verification/correction, repair, validation, customer explanation, and actual timing (or -not measured-). Maintain this evidence through January 2027 without claiming unfinished work is shipped or fixture results are real-store outcomes. Keep Missus unchanged.
 
-- [ ] Set up a small real WooCommerce test store with synthetic products and test-mode payments.
-- [ ] Complete and document deliberate WordPress/WooCommerce break/diagnose/repair exercises from the journal.
+- [~] Local synthetic WooCommerce store and offline checkout exist (September 22 journal); configure a dedicated test-mode payment environment and address the documented SQLite limitation before broader journey claims.
+- [~] Local checkout-page, shipping and gateway exercises are recorded; continue the remaining journal practice backlog and independent reproduction.
 - [ ] Record Brian's independent reproduction and customer-ready explanations.
 - [ ] Measure a defined manual versus bridge-assisted troubleshooting task; record limitations and sample size.
 - [ ] Verify concrete Missus bug/repair artifacts before linking those cases to the application narrative.
@@ -14,7 +39,7 @@ These support exercises complement the implementation sequence below; they are n
 
 ## Implementation objective
 
-Build a standalone WordPress plugin named **AI Diagnostic Bridge** (`0.1.6`) that exposes authenticated, deterministic WordPress and SEO diagnostics to a future Cloudflare Worker and AI diagnostic agent.
+Maintain the standalone **AI Diagnostic Bridge** plugin (current recorded version `0.1.7`) as the authenticated, deterministic WordPress and SEO evidence source for the existing Worker dashboards and reviewed AI support layer. The original 0.1.6 phases below are retained as implementation history.
 
 The plugin will provide observed facts and deterministic findings only. It will not call an AI provider, execute arbitrary code, modify WordPress content or settings, or expose a general-purpose command interface.
 
@@ -397,7 +422,7 @@ The WordPress plugin remains a deterministic evidence source. The dashboard and 
 - [x] **T12.7** Added the evidence-gated builder-plugin-inactive Elementor detection and recorded the real incident and timed SEO comparison in SUPPORT-JOURNAL.md.
 - [x] **T12.8** Implemented the findings-list UX redesign: severity-first grouped sections, sticky counted collapsible headers, responsive quick-jump navigation, and By severity/By page-post grouping.
 
-## Handoff record
+## Historical handoff record (superseded by the current baseline and latest PROGRESS.md entry)
 
 ### Local setup verification - 2026-09-21
 

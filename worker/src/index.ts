@@ -1,13 +1,16 @@
+import { scanPublicPages } from './public-scan'
 import { bridgePath, fetchBridge, object } from './bridge'
+import { recordCompletedScan, sendFindingAlerts, AlertSettings, defaultAlerts, parseAlertSettings } from './alerts'
+import { scanSite } from './scan'
 import { ApiError, boundedJson, createSession, decryptToken, encryptToken, passwordMatches, siteOrigin, validSession } from './security'
 import { ExplanationFields, ExplanationRecord, generateExplanation, parseFields, rowToRecord, safeFinding } from './explanations'
 
-type Site = { id: string; name: string; url: string; ciphertext: string; iv: string; verified_at: string }
+type Site = AlertSettings & { id: string; name: string; url: string; ciphertext: string; iv: string; verified_at: string }
 const cookieName = '__Host-aidb_session'
 const json = (data: unknown, status = 200, headers = {}) => Response.json(data, { status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...headers } })
 const cookie = (value: string, age: number) => `${cookieName}=${value}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=${age}`
 const getSite = (env: Env) => env.DB.prepare("SELECT * FROM sites WHERE id = 'default'").first<Site>()
-const summary = (row: Site | null) => ({ id: 'default', configured: Boolean(row), name: row?.name ?? 'Anbe Nigeria', url: row?.url ?? '', verified_at: row?.verified_at ?? null })
+const summary = (row: Site | null) => ({ id: 'default', configured: Boolean(row), name: row?.name ?? 'Anbe Nigeria', url: row?.url ?? '', verified_at: row?.verified_at ?? null, alert_email: row?.alert_email ?? defaultAlerts.alert_email, alert_severity: row?.alert_severity ?? defaultAlerts.alert_severity })
 const explanationResponse = (record: ExplanationRecord) => ({ explanation: record })
 const parseNote = (value: unknown) => typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 500) || null : null
 const explanationInsert = async (env: Env, finding: Record<string, unknown>, original: ExplanationFields, id = crypto.randomUUID()) => {
@@ -31,7 +34,18 @@ const officialChangelog = async (slug: string) => {
   return { slug: safe, name: typeof data.name === 'string' ? data.name.slice(0, 200) : safe, current_version: typeof data.version === 'string' ? data.version.slice(0, 80) : null, changelog: text, source_url: `https://wordpress.org/plugins/${safe}/#developers` }
 }
 
-async function api(request: Request, env: Env) {
+const scheduledScan = async (env: Env): Promise<void> => {
+  const row = await getSite(env)
+  if (!row) return
+  const startedAt = Date.now()
+  const token = await decryptToken(row, env.CREDENTIAL_KEY)
+  const { findings, ...result } = await scanSite(env, row.url, token)
+  if (result.incomplete) return
+  await recordCompletedScan(env, row, findings, startedAt, result.scannedAt, [token, env.CREDENTIAL_KEY, env.SESSION_KEY, env.DASHBOARD_PASSWORD, env.RESEND_API_KEY ?? ''])
+  await sendFindingAlerts(env, row)
+}
+
+async function api(request: Request, env: Env, ctx?: ExecutionContext) {
   const url = new URL(request.url)
   if (!env.SESSION_KEY || !env.DASHBOARD_PASSWORD || !env.CREDENTIAL_KEY) throw new ApiError(503, 'setup_required', 'Dashboard secrets are not configured.')
   if (request.headers.get('Sec-Fetch-Site') === 'cross-site') throw new ApiError(403, 'cross_origin', 'Open the dashboard directly to continue.')
@@ -53,8 +67,15 @@ async function api(request: Request, env: Env) {
   if (!(await env.API_LIMIT.limit({ key: 'default' })).success) throw new ApiError(429, 'rate_limit', 'Too many requests. Wait a minute and try again.')
   if (url.pathname === '/api/connection') {
     if (request.method === 'GET') return json(summary(await getSite(env)))
-    if (!['PUT', 'DELETE', 'POST'].includes(request.method)) throw new ApiError(405, 'method_not_allowed', 'Use GET, PUT, POST, or DELETE for the connection.')
+    if (!['PUT', 'DELETE', 'POST', 'PATCH'].includes(request.method)) throw new ApiError(405, 'method_not_allowed', 'Use GET, PUT, POST, PATCH, or DELETE for the connection.')
     if (!(await env.CONNECTION_LIMIT.limit({ key: 'default' })).success) throw new ApiError(429, 'rate_limit', 'Too many connection attempts. Wait a minute and try again.')
+    if (request.method === 'PATCH') {
+      if (!await getSite(env)) throw new ApiError(409, 'not_connected', 'Save a site connection first.')
+      const settings = parseAlertSettings(await boundedJson(request, 4096))
+      await env.DB.prepare("UPDATE sites SET alert_email = ?, alert_severity = ? WHERE id = 'default'")
+        .bind(settings.alert_email, settings.alert_severity).run()
+      return json(summary(await getSite(env)))
+    }
     if (request.method === 'DELETE') {
       await env.DB.prepare("DELETE FROM sites WHERE id = 'default'").run()
       return json(summary(null))
@@ -117,6 +138,41 @@ async function api(request: Request, env: Env) {
     if (!updated) throw new ApiError(500, 'storage_error', 'The explanation could not be updated.')
     return json(explanationResponse(rowToRecord(updated)))
   }
+  if (url.pathname === '/api/scan' && request.method === 'POST') {
+    const row = await getSite(env)
+    if (!row) throw new ApiError(409, 'not_connected', 'Save a site connection first.')
+    const startedAt = Date.now()
+    const token = await decryptToken(row, env.CREDENTIAL_KEY)
+    const { findings, ...result } = await scanSite(env, row.url, token)
+    if (!result.incomplete) {
+      try {
+        await recordCompletedScan(env, row, findings, startedAt, result.scannedAt, [token, env.CREDENTIAL_KEY, env.SESSION_KEY, env.DASHBOARD_PASSWORD, env.RESEND_API_KEY ?? ''])
+        const pending = sendFindingAlerts(env, row)
+        if (ctx) ctx.waitUntil(pending)
+        else await pending
+      } catch { console.log(JSON.stringify({ event: 'finding_email', status: 'storage_failed' })) }
+    }
+    return json(result)
+  }
+  if (url.pathname === '/api/public-scan' && request.method === 'GET') return json(await scanPublicPages(env, env.ALLOWED_SITE_ORIGIN))
+  const alertMatch = url.pathname.match(/^\/api\/finding-alerts\/([0-9a-f-]{36})$/)
+  if (alertMatch && request.method === 'GET') {
+    const row = await getSite(env)
+    const alert = await env.DB.prepare('SELECT finding_id, route, detected_at FROM finding_email_alerts WHERE id = ? AND site_id = ?').bind(alertMatch[1], 'default').first<{ finding_id: string; route: string; detected_at: string }>()
+    if (!row || !alert) throw new ApiError(404, 'alert_not_found', 'This finding notification is no longer available.')
+    if (alert.route.startsWith('public/pages/')) {
+      const current = await scanPublicPages(env, env.ALLOWED_SITE_ORIGIN)
+      if (alert.route !== `public/pages/${current.metadata.scope}`) throw new ApiError(503, 'public_scope_changed', 'The public scan scope has changed. This earlier finding is not confirmed cleared.')
+      const finding = current.findings.find(item => item.id === alert.finding_id) ?? null
+      if (!finding && (!current.metadata.enabled || current.metadata.incomplete)) throw new ApiError(503, 'public_scan_incomplete', 'This public-page check could not be completed. The earlier finding is not confirmed cleared.')
+      return json({ site_name: row.name, detected_at: alert.detected_at, finding })
+    }
+    const parsed = new URL(`https://diagnostic.invalid/${alert.route}`)
+    const route = bridgePath(parsed.pathname.slice(1), parsed.searchParams)
+    const envelope = await fetchBridge(row.url, await decryptToken(row, env.CREDENTIAL_KEY), route, env)
+    const finding = envelope.findings.find(value => object(value).id === alert.finding_id) ?? null
+    return json({ site_name: row.name, detected_at: alert.detected_at, finding })
+  }
   if (url.pathname.startsWith('/api/bridge/')) {
     if (request.method !== 'GET') throw new ApiError(405, 'read_only', 'Diagnostics are read-only. Use GET.')
     const route = bridgePath(url.pathname.slice('/api/bridge/'.length), url.searchParams)
@@ -129,12 +185,16 @@ async function api(request: Request, env: Env) {
 }
 
 export default {
-  async fetch(request: Request, env: Env) {
+  async scheduled(_event: ScheduledController, env: Env, _ctx: ExecutionContext) {
+    try { await scheduledScan(env) }
+    catch { console.log(JSON.stringify({ event: 'scheduled_scan', status: 'failed' })) }
+  },
+  async fetch(request: Request, env: Env, ctx?: ExecutionContext) {
     const started = Date.now()
     const url = new URL(request.url)
     if (url.pathname.startsWith('/api/')) {
       let response: Response
-      try { response = await api(request, env) } catch (error) {
+      try { response = await api(request, env, ctx) } catch (error) {
         if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') console.error(JSON.stringify({ event: 'local_api_error', message: error instanceof Error ? error.message : String(error) }))
         const known = error instanceof ApiError ? error : new ApiError(500, 'internal_error', 'The dashboard service is unavailable. Please try again.')
         response = json({ success: false, error: { code: known.code, message: known.message } }, known.status, known.status === 429 ? { 'Retry-After': '60' } : {})

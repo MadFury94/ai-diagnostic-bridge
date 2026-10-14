@@ -1,3 +1,9 @@
 DASHBOARD_PASSWORD=replace-with-a-random-dashboard-access-key
 CREDENTIAL_KEY=replace-with-32-random-bytes-as-base64
 SESSION_KEY=replace-with-a-separate-random-session-secret
+
+# Optional finding email alerts. Leave both unset to disable.
+# RESEND_API_KEY=re_replace-with-a-development-sending-key
+# ALERT_EMAIL_FROM=Diagnostics <alerts@your-verified-domain.example>
+# DASHBOARD_ORIGIN=https://your-dashboard.example.com
+# Recipient and severity threshold are saved in Site connection.

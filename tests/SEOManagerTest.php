@@ -39,6 +39,7 @@ final class SEOManagerTest extends TestCase {
 				'headings',
 				'images',
 				'links',
+				'accessibility',
 			],
 			array_keys($result['metadata']['observations'])
 		);

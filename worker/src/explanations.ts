@@ -52,6 +52,7 @@ export function safeFinding(value: unknown): Record<string, unknown> {
     if (text) result[key] = text
   }
   if (typeof input.evidence === 'object' && input.evidence !== null) result.evidence = safeEvidence(input.evidence)
+  if (Array.isArray(input.categories)) result.categories = input.categories.slice(0, 8).map(value => cleanString(value, 40)).filter(Boolean)
   const post = object(input.post)
   if (typeof post.id === 'number' && Number.isInteger(post.id) && post.id > 0) result.post = { id: post.id, type: cleanString(post.type, 30), title: cleanString(post.title, 300) }
   if (!result.id || !result.title || !result.message) throw new ApiError(400, 'invalid_finding', 'A bounded finding object is required.')
@@ -84,8 +85,10 @@ function parseModelResponse(value: unknown): ExplanationFields {
 }
 
 export async function generateExplanation(ai: AIService, finding: Record<string, unknown>): Promise<ExplanationFields> {
+  const publicHttp = finding.source === 'public_http'
   const prompt = [
-    'You are a support assistant interpreting one deterministic WordPress finding.',
+    publicHttp ? 'You are a support assistant interpreting one deterministic public HTTP finding.' : 'You are a support assistant interpreting one deterministic WordPress finding.',
+    ...(publicHttp ? ['This finding is a public HTTP page, link, or image observation. Explain only the observed response or redirect loop; do not infer a WordPress cause, browser rendering failure, or checkout failure. Recommend verifying the affected public URL and its referring page, then rescanning.'] : []),
     'Use only the supplied finding. Do not claim facts that are absent. Never propose destructive or automatic changes.',
     'If official_changelog and affected_site_context are present, this is a release-note interpretation task, not a generic update explanation. Read the changelog entries and name concrete documented changes (for example a specific fix, feature, security change, or compatibility change and its release version) in summary. Explain why each named change is relevant or not relevant to the supplied site context, including WooCommerce configuration and deterministic findings when present. Do not say only that the update improves security/functionality or that the user should review the changelog. Clearly distinguish direct evidence, plausible relevance, and what still needs verification.',
     'If official_docs_url is present in the finding evidence, use that official documentation to explain the concrete repair in simple English and include the URL in recommended_next_step or verification_step. Never invent a documentation link.',

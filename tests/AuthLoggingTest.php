@@ -62,6 +62,33 @@ final class AuthLoggingTest extends TestCase {
 		$this->assertFalse( str_contains( wp_json_encode( [ Plugin::settings(), $this->entries(), $response->get_data() ] ), $this->token ), 'Raw credential must not be persisted or returned.' );
 	}
 
+	public function test_dedicated_header_authenticates_and_honors_revocation(): void {
+		$request = new WP_REST_Request( 'GET', '/ai-diagnostic/v1/woocommerce' );
+		$request->set_header( 'X-AI-Diagnostic-Token', $this->token );
+		$this->assertSame( 200, rest_do_request( $request )->get_status() );
+		$this->assertStringNotContainsString( $this->token, wp_json_encode( $this->entries() ) );
+		Auth::revoke();
+		$this->assertSame( 401, rest_do_request( $request )->get_status() );
+	}
+
+	public function test_invalid_dedicated_header_does_not_fall_back_to_bearer(): void {
+		foreach ( [ '', 'invalid', str_repeat( 'a', 64 ), $this->token . ' extra' ] as $token ) {
+			$request = new WP_REST_Request( 'GET', '/ai-diagnostic/v1/woocommerce' );
+			$request->set_header( 'X-AI-Diagnostic-Token', $token );
+			$request->set_header( 'Authorization', 'Bearer ' . $this->token );
+			$this->assertSame( 401, rest_do_request( $request )->get_status() );
+		}
+	}
+
+	public function test_dedicated_header_obeys_existing_rate_limit(): void {
+		for ( $i = 0; $i < 10; ++$i ) {
+			$this->dispatch();
+		}
+		$request = new WP_REST_Request( 'GET', '/ai-diagnostic/v1/woocommerce' );
+		$request->set_header( 'X-AI-Diagnostic-Token', $this->token );
+		$this->assertSame( 401, rest_do_request( $request )->get_status() );
+	}
+
 	public function test_missing_malformed_and_invalid_tokens_log_failures(): void {
 		foreach ( [ null, '', 'Basic test', 'Bearer ', 'Bearer invalid-fixture' ] as $header ) {
 			$response = $this->dispatch( $header );

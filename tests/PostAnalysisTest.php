@@ -10,6 +10,8 @@ use BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Title_Checks;
 use BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Meta_Description_Checks;
 use BrianAzukaeme\AIDiagnosticBridge\Diagnostics\SEO_Metadata;
 use BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Indexability_Analysis;
+use BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Accessibility_Analysis;
+use BrianAzukaeme\AIDiagnosticBridge\Diagnostics\Content_Analysis;
 use PHPUnit\Framework\TestCase;
 
 final class PostAnalysisFixture extends Post_Analysis_Context {
@@ -104,6 +106,8 @@ final class PostAnalysisTest extends TestCase {
 		$ids = array_column($result['findings'], 'id');
 		$this->assertContains('seo-heading-missing-h1', $ids);
 		$this->assertContains('seo-image-missing-alt', $ids);
+		$missing_alt = array_values( array_filter( $result['findings'], static fn ( array $finding ): bool => 'seo-image-missing-alt' === $finding['id'] ) )[0] ?? null;
+		$this->assertContains( 'accessibility', $missing_alt['categories'] ?? [] );
 		$this->assertContains('seo-link-missing-href', $ids);
 		$this->assertContains('seo-link-duplicate', $ids);
 		$this->assertSame(1, $result['metadata']['observations']['images']['missing_alt_count']);
@@ -196,7 +200,50 @@ final class PostAnalysisTest extends TestCase {
 		$this->assertContains('seo-heading-multiple-h1', $ids);
 		$this->assertContains('seo-heading-empty', $ids);
 		$this->assertContains('seo-heading-hierarchy-jump', $ids);
+		$hierarchy = array_values( array_filter( $result['findings'], static fn ( array $finding ): bool => 'seo-heading-hierarchy-jump' === $finding['id'] ) )[0] ?? null;
+		$this->assertContains( 'accessibility', $hierarchy['categories'] ?? [] );
 		$this->assertIsInt($result['links']['count']);
 		$this->assertIsInt($result['images']['count']);
+	}
+
+	public function test_accessibility_markup_findings_fire_for_each_markup_violation(): void {
+		$html = '<html><body><img src="https://example.test/IMG_1234.jpg" alt="IMG_1234.jpg"><input type="email"><textarea></textarea><select><option>Choose</option></select><div id="duplicate"></div><span id="duplicate"></span><a href="/shop">Click here</a></body></html>';
+		$ids = array_column( Accessibility_Analysis::site_markup( $html )['findings'], 'id' );
+		$this->assertContains( 'a11y-alt-text-unhelpful', $ids );
+		$this->assertContains( 'a11y-form-input-no-label', $ids );
+		$this->assertContains( 'a11y-missing-lang-attribute', $ids );
+		$this->assertContains( 'a11y-duplicate-id', $ids );
+		$this->assertContains( 'a11y-nondescriptive-link-text', $ids );
+		$fixed = '<html lang="en"><body><img src="https://example.test/IMG_1234.jpg" alt="Red summer dress"><label for="email">Email</label><input id="email" type="email"><label>Message<textarea></textarea></label><label for="size">Size</label><select id="size"><option>Choose</option></select><div id="one"></div><span id="two"></span><a href="/shop">Shop the summer collection</a></body></html>';
+		$this->assertSame( [], Accessibility_Analysis::site_markup( $fixed )['findings'] );
+	}
+
+	public function test_checkout_unlabelled_controls_are_high_and_existing_seo_findings_are_also_accessibility_tagged(): void {
+		$checkout = Content_Analysis::analyze( '<h2>Checkout</h2><input type="text">', true );
+		$form = array_values( array_filter( $checkout['findings'], static fn ( array $finding ): bool => 'a11y-form-input-no-label' === $finding['id'] ) )[0] ?? null;
+		$this->assertNotNull( $form );
+		$this->assertSame( 'high', $form['severity'] );
+		$heading = array_values( array_filter( $checkout['findings'], static fn ( array $finding ): bool => 'seo-heading-missing-h1' === $finding['id'] ) )[0] ?? null;
+		$this->assertContains( 'accessibility', $heading['categories'] ?? [] );
+	}
+
+	public function test_local_wordpress_post_fixture_clears_accessibility_findings_after_markup_is_fixed(): void {
+		$post = new \WP_Post((object) [
+			'ID' => 93, 'post_type' => 'page', 'post_status' => 'publish', 'post_password' => '',
+			'post_title' => 'Checkout', 'post_name' => 'checkout',
+			'post_content' => '<h2>Checkout</h2><img src="https://example.test/IMG_1234.jpg" alt="IMG_1234.jpg"><input type="email"><div id="same"></div><span id="same"></span><a href="/shop">Read more</a>',
+		]);
+		$broken = Post_Analysis::run( 93, new PostAnalysisFixture( $post ) );
+		$broken_ids = array_column( $broken['findings'], 'id' );
+		$this->assertContains( 'a11y-alt-text-unhelpful', $broken_ids );
+		$this->assertContains( 'a11y-form-input-no-label', $broken_ids );
+		$this->assertContains( 'a11y-duplicate-id', $broken_ids );
+		$this->assertContains( 'a11y-nondescriptive-link-text', $broken_ids );
+		$post->post_content = '<h1>Checkout</h1><img src="https://example.test/IMG_1234.jpg" alt="Red summer dress"><label for="email">Email</label><input id="email" type="email"><div id="one"></div><span id="two"></span><a href="/shop">Shop the summer collection</a>';
+		$fixed_ids = array_column( Post_Analysis::run( 93, new PostAnalysisFixture( $post ) )['findings'], 'id' );
+		$this->assertNotContains( 'a11y-alt-text-unhelpful', $fixed_ids );
+		$this->assertNotContains( 'a11y-form-input-no-label', $fixed_ids );
+		$this->assertNotContains( 'a11y-duplicate-id', $fixed_ids );
+		$this->assertNotContains( 'a11y-nondescriptive-link-text', $fixed_ids );
 	}
 }

@@ -39,7 +39,7 @@ All routes except login require a valid session. State-changing requests also re
 - Rate-limit counters are per Cloudflare location, eventually consistent, and not a strict global quota. See [Cloudflare rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
 - Structured application logs contain only operation area, HTTP status, and elapsed milliseconds. Invocation request logs are disabled. No request bodies, headers, URLs/queries, credential values, diagnostic data, or raw upstream errors are logged by this code.
 - API responses use `Cache-Control: no-store`. The browser calls only its own origin; a CSP blocks other connections.
-- Dashboard scans read at most 20 pages of 50 records sequentially. Incomplete scans are labelled. Scans are not transactional snapshots or durable scan history.
+- Dashboard and scheduled scans read at most 20 pages of 50 records sequentially. Incomplete scans are labelled. Scans are not transactional snapshots or durable scan history.
 
 ## Development and validation
 
@@ -73,6 +73,30 @@ npx wrangler deploy
 
 `scripts/browser-smoke.mjs <worker-origin>` runs headless installed Microsoft Edge via Playwright. It checks sign-in, live scan, About detail, keyboard dismissal, saved connection verification, mobile overflow, sign-out, and browser credential/origin boundaries. Screenshots are saved under ignored `.private/`.
 
+## Finding email alerts (Resend)
+
+For a side-by-side activation guide covering both deployments, see [Email alerts: Anbe and Katalyst](../EMAIL-ALERTS-SETUP.md).
+
+The dashboard calls authenticated `POST /api/scan`, and the Worker also runs the same scan hourly through its Cloudflare Cron Trigger (`0 * * * *`). The Worker reads site SEO, health, plugins, core updates, WooCommerce, and up to 20 pages of 50 public posts/pages. It compares finding IDs only after every required request succeeds and pagination is complete. Unknown/truncated results, missing records, failed requests, and capped scans do not advance the baseline or trigger email. Direct diagnostic reads and browser-submitted findings cannot trigger alerts.
+
+The first successful scan silently establishes a baseline. Subsequent scans email only IDs absent from the previous successful scan, at or above the connection's minimum severity. Default is **high**, including high and critical. A persistent finding never repeats merely because time passes; confirmed clearing followed by reappearance is new. Changing wording, recipient, or threshold does not make an existing ID new. Atomic D1 baseline updates and email claims suppress concurrent duplicates; older overlapping scans cannot overwrite newer baselines.
+
+Each plain-text email contains only the site name with its affected hostname, finding title and severity, detection timestamp in UTC, and an authenticated dashboard detail link. The link carries a random notification ID, never a credential or finding payload. The dashboard retains the link during sign-in and loads current evidence through authenticated `GET /api/finding-alerts/{id}`. If the finding has cleared, it says so. No evidence, diagnostic message, raw finding ID, WordPress URL, or credentials are included in the email. Finding titles and site labels are bounded and redact known secrets/control characters.
+
+Setup in this `worker/` deployment:
+
+1. Create a Resend account and verify a sending domain with the exact DKIM and SPF/return-path DNS records Resend provides. Review or add DMARC without replacing an existing domain policy. See [Resend domain setup](https://resend.com/docs/dashboard/domains/introduction).
+2. Apply migrations: `npx wrangler d1 migrations apply ai-diagnostic-bridge --remote` (`--local` for development). Migration 0003 has not been deployed as part of this work.
+3. Store a sending API key with `npx wrangler secret put RESEND_API_KEY`, and a sender such as `Diagnostics <alerts@your-verified-domain>` with `npx wrangler secret put ALERT_EMAIL_FROM`. Never commit or share the API key.
+4. Set `DASHBOARD_ORIGIN` to the canonical HTTPS dashboard origin, with no path/query or credentials, using Wrangler variables or `npx wrangler secret put DASHBOARD_ORIGIN`. Links use this configured origin, never a request-supplied host.
+5. Build and deploy. In **Site connection → Finding email alerts**, set the recipient and minimum severity. Defaults: `webdeveloperbrian@gmail.com` and high. Blank recipient disables the connection's alerts. Preferences use authenticated, same-origin `PATCH /api/connection`; credential replacement preserves them.
+
+The integration requires Resend but no SDK dependency: it uses the [Resend API](https://resend.com/docs/api-reference/emails/send-email) documented in [Cloudflare's tutorial](https://developers.cloudflare.com/workers/tutorials/send-emails-with-resend/). Disabled/unconfigured alerts still establish scan baselines, so enabling email does not send old findings. Local example settings are in `.dev.vars.example`.
+
+D1 stores baseline IDs and notification summaries/routing metadata, never finding evidence in the alert tables. Pending sends retry after a one-minute backoff on later completed scans, using a stable [Resend idempotency key](https://resend.com/docs/dashboard/emails/idempotency-keys). Provider deduplication lasts 24 hours, so an ambiguous success followed by a database write failure can duplicate after that window. Each request has a five-second timeout; sends stop starting after 20 seconds and remaining notifications await a later scan. Pending notifications for resolved IDs or previous recipients are removed. Delivery is best effort; provider acceptance is not proof of inbox delivery. Deleting a connection cascades to its baseline and notifications. Provider/storage failures do not fail the diagnostic result.
+
+Tests require Node 22.13+ for SQLite and use mocked Resend calls. No live emails are sent. The separate Katalyst deployment now implements the same behavior; see [Katalyst setup](../worker-katalyst/README.md).
+
 ## Credential operations and remaining scope
 
 Saving a verified replacement atomically overwrites the current D1 record; failed verification leaves the existing record intact. Removing a connection deletes its current D1 record. Neither action revokes a WordPress-issued token: revoke/regenerate it in WordPress Settings → AI Diagnostic Bridge when needed. Encrypted D1 historical backups may retain older ciphertext according to platform retention.
@@ -82,3 +106,15 @@ Sign-out clears the browser cookie. To invalidate all previously issued session 
 AI explanation generation, verification/correction capture, multi-user administration, additional sites, durable scan history, and complete release hardening remain separate work. This backend does not expose a general diagnostic executor or write to WordPress.
 
 References: [Worker secrets](https://developers.cloudflare.com/workers/configuration/secrets/), [Worker best practices](https://developers.cloudflare.com/workers/best-practices/workers-best-practices/), [static assets](https://developers.cloudflare.com/workers/static-assets/).
+
+### Where to enter the API key
+
+In Cloudflare, open **Workers & Pages**, select **ai-diagnostic-bridge** (Anbe), then **Settings > Variables and Secrets > Add**. Choose **Secret**, name it `RESEND_API_KEY`, and paste the Resend sending API key as its value. Also configure `ALERT_EMAIL_FROM` (the address on your verified sending domain) and `DASHBOARD_ORIGIN` (this Worker's HTTPS dashboard origin). [Cloudflare secret setup](https://developers.cloudflare.com/workers/configuration/secrets/).
+
+The sender domain and affected site domain are separate. One verified sender can notify you about Anbe, Katalyst, and future client sites. Each notification identifies its actual affected hostname, for example `Anbe Nigeria (anbenigeria.com)`; it does not infer the affected site from the From address. The recipient remains per connection.
+
+Katalyst uses a separate Worker, `ai-diagnostic-bridge-katalyst`. Secrets are per Worker, so configure the same three bindings there as well, with the Katalyst dashboard origin. Its alert integration is now implemented; apply its migration and deploy its updated code before expecting emails. See [Katalyst setup](../worker-katalyst/README.md).
+
+## Bounded public-page checks (Anbe deployed 2026-10-14)
+
+See [Public page checks](../PUBLIC-PAGE-CHECKS.md) for the new PUBLIC_SCAN_PATHS setting, public origin selection, bounded page/link/image observations, dashboard integration and incomplete-scan alert behavior. Anbe Worker 9bd92087-4ebd-492f-8970-be09dc0ee290 is deployed; a complete live scan read 12 WordPress records and checked 15 public URLs. The existing high/critical alert threshold remains unchanged. User-run error/email verification is pending. No database migration or plugin update is needed for this addition.

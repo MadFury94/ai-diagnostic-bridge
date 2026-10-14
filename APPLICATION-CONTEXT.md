@@ -1,6 +1,6 @@
 # Jen and Automattic application context
 
-Recorded: 2026-09-21. Target: Brian's preparation to reapply for Automattic's Happiness Engineer role from January 2027 onward, when ready.
+Recorded: 2026-09-21. Implementation context reconciled: 2026-10-13. Target: Brian's preparation to reapply for Automattic's Happiness Engineer role from January 2027 onward, when ready.
 
 ## Why this project exists
 
@@ -19,7 +19,7 @@ Source: Brian's saved correspondence at `D:\My Web Sites\missus\JEN_FEEDBACK.md`
 
 ## How the two projects connect
 
-**AI Diagnostic Bridge:** authenticated WordPress diagnostic APIs, safe evidence, AI-assisted development and investigation, reproducible tests, and customer-facing explanations. Today the plugin is deterministic and does not call an AI provider. The current evidence includes an assistant consuming authenticated local endpoints; the planned Worker/AI/dashboard integration is not shipped.
+**AI Diagnostic Bridge:** authenticated WordPress diagnostic APIs, safe evidence, AI-assisted development and investigation, reproducible tests, and customer-facing explanations. Today the plugin is deterministic and does not call an AI provider. The recorded shipped baseline is plugin 0.1.7 plus separate Anbe, Katalyst and Missus Worker dashboards, manual/hourly scans, finding alerts, and click-only AI explanations with human verification/correction. October 6 records include observed Anbe and Missus accessibility findings. These deployment records were not independently reverified in the October 13 implementation session. The bounded public-page/link/image checks were deployed to Anbe and its live scan passed on October 14; Katalyst/Missus deployment and new-error email acceptance remain pending. See PUBLIC-PAGE-CHECKS.md.
 
 **Missus:** Brian's separate headless Next.js WooCommerce storefront, with an admin panel and Paystack payments. This context is supplied by Brian and the saved feedback; this documentation session did not re-audit the storefront implementation. Missus must remain unchanged during standalone plugin development.
 
@@ -37,4 +37,10 @@ Connect the projects through verified cases, not shared branding alone: an obser
 
 ## Remaining practical evidence
 
-The local WordPress site and isolated SQLite test snapshots are working. A real small WooCommerce test store and deliberate break/diagnose/repair exercises remain outstanding. The journal contains a practice backlog and reusable case template. Keep the software implementation sequence in PLAN.md, and track support practice alongside it rather than treating code completion as proof of support outcomes.
+The local WordPress/SQLite WooCommerce store and isolated test snapshots are working. SUPPORT-JOURNAL.md records September 22 synthetic checkout, checkout-page, shipping and payment-gateway exercises, plus read-only Anbe observations. The SQLite stock-reservation workaround limits that checkout evidence; it is not a general payment or concurrency validation. A dedicated test-mode payment environment, further exercises, and Brian's independent reproduction/explanations remain follow-up work. Track support practice alongside PLAN.md rather than treating code completion as proof of support outcomes.
+
+## Diagnostic expansion and support evidence - 2026-10-13
+
+The next implementation phase expands observable failures through bounded public HTTP checks, followed later by browser/mobile/accessibility checks and synthetic shopping journeys. It preserves the deterministic WordPress plugin, protected credentials, separate backend/frontend attribution, and human-reviewed AI interpretations.
+
+Use the local broken-link/image failure-and-repair exercise as fixture evidence only. Brian's independent reproduction, explanation, extension of the existing synthetic WooCommerce setup for test-mode payments, and live acceptance of the new checks remain separate tasks. Existing recorded real-site cases remain valid historical evidence and are not replaced by this exercise. More findings alone do not establish support value; document verified cause, repair, outcome and actual timing (or not measured).

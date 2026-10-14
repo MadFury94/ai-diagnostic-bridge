@@ -4,11 +4,11 @@ Started: 2026-09-21. Purpose and application context: [APPLICATION-CONTEXT.md](A
 
 ## Evidence status
 
-Latest status (2026-09-24): Worker/dashboard deployment and live Anbe acceptance are complete, including all seven proxy routes and browser scan/detail checks. Later dated entries supersede the earlier credential-blocker and old suite/integration summaries below. Current requested work is plugin update and known-vulnerability detection.
+Latest status (2026-10-13): the recorded shipped baseline includes plugin 0.1.7, the three Worker dashboards, reviewed AI explanations, alerts, and October 6 accessibility observations. Bounded public-page/link/image diagnostics are now implemented locally; deployment/live acceptance are pending. See the October 13 case and PROGRESS.md for validation. Earlier blocker and suite summaries below are historical.
 
 Entries below summarize observed work in this workspace/conversation unless explicitly labelled otherwise. They are development/troubleshooting evidence, not customer support tickets or claims of customer impact. Brian's independent reproduction and explanation are still to be recorded. Investigation time and hours saved were not measured in these sessions.
 
-The latest suite passed **40 tests / 629 assertions** on PHP 8.3.33 and PHPUnit 10.5.64. The reported PHPUnit test runtime was **12.500 seconds**; this excludes setup and is not an investigation-time or productivity metric. Tests use a temporary SQLite snapshot and the repository source, not the installed plugin copy. The local WooCommerce-present cases use an API-adapter fixture; real WooCommerce integration remains unverified.
+Historical September 22 suite: **40 tests / 629 assertions** on PHP 8.3.33 and PHPUnit 10.5.64. The reported PHPUnit test runtime was **12.500 seconds**; this excludes setup and is not an investigation-time or productivity metric. Tests use a temporary SQLite snapshot and the repository source, not the installed plugin copy. The local WooCommerce-present cases use an API-adapter fixture; at that point real WooCommerce integration remained unverified; later dated local-store and Anbe entries provide subsequent evidence with their stated limits.
 
 ## 2026-09-21 ? Local setup: verify the blocker before fixing it
 
@@ -552,3 +552,119 @@ The Elementor Pro finding now carries an official Elementor troubleshooting URL.
 **Customer-ready explanation:** Two automated checks were broken, so they were not verifying the Elementor warnings as intended. The checks now run successfully. This repair improves the evidence behind the diagnostics; it does not change your website or claim that a live site was repaired.
 
 **Timing:** Investigation/repair time and support time saved were not measured. The final PHP suite took 15.954 seconds, which is test runtime only.
+## 2026-10-03 ? Missus JWT authentication conflict
+
+- The Missus backend responded normally, but its JWT plugin intercepted the diagnostic `Authorization: Bearer` request and returned `jwt_auth_invalid_token` before the diagnostic plugin ran.
+- Plugin 0.1.7 adds `X-AI-Diagnostic-Token`; the Missus Worker now sends that header. Bearer authentication remains supported for Anbe and Katalyst.
+- Verified the plugin suite (87 tests, 828 assertions, one expected skip), Missus Worker tests (61/61), and deployed Missus Worker version `d998f979-4fb5-418f-98ee-9cf51bca083e`.
+- The existing Missus `WORDPRESS_TOKEN` binding is still plain text because Cloudflare rejected replacement while the same-name variable exists. Convert it to a Worker Secret after removing only that plain binding; do not paste the token into chat or source control.
+## 2026-10-04 - Scheduled alert scans deployed
+
+Deployed the hourly Cloudflare Cron Trigger (`0 * * * *` UTC) and scheduled complete-scan handler to Anbe, Katalyst, and Missus. Scheduled scans reuse the completed-scan baseline and finding debounce; incomplete scans do not advance the baseline. Manual dashboard scans remain available.
+
+All three Workers were deployed with `--keep-vars` after Resend secret configuration. Current versions: Anbe `a05d0712-b599-4f52-ac9d-68f550c258dd`, Katalyst `e9d6bcde-196a-4b10-ab60-56f1c70ced20`, Missus `2b3bdef6-3786-41ad-ad75-230b5d1af1b4`. No credential values or API keys are recorded here. Real inbox delivery still requires a verified sender, configured recipient, and a live qualifying-finding test.
+## 2026-10-04 - Anbe alert preference error fixed
+
+The Anbe dashboard returned its generic service-unavailable response when saving email preferences because the live D1 database had not applied `0003_critical_email_alerts.sql`. The deployed Worker expected `sites.alert_email` and `sites.alert_severity`, but the remote schema was still at migration 0002. Applied migration 0003 remotely to database `ai-diagnostic-bridge` and reran the live smoke test successfully: all seven diagnostic routes returned expected results, connection verification passed, and no credentials appeared in responses. Retry the preference save from the dashboard.
+## 2026-10-04 - Anbe email delivery configuration fix
+
+Anbe high-finding preference saves initially succeeded after applying migration 0003, but no email was sent because the active Worker had `RESEND_API_KEY` and `DASHBOARD_ORIGIN` without `ALERT_EMAIL_FROM`. Configured the verified sender as a Worker secret. A finding already present in the completed-scan baseline will not be retroactively emailed; verify with a new finding ID or clear and reappear the test finding after the sender is configured.
+## 2026-10-04 - Resend delivery fix verified
+
+Anbe detected the recreated high finding and queued a notification, but delivery initially failed because the Resend fetch used `redirect: error`; the provider response path caused a transport exception before the response was handled. Changed the alert fetch to `redirect: manual`, added sanitized provider/transport status logging, and corrected Anbe's sender secret to `notifications@alert.katalyst.tech` (singular verified domain). A controlled complete scan then marked the alert `sent_at` with `lease_until=0`, confirming provider acceptance. The redirect-safe fix was deployed to Katalyst and Missus as well.
+## 2026-10-04 - Katalyst and Missus Resend sender correction
+
+Deployed the redirect-safe Resend request handling to Katalyst and Missus. Both Workers already had `RESEND_API_KEY` as encrypted secrets; configured `ALERT_EMAIL_FROM` as the verified `notifications@alert.katalyst.tech` sender (singular `alert` domain) using Wrangler secret deployment. Existing variables, WordPress credentials, hourly Cron triggers, and dashboard origins were preserved.
+## 2026-10-04 - Automatic scan countdown added
+
+Added a live dashboard countdown for the next hourly Cloudflare scan. Configured dashboards show the next top-of-hour UTC time and a seconds countdown that refreshes every 30 seconds; manual scans remain available. Built and deployed Anbe (`b3e269bd-0532-428f-8388-646d0b4f7f0a`), Katalyst (`34c8ea55-9371-4606-a79b-fa3d3b6c8db5`), and Missus (`4787d697-f9c6-4b36-acbe-f5e30a88851c`).
+## 2026-10-04 - Missus headless plugin review
+
+Added and deployed a Missus-only dashboard review for the headless setup. The dashboard now groups plugins into likely useful for the WordPress backend/API, review candidates that are commonly frontend/page-builder oriented, and plugins requiring usage verification. It does not remove or disable anything automatically and does not change the underlying scan results. This keeps the review aligned with APPLICATION-CONTEXT.md: Missus uses WordPress at cms.missusoutfits.com as a backend and the Next.js storefront at missusoutfits.com.
+
+Validation: Missus dashboard build passed, type/check validation passed, and all 61 tests passed. Deployed ai-diagnostic-bridge-missus version d756c8f9-ded0-4c2c-8b92-3129398a77e7. The scheduled scan remains hourly at 0 * * * * UTC.
+## 2026-10-04 - Missus headless scan scope
+
+Missus now runs in headless mode. The Worker excludes WordPress post/page SEO records from manual and hourly scans so CMS-only findings such as Elementor usage or missing metadata on unused WordPress pages do not appear as storefront findings. It checks the public Next.js origin, https://missusoutfits.com, for availability, HTML delivery, homepage title, and homepage meta description. WordPress health, plugins, core updates, and WooCommerce diagnostics remain enabled.
+
+The dashboard now labels the public checks as Next.js storefront observations and includes them in Findings. Frontend finding detail does not request a WordPress post endpoint. No WordPress plugin is removed or disabled automatically.
+
+Validation: Missus dashboard build passed, Worker type checking passed, and all 62 tests passed. Deployed ai-diagnostic-bridge-missus version 849ac8bd-8b2a-4fa3-b2f7-6b1f32036b05 with HEADLESS_MODE=true and PUBLIC_SITE_ORIGIN=https://missusoutfits.com.
+## 2026-10-04 - Headless plugin review visible on Findings
+
+The Missus headless plugin review was previously limited to Overview. It is now also visible on the dedicated Findings page, so the dashboard continues to show likely useful backend/API plugins, traditional frontend plugins to review, and plugins requiring usage verification while the page-level CMS findings remain excluded.
+
+Validation: dashboard rebuilt and deployed as ai-diagnostic-bridge-missus version 6c6f59ae-72dc-47eb-8f7b-35f4a3036cf5.
+## 2026-10-04 - Missus storefront title finding and email threshold
+
+The Missus public storefront check reported `headless-frontend-title-missing` with severity **medium**. The red/destructive styling in the dashboard is used for medium, high, and critical findings; the detail record itself is medium. Missus alert preferences default to high (high + critical), so Resend correctly sent no email for this medium finding. Set the connection alert threshold to medium if these storefront metadata findings should generate email.
+
+The first AI explanation incorrectly mentioned WordPress version and WooCommerce configuration because the generic explanation prompt treated every finding as a WordPress finding. The Missus explanation prompt now detects `source=headless_frontend` / `category=headless-frontend` and requires the explanation to stay focused on the public Next.js storefront and rendered HTML. Existing saved explanations need **Regenerate** to use the corrected context.
+Deployment follow-up: Missus Worker explanation-context fix deployed as version b069df71-a2f0-4695-9714-378d67dad57d. Existing saved explanations are intentionally retained for review; use Regenerate to create a corrected storefront-specific explanation.
+## 2026-10-04 - Missus canonical frontend metadata check
+
+The supplied storefront HTML contains a title and meta description. Investigation found that the apex URL https://missusoutfits.com returns HTTP 308 to https://www.missusoutfits.com/, while the canonical www response returns HTTP 200 with both metadata elements. Because the Worker intentionally does not follow redirects, it had inspected the redirect response and raised a false missing-title finding.
+
+Configured PUBLIC_SITE_ORIGIN to https://www.missusoutfits.com and redeployed. Type checking and all 62 tests pass. Deployed version e3e0e821-0ee8-4dcd-ab44-9db462d31f4e. Run a fresh scan; the old missing-title finding should clear, and the missing-description finding should also clear.
+## 2026-10-04 - Accessibility findings implemented
+
+Added a deterministic accessibility category to the plugin and Worker response path. Existing missing-alt and heading findings retain their SEO category and now also expose `categories: [current_category, accessibility]`. New markup findings are `a11y-alt-text-unhelpful` (low), `a11y-form-input-no-label` (medium, high on checkout/cart content), `a11y-missing-lang-attribute` (medium site-wide), `a11y-duplicate-id` (medium), and `a11y-nondescriptive-link-text` (low). Hidden and button-like inputs are excluded from label checks; accessible names through labels, aria-label, and aria-labelledby are accepted.
+
+The site-level check fetches bounded homepage HTML using the existing WordPress HTTP client and reports missing lang only when the page is retrievable. Missus headless mode also checks the public canonical Next.js homepage markup for title/description, language, duplicate IDs, unhelpful image alt text, unlabeled controls, and generic links. Browser-rendered color contrast and keyboard/focus behavior remain explicitly out of scope.
+
+Local WordPress validation completed with 89 tests and 837 assertions, including violation-and-repair fixtures for bad alt text, unlabeled controls, missing lang, duplicate IDs, generic links, and checkout severity. Worker validation passed: Anbe 53/53 tests, Katalyst 59/59, Missus 62/62; TypeScript checks and dashboard builds passed. PHPCS still reports the repository's pre-existing style backlog.
+
+Worker deployments: Anbe 39c9a9b7-4116-44ed-8ccd-c7fab988aa28, Katalyst d186259f-41ea-4038-b33c-f21a7d0762ca, Missus 1675d2ec-3e41-49b8-aeca-32b2a1a0dd34. The WordPress plugin must be updated on each live backend before Anbe/Katalyst can return the new plugin findings. No live-site accessibility issue is recorded yet because the live plugin update and post-deployment scans are still pending.## 2026-10-04 - Accessibility plugin release packaged
+
+Rebuilt `.tools/ai-diagnostic-bridge-0.1.7.zip` from the current plugin source, including the deterministic accessibility checks and additive accessibility categories. PHP syntax checks and the local WordPress suite remain green. The package is ready for installation on Anbe, Katalyst, and the Missus backend. WordPress plugin installation requires access to each site's WordPress admin or hosting filesystem; the Cloudflare Workers cannot install or update a WordPress plugin remotely.
+## 2026-10-06 - Accessibility plugin pushed to GitHub
+
+Committed the WordPress plugin runtime update as `c0b778b` (`Add deterministic accessibility diagnostics`) and pushed it to `origin/master` at `github.com/MadFury94/ai-diagnostic-bridge`. Hostinger-connected Anbe can now pull the plugin update. The commit includes the plugin version 0.1.7 files, dedicated diagnostic header support, accessibility analysis, site markup checks, and additive accessibility metadata. Worker and unrelated dashboard changes were not included in this plugin commit.
+## 2026-10-06 - Anbe accessibility findings verified
+
+After Hostinger pulled commit `c0b778b`, an Anbe scan displayed the new site-wide observation `Unhelpful image alt text was observed` at low severity. The existing `seo-image-missing-alt` finding also appeared on the Projects page; it retains its SEO finding ID while carrying the additive Accessibility category in the finding detail. The observed meta-description and missing-href findings remain SEO-only. No unlabeled-form, missing-lang, duplicate-ID, or generic-link findings were detected in this scan. Missus headless WooCommerce validation is the next test.
+## 2026-10-06 - Missus headless accessibility finding verified
+
+The Missus Worker detected a real public Next.js storefront finding: `a11y-form-input-no-label`, medium severity, on `https://www.missusoutfits.com`. The initial HTML contained two form controls without a label, `aria-label`, or `aria-labelledby`. The evidence reports `commerce_flow: false` because this scan covered the storefront homepage rather than a detected checkout/cart page, so medium severity is correct; the same violation on checkout/cart markup is configured as high. The finding is sourced from `headless_frontend` and does not depend on the WordPress backend plugin.
+
+The AI explanation is an unverified interpretation. Its accessibility guidance is relevant, but the legal-risk wording is generic and should not be treated as a legal conclusion. The dashboard correctly excludes control values or other sensitive payloads from the finding evidence.
+
+## 2026-10-13 - Public broken-link/image detection and controlled repair
+
+**Evidence class:** local fixture exercise in the Cloudflare Workers runtime, plus actual Worker-handler integration against disposable SQLite. No live customer site, payment, order, email or production repair is involved.
+
+**Symptom and baseline:** The existing bridge could inspect markup but did not verify whether linked public destinations or image URLs returned HTTP errors. A synthetic public page referenced /missing and /missing.png; both returned 404.
+
+**Hypothesis:** bounded, unauthenticated same-origin GET requests can establish missing destinations while retaining the read-only plugin and safe evidence boundary.
+
+**Implementation:** Added an optional server-configured public HTTP scanner to all three Workers and dashboards. The scanner checks source pages and initial-HTML links/img src, validates each redirect, and bounds target count, HTTP requests, body bytes and time. Findings contain resource URL, first referring page, kind, status and a stable hashed ID. Query/action/external URLs are excluded. A successful HTTP response does not prove browser rendering or checkout.
+
+**AI proposal and verification/correction:** A runtime test disproved the initial assumption that HTMLRewriter decodes attribute entities: photo&#46;png was incorrectly interpreted as photo& plus a fragment. Added explicit bounded URL-entity decoding and tests for numeric entities, encoded query actions and unsupported entities. This prevented probing a different destination and demonstrates why the implementation needed real parser/runtime validation. A dashboard build also caught use of replaceAll beyond its ES2020 library target; replaced it with a compatible expression.
+
+**Controlled repair and before/after:** With both fixture resources returning 404, two findings are produced. Changing both to 200 clears them on a complete scan. Reintroducing the 404s restores the same IDs. Tests verify no credential/cookie headers, no external/action URL requests, no recursive crawl, and no false healthy result after a timeout, blocked redirect or exceeded bound. Source-page failures remain incomplete because previously referenced resources cannot be rechecked.
+
+**Alert verification:** The real authenticated Worker handler returns public findings in scan output. Incomplete scans leave the baseline unchanged; a subsequent complete scan records a new public notification. Notification detail requires login, rechecks the public scanner, returns 503 rather than claiming repair if coverage is incomplete or its configured scope changed, and reports absence only after a complete check of the same scope. Resend is mocked; no email was sent.
+
+**Customer-ready explanation (agent draft):** The check found a link and an image whose addresses returned 404. After the test destinations were repaired, those findings disappeared. On your site, we would verify the affected address and the page referencing it before repairing either the destination or the reference. A timeout means the check could not finish, not that the page is healthy or definitely broken.
+
+**Brian's independent reproduction/explanation:** pending; this agent-run exercise must not be attributed to Brian as independently completed.
+
+**Timing:** investigation/repair time and support time saved were not measured. Automated test duration is not time saved.
+
+**Release status:** local implementation. Full validation totals are recorded in the October 13 PROGRESS.md entry. Deployment and live acceptance remain pending; the existing PHP static-analysis backlog is unchanged.
+
+
+**Final local verification:** Anbe 85/85, Katalyst 91/91 and Missus 94/94 Worker tests passed; all Worker type checks and final dashboard builds passed. The 31 scanner tests per client were rerun after the final coverage-counter correction. Local headless Edge verified finding detail/refresh routing, mobile layout, incomplete messaging and removal of the synthetic WordPress ID label for all three dashboards. Client isolation and final deployment dry runs passed. Screenshots are ignored local fixture artifacts; these results are not live-site repair evidence.
+
+
+## 2026-10-14 - Anbe public-page release deployed and accepted
+
+At the user's request, deployed only the Anbe Worker/dashboard with existing variables and secrets preserved. Worker version: 9bd92087-4ebd-492f-8970-be09dc0ee290 at https://ai-diagnostic-bridge.onochieazukaeme.workers.dev. Cron remains 0 * * * * UTC. Katalyst and Missus were not deployed in this release.
+
+Authenticated live verification confirmed AI Diagnostic Bridge 0.1.7 is already installed and health is ok. The PHP runtime is identical to the existing pushed c0b778b source; no plugin version bump or redundant reinstall was needed. The combined acceptance scan completed at 2026-10-14T10:57:11.468Z with incomplete=false and all 12 WordPress records. Public checks covered 15 URLs using 16 requests, excluded three references and returned no new public HTTP findings. A recorded site-wide unhelpful-alt observation remains low severity.
+
+Alert preferences remain high (high and critical) to webdeveloperbrian@gmail.com. RESEND_API_KEY and ALERT_EMAIL_FROM bindings are present; secret values were not read or printed. Missing image/link 404 findings are medium and will not email at this threshold. AI Diagnostic Bridge must remain active, and a completed scan with a new qualifying finding ID is required. A fatal site/diagnostic failure or incomplete public scan does not generate a finding email in the current design. The user will perform their own controlled site change; this deployment session did not deactivate plugins or alter WordPress content.
+
+Git publication and baseline verification results are recorded in the follow-up below. This is live scan acceptance, not proof that a newly introduced test failure has reached the user's inbox.
+
+Release verification: the remote Anbe baseline is saved (2026-10-14 10:57:05 UTC, 15 finding IDs), with zero pending notifications. PHP verification passed: 90 tests, 847 assertions, one skipped. The Anbe Worker/dashboard, plugin test coverage and release documentation are included in this release commit; other clients remain outside this publication. Inbox delivery awaits the user-controlled new-finding test.

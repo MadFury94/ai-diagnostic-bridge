@@ -1,6 +1,14 @@
 # Changelog
 
+## Worker public-page diagnostics - Anbe deployed 2026-10-14
+
+- Add bounded server-configured public page, internal-link and image HTTP checks, validated redirects, safe stable findings and explicit incomplete coverage.
+- Integrate all three dashboards and authenticated notification detail; preserve the existing complete-scan baseline and human-reviewed AI explanations.
+- Document local failure/repair evidence, configuration, exclusions and deployment acceptance in PUBLIC-PAGE-CHECKS.md. WordPress plugin remains 0.1.7; Anbe deployment and live scan are verified. Other clients remain pending.
+
 ## Unreleased
+
+- Plugin 0.1.7 accepts the dedicated `X-AI-Diagnostic-Token` header for headless/JWT compatibility, preserving Bearer authentication for existing clients. Both paths enforce hashed credentials, revocation and rate limiting. Missus Worker uses the dedicated header.
 
 - Kept the plugins diagnostic status as `ok` when findings are informational only; warnings now require a medium, high, or critical finding.
 
