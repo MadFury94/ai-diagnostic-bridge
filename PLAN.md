@@ -445,3 +445,9 @@ Update this block at the end of each session so another AI can continue safely.
 
 
 
+
+## 2026-10-14 - Independent Anbe availability monitoring
+
+Added a separate Cloudflare cron (*/5 * * * *) that checks the public homepage without WordPress credentials or a successful diagnostic scan. Hourly diagnostic scans remain unchanged. Two consecutive failed checks within 15 minutes open an outage; the next HTTP 2xx closes it and queues recovery. Normal detection is about 5-10 minutes after failure. Timeout is 10 seconds, with at most three same-origin redirects. HTTP errors (including blocked 403/429), unsafe redirects, transport errors and timeouts count as failed checks, not proof that every visitor is offline. A healthy initial check sends no email.
+
+Notifications use the existing recipient and Resend settings, independent of finding severity. Blank recipient disables mail. D1 migration 0004 stores timestamp-guarded state and notification events; duplicate/stale ticks do not advance the failure streak. Delivery uses leases, stable provider idempotency keys and retries on subsequent checks; events expire after 23 hours. The check requests cache revalidation but a CDN may still return cached success. It cannot detect broken page content returning 200, plugin deactivation alone, or an outage of Cloudflare/the monitoring Worker itself. Other clients are unchanged.

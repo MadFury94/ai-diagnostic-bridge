@@ -1,3 +1,4 @@
+import { checkAvailability } from './availability'
 import { scanPublicPages } from './public-scan'
 import { bridgePath, fetchBridge, object } from './bridge'
 import { recordCompletedScan, sendFindingAlerts, AlertSettings, defaultAlerts, parseAlertSettings } from './alerts'
@@ -186,6 +187,11 @@ async function api(request: Request, env: Env, ctx?: ExecutionContext) {
 
 export default {
   async scheduled(_event: ScheduledController, env: Env, _ctx: ExecutionContext) {
+    if (_event.cron === '*/5 * * * *') {
+      const site = await getSite(env)
+      if (site) await checkAvailability(env, site, _event.scheduledTime)
+      return
+    }
     try { await scheduledScan(env) }
     catch { console.log(JSON.stringify({ event: 'scheduled_scan', status: 'failed' })) }
   },
