@@ -187,7 +187,8 @@ async function api(request: Request, env: Env, ctx?: ExecutionContext) {
 
 export default {
   async scheduled(_event: ScheduledController, env: Env, _ctx: ExecutionContext) {
-    if (_event.cron === '*/5 * * * *') {
+    console.log(JSON.stringify({ event: 'scheduled_started', cron: _event.cron, scheduled_at: _event.scheduledTime }))
+    if (['*/5 * * * *', '0,5,10,15,20,25,30,35,40,45,50,55 * * * *'].includes(_event.cron)) {
       const site = await getSite(env)
       if (site) await checkAvailability(env, site, _event.scheduledTime)
       return
