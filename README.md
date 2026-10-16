@@ -17,6 +17,8 @@ The plugin can also be installed from a packaged release ZIP. Do not put the cre
 
 ### Optional Worker email alerts
 
+Anbe also has independent five-minute database-error and scheduler observations in the Worker/dashboard. These require WordPress plugin **0.1.8** and a configured readable log for error detection. See [operational monitoring](OPERATIONAL-MONITORING.md) for installation, thresholds, source coverage and limits. Worker deployment alone does not establish that the WordPress evidence source is available.
+
 Use the [Anbe and Katalyst email setup guide](EMAIL-ALERTS-SETUP.md) for the per-Worker settings, DNS requirements, migration/deployment commands, current activation status, and future-client pattern.
 
 The dashboard Worker supports finding alerts through **Resend**, an external transactional email service. Create a Resend account and verify a sending domain by adding the DKIM and SPF/return-path DNS records supplied by Resend; see [Resend's domain setup](https://resend.com/docs/dashboard/domains/introduction). Your receiving address can be Gmail, but the sender must use the verified domain.

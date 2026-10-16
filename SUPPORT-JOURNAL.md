@@ -688,3 +688,55 @@ Added native Miniflare/Workers/D1 scheduled-handler coverage for healthy checks,
 Final local validation: TypeScript and all 94 Worker tests passed, including the native scheduled outage/recovery sequence.
 
 Production follow-up at 2026-10-14 12:51 UTC (13:51 Lagos): after the documented 15-minute propagation window and the next 12:50 tick, live tail still showed no scheduled-start/availability event and Cloudflare scheduled history still contained only the 12:00:38 hourly run. Replacement did not establish working availability scheduling. Latest remote state/notification reads remained empty. Real scheduled execution and provider/inbox delivery remain unresolved; do not repeat a live-site outage until a scheduled healthy check is proven. Next investigation is Cloudflare scheduler execution for script ai-diagnostic-bridge, account e260983617003d3a7092441acdfcd4f4, deployed version 86140420-8e2a-4832-b934-694b0451bf3d. No support message was sent.
+
+## 2026-10-15 - Anbe outage delivery confirmed and detailed notifications
+
+Live verification: a healthy scheduled check was stored at 05:10 UTC and a completed diagnostic baseline at 05:00:41 UTC. Scheduled execution had resumed; the original scheduling failure's cause remains unproven.
+
+The user temporarily returned HTTP 503 from WordPress index.php. The first failed check window was 09:35 UTC (10:35 Lagos); outage confirmation was 09:40 UTC, with provider acceptance at 09:40:38 UTC. The user confirmed receiving the outage email. Recovery was recorded at 09:45 UTC and its email accepted at 09:45:39 UTC. Recovery inbox receipt was not separately confirmed.
+
+User-reported outcome: finding an error previously took three days and a call from the client, versus about five minutes with scheduled monitoring in this test. The five-minute observation concerns the deliberate HTTP 503 test only. It does not demonstrate detection or diagnosis of the original WooCommerce database/cron incident, and is not a like-for-like incident comparison, repair-time measurement, or guaranteed SLA. Stored failure-to-confirmation windows are five minutes apart; exact code insertion time was not recorded. Two failed checks are required, so normal detection takes approximately 5-10 minutes plus delivery latency. Full diagnostics remain hourly.
+
+Changes: outage/recovery subjects identify the hostname and result. Bodies include the checked homepage, UTC event window, plain-language explanations, qualified possible causes, confirmation rules, troubleshooting steps, five-minute cadence, recovery expectations, and homepage-only coverage limits. The timestamp is the confirming check window, not the exact outage start. Recovery does not prove that checkout or every page works.
+
+The release also includes the existing local authenticated GET/POST /api/availability endpoint and five-minute buckets shared by manual and scheduled checks. Repeated checks in one bucket cannot independently confirm an outage. Tests cover authentication and duplicate-window suppression. No new database migration, secret, or WordPress plugin update is needed. Only Anbe is being deployed; unrelated Katalyst and Missus changes are excluded.
+
+Validation: Worker TypeScript passed; all 10 availability unit/runtime tests passed, including native scheduled outage/recovery; dashboard production build passed. Deployment result is recorded below.
+
+Deployment verified: Anbe version 3c567fa5-7231-4fc9-9d6d-a3c192d340a8 was deployed at 2026-10-15 09:48:53 UTC (10:48:53 Lagos), and deployments list confirmed 100% allocation. URL: https://ai-diagnostic-bridge.onochieazukaeme.workers.dev. Used wrangler deploy --keep-vars; existing configuration was preserved. Both hourly diagnostics and the explicit five-minute availability schedule were confirmed in deployment output. No static assets changed. The richer template applies to future notifications; no new outage was induced or test email sent for this release. The earlier confirmed inbox email used the previous template.
+
+## 2026-10-15 - WooCommerce coverage audit and incident acceptance plan
+
+Corrected the five-minute outcome claim: the live test verified homepage HTTP 503 notification only, not the original WooCommerce failure. Source inspection confirms that database version/update-needed/HPOS fields do not establish database integrity; DISABLE_WP_CRON does not establish execution health. Existing site-wide failed/overdue action counts are medium severity, below the default email threshold. Full-scan failures/incompleteness also suppress finding notifications.
+
+INCIDENT-DETECTION-PLAN.md records source-level coverage, separate local fetch_patterns and SQLite checkout failures, evidence contracts, acceptance cases, and implementation order for content, database structure/consistency, scheduler health, and independent notification scopes. The original client's specific database/cron error and successful repair are not established in available records; clarification was requested. No new diagnostic code or deployment is claimed by this audit.
+
+## 2026-10-15 - Original Anbe incident evidence supplied
+
+The user supplied three Hostinger AI screenshots under worker/src/hostinger and confirmed Anbe became inaccessible and recovered after a backup restore through Hostinger. The screenshots report HTTP 503 with repeated WordPress database Commands out of sync errors associated with WP-Cron/WooCommerce Action Scheduler. Proposed database repair and WooCommerce deactivation are described as not applied in the shown runs. The available 2026-10-06 backup mentioned in one screenshot is not confirmed as the backup restored. Incident date and raw error chronology remain unknown.
+
+These are third-party AI summaries, not independently verified root-cause evidence. MySQL documents this signature as a client-operation sequencing problem; it does not establish table corruption. Source audit additionally found the existing error reader does not explicitly classify plain WordPress database-error lines, and hourly scans do not request the errors endpoint. INCIDENT-DETECTION-PLAN.md now prioritizes sanitized fresh database-error evidence, scheduler progress, independent notification coverage, and the inability to retrieve internal evidence while WordPress is unavailable. Schema checks alone cannot demonstrate coverage of this incident. No diagnostic code or production configuration changed in this evidence-review step.
+
+## 2026-10-15 - Operational detector implementation and Anbe deployment
+
+Implemented plugin 0.1.8 operations observations and independent Anbe monitoring. The plugin reads bounded configured log evidence for fresh, timestamped WordPress database Commands out of sync errors, plus overdue WordPress cron and Action Scheduler pending/in-progress snapshots. It exposes no raw log lines, SQL, action arguments, or private records. It does not enable debug logging, run/retry jobs, alter schemas, or repair the database.
+
+The five-minute Worker checks each source independently of full diagnostics, tracks unchanged overdue items for 15 minutes, preserves unknown coverage, uses atomic timestamp guards and duplicate suppression, and queues high-severity emails using existing recipient/threshold settings. Fresh operational failures can alert on the first observation; persistent failures do not repeat. Rotation/truncation/stale evidence cannot immediately imply recovery. Operational recovery is reflected in dashboard state, not a separate recovery email. New dashboard panel shows source coverage even when the ordinary full scan fails. Detailed contracts, setup and limits are in OPERATIONAL-MONITORING.md.
+
+Verification passed: 96 PHP tests, 874 assertions, one expected skip; 106 Worker tests including the native scheduled/D1 outage, unknown, clear and recurrence sequence with simulated provider; Worker TypeScript; dashboard production build. A test-only JSON typing error was corrected and TypeScript rerun successfully. These tests establish signature/observation handling, not reproduction of the initiating database defect or real inbox receipt of the new operational email.
+
+Applied remote migration 0005_operational_monitor.sql and deployed Anbe Worker/dashboard version c2595cfa-507c-493a-9a6a-a7a6d8919d68 with --keep-vars. OPERATIONAL_MONITOR_ENABLED=true; existing hourly and five-minute schedules remain. Katalyst and Missus were not deployed.
+
+Live authenticated verification at 2026-10-15 14:59:15 UTC: health endpoint HTTP 200, installed plugin still 0.1.7; monitor API HTTP 200 and enabled; new plugin operations endpoint unavailable (proxied HTTP 502). No operational observations had yet been stored at that check. Thus the Worker/UI release is live, but internal monitoring coverage is pending plugin installation, not accepted as functioning on Anbe yet.
+
+Prepared .tools/ai-diagnostic-bridge-0.1.8.zip containing 28 runtime plugin files. No Hostinger installation capability is connected in this session. The user must install the ZIP as an update to the existing plugin, preserving credentials, and configure access to an existing suitable readable server log if absent. Scheduler observation does not require that log. No live database failure was induced, backup restored, WordPress plugin changed, or diagnostic error mail deliberately sent in this release.
+
+Production scheduled verification: the 2026-10-15 15:00 UTC tick stored all three operational sources with status unknown and active=0, matching the unavailable plugin 0.1.7 endpoint. This verifies real scheduling and correct unknown-state behavior, not successful internal diagnostic coverage. Final plugin ZIP SHA-256: 965FAA837799FD5386382E1E22CACCEEF255F5754D623185BADDC5EA961A1C2D. Next required action is installing plugin 0.1.8 and verifying source coverage.
+
+## 2026-10-16 - GitHub publication and Anbe redeployment for testing
+
+At the user's request, prepared plugin 0.1.8 and the associated Anbe operational monitoring source, tests, and documentation for publication to origin/master. Unrelated Katalyst/Missus work and local Hostinger screenshots are excluded from this release.
+
+Worker TypeScript and the dashboard production build passed again; the generated assets match the previously tested release. Cloudflare confirmed no pending D1 migrations. Redeployed Anbe with --keep-vars as version 89683aa9-99af-4216-8b0b-a8eadedc7252, preserving hourly diagnostics and five-minute availability/operational schedules. Prior source validation remains 96 PHP tests / 874 assertions / one expected skip and 106 Worker tests; no runtime source changes were made in this publication step.
+
+Testing still requires updating the installed WordPress plugin from GitHub to 0.1.8. Database-error observations additionally require an existing configured readable log. Publication/deployment does not establish that the live WordPress plugin has already been updated or that new operational alerts reached the inbox.

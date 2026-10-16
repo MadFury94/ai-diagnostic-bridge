@@ -26,6 +26,7 @@ final class REST_API {
 			'plugins'      => array( 'callback' => array( self::class, 'plugins' ) ),
 			'themes'       => array( 'callback' => array( self::class, 'themes' ) ),
 			'errors'       => array( 'callback' => array( self::class, 'errors' ) ),
+			'operations'   => array( 'callback' => array( self::class, 'operations' ) ),
 			'rest-api'     => array( 'callback' => array( self::class, 'rest_api' ) ),
 			'performance'  => array( 'callback' => array( self::class, 'performance' ) ),
 			'security'     => array( 'callback' => array( self::class, 'security' ) ),
@@ -217,6 +218,8 @@ final class REST_API {
 		return Diagnostic_Manager::run( array( 'themes' ) )['checks']['themes']; }
 	public static function errors(): array {
 		return Diagnostic_Manager::run( array( 'errors' ) )['checks']['errors']; }
+	public static function operations(): array {
+		return Diagnostic_Manager::run( array( 'operations' ) )['checks']['operations']; }
 	public static function rest_api(): array {
 		return Diagnostic_Manager::run( array( 'rest-api' ) )['checks']['rest-api']; }
 	public static function performance(): array {

@@ -1,4 +1,5 @@
 import { checkAvailability } from './availability'
+import { checkOperations, operationalSources, readOperation } from './operations'
 import { scanPublicPages } from './public-scan'
 import { bridgePath, fetchBridge, object } from './bridge'
 import { recordCompletedScan, sendFindingAlerts, AlertSettings, defaultAlerts, parseAlertSettings } from './alerts'
@@ -139,6 +140,18 @@ async function api(request: Request, env: Env, ctx?: ExecutionContext) {
     if (!updated) throw new ApiError(500, 'storage_error', 'The explanation could not be updated.')
     return json(explanationResponse(rowToRecord(updated)))
   }
+  if (url.pathname === '/api/availability' && ['GET', 'POST'].includes(request.method)) {
+    const site = await getSite(env)
+    if (!site) throw new ApiError(409, 'not_connected', 'Save a site connection first.')
+    if (request.method === 'POST') await checkAvailability(env, site, Date.now())
+    return json({ state: await env.DB.prepare('SELECT checked_at, failures, down, detail FROM availability_state WHERE site_id = ?').bind(site.id).first() })
+  }
+  if (url.pathname === '/api/operations' && request.method === 'GET') {
+    const site = await getSite(env)
+    if (!site) throw new ApiError(409, 'not_connected', 'Save a site connection first.')
+    if (env.OPERATIONAL_MONITOR_ENABLED !== 'true') return json({ enabled: false, observations: [] })
+    return json({ enabled: true, observations: await Promise.all(operationalSources.map(source => readOperation(env, site.id, source))) })
+  }
   if (url.pathname === '/api/scan' && request.method === 'POST') {
     const row = await getSite(env)
     if (!row) throw new ApiError(409, 'not_connected', 'Save a site connection first.')
@@ -161,6 +174,13 @@ async function api(request: Request, env: Env, ctx?: ExecutionContext) {
     const row = await getSite(env)
     const alert = await env.DB.prepare('SELECT finding_id, route, detected_at FROM finding_email_alerts WHERE id = ? AND site_id = ?').bind(alertMatch[1], 'default').first<{ finding_id: string; route: string; detected_at: string }>()
     if (!row || !alert) throw new ApiError(404, 'alert_not_found', 'This finding notification is no longer available.')
+    if (alert.route.startsWith('operations/')) {
+      const source = operationalSources.find(item => alert.route === `operations/${item}`)
+      if (!source) throw new ApiError(404, 'alert_not_found', 'This operational source is unavailable.')
+      const current = await readOperation(env, row.id, source)
+      if (env.OPERATIONAL_MONITOR_ENABLED !== 'true' || !current.available) throw new ApiError(503, 'operational_coverage_unknown', 'Current operational evidence is unavailable or stale. The earlier finding is not confirmed cleared.')
+      return json({ site_name: row.name, detected_at: alert.detected_at, finding: current.finding })
+    }
     if (alert.route.startsWith('public/pages/')) {
       const current = await scanPublicPages(env, env.ALLOWED_SITE_ORIGIN)
       if (alert.route !== `public/pages/${current.metadata.scope}`) throw new ApiError(503, 'public_scope_changed', 'The public scan scope has changed. This earlier finding is not confirmed cleared.')
@@ -190,7 +210,12 @@ export default {
     console.log(JSON.stringify({ event: 'scheduled_started', cron: _event.cron, scheduled_at: _event.scheduledTime }))
     if (['*/5 * * * *', '0,5,10,15,20,25,30,35,40,45,50,55 * * * *'].includes(_event.cron)) {
       const site = await getSite(env)
-      if (site) await checkAvailability(env, site, _event.scheduledTime)
+      if (site) {
+        try { await checkAvailability(env, site, _event.scheduledTime) }
+        catch { console.log(JSON.stringify({ event: 'availability_check', status: 'unavailable' })) }
+        try { await checkOperations(env, site, _event.scheduledTime) }
+        catch { console.log(JSON.stringify({ event: 'operational_check', status: 'storage_failed' })) }
+      }
       return
     }
     try { await scheduledScan(env) }

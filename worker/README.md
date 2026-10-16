@@ -126,3 +126,17 @@ Added a separate Cloudflare cron (*/5 * * * *) that checks the public homepage w
 Notifications use the existing recipient and Resend settings, independent of finding severity. Blank recipient disables mail. D1 migration 0004 stores timestamp-guarded state and notification events; duplicate/stale ticks do not advance the failure streak. Delivery uses leases, stable provider idempotency keys and retries on subsequent checks; events expire after 23 hours. The check requests cache revalidation but a CDN may still return cached success. It cannot detect broken page content returning 200, plugin deactivation alone, or an outage of Cloudflare/the monitoring Worker itself. Other clients are unchanged.
 
 Availability cron investigation (2026-10-14): replaced the five-minute step expression with an equivalent explicit minute list after production showed no recorded availability runs. Real scheduled execution and inbox delivery remain unverified; see SUPPORT-JOURNAL.md.
+
+## Availability follow-up - 2026-10-15
+
+Implementation follow-up: plugin 0.1.8 and the Anbe Worker now implement independent database-error and overdue-work observations. See [operational monitoring](../OPERATIONAL-MONITORING.md) for installation requirements, evidence limits, source-specific alert behavior, and deployment verification. These do not constitute full database integrity or end-to-end cron/checkout verification.
+
+Coverage correction: the five-minute live test demonstrated deliberate HTTP 503 detection only. It did not verify detection or diagnosis of the original WooCommerce database/cron incident. HTTP 200 with incorrect content can pass this availability check. Database integrity and cron execution health remain separate gaps; see [the evidence and acceptance plan](../INCIDENT-DETECTION-PLAN.md).
+
+The prior unverified status above is superseded: scheduled execution and user-reported outage inbox delivery are confirmed. Recovery was observed and its email accepted by the provider. The original scheduling failure's cause remains unproven. See SUPPORT-JOURNAL.md for timestamps and deployment evidence.
+
+Availability emails identify the hostname and result, explain the observed failure and possible causes, provide troubleshooting steps, and describe confirmation/recovery rules. The UTC event timestamp is the confirming check window, not an exact outage start. Recovery confirms a successful homepage response, not all site functionality. No migration or WordPress plugin update is required.
+
+Authenticated GET /api/availability reads monitor state. Authenticated, same-origin JSON POST /api/availability requests a check independently of WordPress credentials. Manual and scheduled checks share five-minute buckets so repeated requests cannot count as separate failed windows. The dashboard's hourly schedule refers to full diagnostics; homepage availability monitoring runs every five minutes and normally needs 5-10 minutes to confirm an outage, plus delivery latency.
+
+Release: version 3c567fa5-7231-4fc9-9d6d-a3c192d340a8 deployed on 2026-10-15 at 09:48:53 UTC, verified at 100% allocation. Existing variables and both cron schedules were preserved. Detailed templates apply to future notifications; the previously confirmed inbox test used the old template.

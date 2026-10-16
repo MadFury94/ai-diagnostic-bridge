@@ -15,11 +15,13 @@ it('executes actual scheduled handler with native D1',async()=>{
   await db.prepare("INSERT INTO sites (id,name,url,ciphertext,iv,verified_at) VALUES ('default','Test','https://anbenigeria.com','cipher','iv','now')").run()
   const worker=await runtime.getWorker()
   const cron='0,5,10,15,20,25,30,35,40,45,50,55 * * * *'
-  const time=Date.now()
+  const time=Math.floor(Date.now()/300000)*300000
   await worker.scheduled({cron:'0,5,10,15,20,25,30,35,40,45,50,55 * * * *',scheduledTime:new Date()})
   expect(await db.prepare('SELECT detail FROM availability_state').first('detail')).toBe('HTTP 2xx')
   status=503
   await worker.scheduled({cron,scheduledTime:new Date(time+300000)})
+  expect(emails).toHaveLength(0)
+  await worker.scheduled({cron,scheduledTime:new Date(time+300001)})
   expect(emails).toHaveLength(0)
   await worker.scheduled({cron,scheduledTime:new Date(time+600000)})
   expect(emails).toHaveLength(1)

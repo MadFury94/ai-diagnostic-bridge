@@ -15,6 +15,7 @@ final class Diagnostic_Manager {
 		'plugins'      => array( Plugins::class, 'run' ),
 		'themes'       => array( Themes::class, 'run' ),
 		'errors'       => array( PHP_Errors::class, 'run' ),
+		'operations'   => array( Operations::class, 'run' ),
 		'rest-api'     => array( REST_API_Check::class, 'run' ),
 		'performance'  => array( Performance::class, 'run' ),
 		'security'     => array( Security::class, 'run' ),

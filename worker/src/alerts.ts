@@ -1,5 +1,6 @@
 ﻿import { object } from './bridge'
 import { ApiError } from './security'
+import { operationalEmailExplanation } from './operations'
 
 declare global { interface Env { RESEND_API_KEY?: string; ALERT_EMAIL_FROM?: string; DASHBOARD_ORIGIN?: string } }
 export const severities = ['info', 'low', 'medium', 'high', 'critical'] as const
@@ -43,12 +44,12 @@ export async function recordCompletedScan(env: Env, site: AlertSite, findings: S
       ON CONFLICT(site_id) DO UPDATE SET finding_ids = excluded.finding_ids, started_at = excluded.started_at WHERE started_at < excluded.started_at`)
       .bind(site.id, JSON.stringify(unique.map(finding => finding.id)), startedAt),
     // Resolved findings and obsolete recipients must not receive delayed emails.
-    env.DB.prepare(`DELETE FROM finding_email_alerts WHERE site_id = ? AND sent_at IS NULL AND (recipient <> ? OR finding_id NOT IN
+    env.DB.prepare(`DELETE FROM finding_email_alerts WHERE site_id = ? AND route NOT LIKE 'operations/%' AND sent_at IS NULL AND (recipient <> ? OR finding_id NOT IN
       (SELECT j.value FROM finding_scan_baselines b, json_each(b.finding_ids) j WHERE b.site_id = ?))`).bind(site.id, site.alert_email, site.id),
   ])
 }
 
-type PendingAlert = { id: string; title: string; severity: string; site_name: string; recipient: string; detected_at: string }
+type PendingAlert = { id: string; title: string; severity: string; site_name: string; recipient: string; detected_at: string; route: string }
 export async function sendFindingAlerts(env: Env, site: AlertSite) {
   if (!site.alert_email || !env.RESEND_API_KEY || !env.ALERT_EMAIL_FROM || !env.DASHBOARD_ORIGIN) return
   try {
@@ -59,12 +60,13 @@ export async function sendFindingAlerts(env: Env, site: AlertSite) {
       const now = Date.now()
       const alert = await env.DB.prepare(`UPDATE finding_email_alerts SET lease_until = ? WHERE id = (
         SELECT id FROM finding_email_alerts WHERE site_id = ? AND recipient = ? AND sent_at IS NULL AND lease_until <= ? ORDER BY detected_at, id LIMIT 1
-      ) RETURNING id, title, severity, site_name, recipient, detected_at`).bind(now + 60000, site.id, site.alert_email, now).first<PendingAlert>()
+      ) RETURNING id, title, severity, site_name, recipient, detected_at, route`).bind(now + 60000, site.id, site.alert_email, now).first<PendingAlert>()
       if (!alert) break
       const link = new URL('/findings', origin)
       link.searchParams.set('alert', alert.id)
-      const body = { from: env.ALERT_EMAIL_FROM, to: [alert.recipient], subject: 'New diagnostic finding',
-        text: `Site: ${alert.site_name}\nFinding: ${alert.title}\nSeverity: ${alert.severity}\nDetected: ${alert.detected_at}\nView finding (sign-in required): ${link.href}` }
+      const operational = alert.route.startsWith('operations/')
+      const body = { from: env.ALERT_EMAIL_FROM, to: [alert.recipient], subject: operational ? `${alert.site_name}: ${alert.title}` : 'New diagnostic finding',
+        text: `Site: ${alert.site_name}\nFinding: ${alert.title}\nSeverity: ${alert.severity}\nDetected: ${alert.detected_at}\nView finding (sign-in required): ${link.href}${operational ? `\n\n${operationalEmailExplanation(alert.route)}\n\nChecked every five minutes independently of the full diagnostic scan. This is evidence observed at the time above, not a guarantee that the condition is still present. The authenticated detail shows the latest observation and coverage. Persistent findings do not email on every check.` : ''}` }
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 5000)
       try {

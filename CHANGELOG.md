@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8 - Operational evidence and Anbe monitoring
+
+- Add an authenticated read-only operations endpoint for fresh database Commands out of sync signatures, overdue WordPress events, and pending/in-progress Action Scheduler observations.
+- Add independent five-minute Worker state and high-severity notifications, duplicate suppression, source-specific unknown handling, and authenticated evidence details. A full diagnostic failure does not suppress these observations.
+- Add dashboard coverage/status visibility and D1 migration 0005. Plugin installation and readable log configuration are required for full coverage; no database repair or logging configuration changes are performed. See OPERATIONAL-MONITORING.md and SUPPORT-JOURNAL.md for installation and deployment status.
+
 ## Worker public-page diagnostics - Anbe deployed 2026-10-14
 
 - Add bounded server-configured public page, internal-link and image HTTP checks, validated redirects, safe stable findings and explicit incomplete coverage.
@@ -40,3 +46,14 @@
 - Added structured response and finding primitives.
 - Added hashed credential generation, Bearer authentication, revocation, and rate-limit foundation.
 - Added bounded diagnostic activity logging.
+
+## Anbe availability alerts - 2026-10-15
+
+- Expanded outage and recovery subjects with hostname/result, and bodies with explanations, UTC check window, confirmation criteria, troubleshooting, cadence, recovery expectations, and coverage limits.
+- Added authenticated GET/POST /api/availability and shared five-minute buckets to prevent repeated checks from counting as separate failures.
+- Confirmed live scheduled HTTP 503 outage delivery to the user's inbox; recovery was observed and its email accepted by the provider.
+- Recorded the user's reported three-day/client-call experience alongside the approximately five-minute deliberate HTTP 503 test. This does not establish faster detection of the original WooCommerce database/cron incident, a like-for-like comparison, repair time, or a detection guarantee.
+
+## WooCommerce coverage audit - 2026-10-15
+
+- Added INCIDENT-DETECTION-PLAN.md with existing coverage, missing evidence, acceptance tests, and implementation order for content correctness, database structure/consistency, and scheduler execution health. These checks are not implemented by this documentation change.

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { OperationalChecks } from './operations'
 
 type Selection = { post: Post; finding: Finding }
 const SEVERITY_ORDER = ['critical', 'high', 'medium', 'low', 'info'] as const
@@ -80,6 +81,7 @@ export function Dashboard() {
     {connection.isPending && <p role='status'>Loading site connection...</p>}
     {connection.data && !connection.data.configured && <Card><CardContent className='pt-6'>No site is connected. <Link className='underline' to='/connection'>Connect WordPress</Link> to start a scan.</CardContent></Card>}
     {connection.data?.configured && <NextScanCountdown now={clock} />}
+    {connection.data?.configured && <OperationalChecks />}
     {connection.error && <p role='alert' className='rounded-lg border border-destructive p-4 text-sm'>{connection.error.message} <Link to='/connection' className='underline'>Check site connection</Link>.</p>}
     {scan.error && <Card className='border-red-300 bg-red-50'><CardHeader><div className='flex flex-wrap items-center justify-between gap-3'><CardTitle>WordPress site unavailable</CardTitle><Badge variant='destructive'>High — no current findings</Badge></div><CardDescription>The dashboard received an availability or response error from the connected site. The diagnostic cannot determine whether the cause is hosting, DNS, SSL, firewall, PHP, or a plugin without a valid response.</CardDescription></CardHeader><CardContent><p role='alert' className='text-sm'>{scan.error.message}</p><p className='mt-3 text-sm'>Check the site in a browser, hosting/server status, DNS and SSL, firewall rules, PHP error logs, and the saved site URL. Run the scan again after the site responds normally.</p></CardContent></Card>}
     {scan.isPending && connection.data?.configured && <p role='status'>Reading bounded diagnostic pages from WordPress...</p>}

@@ -2,7 +2,7 @@
 Contributors: brianazukaeme
 Requires at least: 6.5
 Requires PHP: 8.1
-Stable tag: 0.1.7
+Stable tag: 0.1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,8 @@ Read-only, deterministic WordPress support and SEO diagnostics. The plugin repor
 The namespace is `/wp-json/ai-diagnostic/v1/`. Core routes include `/site`, `/health`, `/plugins`, `/themes`, `/errors`, `/rest-api`, `/performance`, `/security`, and `/woocommerce`. SEO routes include `/seo/post/{id}`, `/seo/posts`, `/seo/issues`, `/seo/site`, `/images/issues`, and `/links/issues`. Collection page sizes are bounded to 1-50. Combined diagnostic GET and POST requests accept an allowlisted check list.
 
 == Security ==
+
+Plugin 0.1.8 also provides authenticated `/operations` observations for recent timestamped database Commands out of sync errors and overdue cron/Action Scheduler work. Reading errors requires an existing configured local log (AIDB_OPERATIONAL_LOG_PATH or enabled WP_DEBUG_LOG); the plugin does not enable logging. This evidence does not prove database integrity or that all jobs execute. The Anbe Worker evaluates continuity and sends independent notifications.
 
 Credentials are random tokens stored only as password hashes. Admin actions require `manage_options` and WordPress nonces. Failed authentication is rate-limited. Activity logs exclude headers, tokens, request bodies, query values, and response contents. Diagnostic input is allowlisted and bounded.
 

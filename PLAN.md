@@ -451,3 +451,26 @@ Update this block at the end of each session so another AI can continue safely.
 Added a separate Cloudflare cron (*/5 * * * *) that checks the public homepage without WordPress credentials or a successful diagnostic scan. Hourly diagnostic scans remain unchanged. Two consecutive failed checks within 15 minutes open an outage; the next HTTP 2xx closes it and queues recovery. Normal detection is about 5-10 minutes after failure. Timeout is 10 seconds, with at most three same-origin redirects. HTTP errors (including blocked 403/429), unsafe redirects, transport errors and timeouts count as failed checks, not proof that every visitor is offline. A healthy initial check sends no email.
 
 Notifications use the existing recipient and Resend settings, independent of finding severity. Blank recipient disables mail. D1 migration 0004 stores timestamp-guarded state and notification events; duplicate/stale ticks do not advance the failure streak. Delivery uses leases, stable provider idempotency keys and retries on subsequent checks; events expire after 23 hours. The check requests cache revalidation but a CDN may still return cached success. It cannot detect broken page content returning 200, plugin deactivation alone, or an outage of Cloudflare/the monitoring Worker itself. Other clients are unchanged.
+
+## 2026-10-15 - Operational incident detection backlog
+
+See INCIDENT-DETECTION-PLAN.md for the source audit and acceptance criteria. The HTTP 503 notification test does not close these items.
+
+- [ ] Reconstruct the original client WooCommerce incident from its actual error and successful repair.
+- [ ] Implement configured public-content checks that can detect relevant HTTP 200 failures.
+- [ ] Implement version/storage-aware WooCommerce database structure and targeted consistency checks.
+- [ ] Implement cron execution and scheduled-action progress observations, with unknown-state handling.
+- [ ] Define per-source cadence, severity, baseline and notification behavior independently of unrelated incomplete scans.
+- [ ] Reproduce the original failure and recovery in a disposable matching environment; verify scheduled notification separately.
+
+## 2026-10-15 - First operational monitoring implementation
+
+- [x] Implement fresh Commands out of sync signature observations, bounded evidence and unknown-state handling in plugin 0.1.8.
+- [x] Implement unchanged-overdue-item observations for WordPress cron and Action Scheduler, without claiming complete execution history or automatic repair.
+- [x] Implement independent source state/notifications and dashboard coverage visibility; apply Anbe migration 0005 and deploy Worker/dashboard.
+- [x] Validate PHP, Worker/native scheduled behavior, privacy, duplicate/retry/unknown/recovery cases, and dashboard build; prepare installable plugin ZIP.
+- [ ] Install plugin 0.1.8 on Anbe; establish readable log coverage and verify actual scheduled source observations.
+- [ ] Verify a new operational notification reaches the inbox using an isolated controlled test.
+- [ ] Complete broader content/structural database checks and reproduce the original initiating defect when raw evidence is available. These are not claimed complete by signature detection.
+
+See OPERATIONAL-MONITORING.md and SUPPORT-JOURNAL.md for release and evidence limits.

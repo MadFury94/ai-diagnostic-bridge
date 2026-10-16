@@ -1,3 +1,4 @@
+import { createSession } from '../src/security'
 import worker from '../src/index'
 import { DatabaseSync } from 'node:sqlite'
 import { readFileSync } from 'node:fs'
@@ -102,4 +103,16 @@ it('aborts a stalled homepage request after ten seconds', async () => {
  const pending=probeAvailability(env.ALLOWED_SITE_ORIGIN)
  await vi.advanceTimersByTimeAsync(10000)
  expect(await pending).toBe('Timed out after 10 seconds')
+})
+
+it('requires authentication and lets an authenticated check run without WordPress', async () => {
+ Object.assign(env,{SESSION_KEY:'test-session-key',DASHBOARD_PASSWORD:'test-password',CREDENTIAL_KEY:'invalid-plugin-key',API_LIMIT:{limit:async()=>({success:true})}})
+ const origin='https://dashboard.example'
+ expect((await worker.fetch(new Request(origin+'/api/availability'),env)).status).toBe(401)
+ const cookie='__Host-aidb_session='+await createSession(env.SESSION_KEY)
+ outbound.mockResolvedValue(new Response('ok'))
+ const result=await worker.fetch(new Request(origin+'/api/availability',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json',Cookie:cookie},body:'{}'}),env)
+ expect(result.status).toBe(200)
+ expect((await result.json() as {state:{detail:string}}).state.detail).toBe('HTTP 2xx')
+ expect(outbound).toHaveBeenCalledOnce()
 })
