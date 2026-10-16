@@ -32,6 +32,10 @@ Email identifies the symptom, site, time, uncertainty, and next steps, with an a
 
 ## Installation and activation
 
+Plugin **0.1.9** adds a setup panel under **Settings > AI Diagnostic Bridge > Database error log setup**. It shows the detected source, selected path (administrator only), and readable/missing/unreadable status. Detection order is: server constant `AIDB_OPERATIONAL_LOG_PATH`, saved plugin override, enabled WordPress debug-log configuration, then enabled PHP logging with an absolute file path. Relative destinations and syslog are not supported. A configured but missing file is reported rather than silently replaced by a different log.
+
+For existing supported logging, no manual path is needed. Otherwise an administrator can enter an existing readable local file and choose **Save and check log**. Blank restores automatic detection. A server constant locks the control. If no suitable log exists, the panel explains that logging must be configured on the server; it does not create one or enable debug mode. Readability does not prove current recording or a compatible error format. No Worker update or migration is needed for 0.1.9.
+
 1. Install the prepared `ai-diagnostic-bridge-0.1.8.zip` as an update to the existing WordPress plugin. Preserve the existing connection credentials. The package contains runtime plugin files only.
 2. Give the plugin access to an existing suitable local log. It uses `AIDB_OPERATIONAL_LOG_PATH` when explicitly defined in server-side WordPress configuration; otherwise it uses the existing enabled `WP_DEBUG` / `WP_DEBUG_LOG` configuration. Do not guess a Hostinger path or enable public debug output. Ask the host for the actual readable log path if needed. This release does not change either setting. Scheduler observations do not require the log.
 3. Apply Anbe D1 migration `0005_operational_monitor.sql`, build the dashboard, and deploy the Anbe Worker with existing variables preserved. `OPERATIONAL_MONITOR_ENABLED=true` enables observations; false/absent disables the new checks without disabling homepage monitoring. Katalyst and Missus are separate deployments and are not changed by this release.

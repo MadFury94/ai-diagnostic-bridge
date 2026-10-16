@@ -17,7 +17,7 @@ The plugin can also be installed from a packaged release ZIP. Do not put the cre
 
 ### Optional Worker email alerts
 
-Anbe also has independent five-minute database-error and scheduler observations in the Worker/dashboard. These require WordPress plugin **0.1.8** and a configured readable log for error detection. See [operational monitoring](OPERATIONAL-MONITORING.md) for installation, thresholds, source coverage and limits. Worker deployment alone does not establish that the WordPress evidence source is available.
+Anbe also has independent five-minute database-error and scheduler observations in the Worker/dashboard. These require WordPress plugin **0.1.8 or later** and a configured readable log for error detection. Plugin **0.1.9** adds automatic log detection and an administrator setup panel under **Settings > AI Diagnostic Bridge**. See [operational monitoring](OPERATIONAL-MONITORING.md) for installation, thresholds, source coverage and limits. Worker deployment alone does not establish that the WordPress evidence source is available.
 
 Use the [Anbe and Katalyst email setup guide](EMAIL-ALERTS-SETUP.md) for the per-Worker settings, DNS requirements, migration/deployment commands, current activation status, and future-client pattern.
 

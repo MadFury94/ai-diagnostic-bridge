@@ -7,13 +7,8 @@ use BrianAzukaeme\AIDiagnosticBridge\Response;
 /** Read-only observations. No jobs are run and no log configuration is changed. */
 class Operations_Context {
 	public function log_path(): string {
-		if ( defined( 'AIDB_OPERATIONAL_LOG_PATH' ) ) {
-			return (string) AIDB_OPERATIONAL_LOG_PATH;
-		}
-		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG || ! defined( 'WP_DEBUG_LOG' ) || ! WP_DEBUG_LOG ) {
-			return '';
-		}
-		return true === WP_DEBUG_LOG || '1' === (string) WP_DEBUG_LOG ? WP_CONTENT_DIR . '/debug.log' : (string) WP_DEBUG_LOG;
+		$log = \BrianAzukaeme\AIDiagnosticBridge\Log_Settings::current();
+		return 'readable' === $log['state'] ? $log['path'] : '';
 	}
 	public function cron(): array {
 		// Read the current format without invoking _get_cron_array's legacy upgrade.

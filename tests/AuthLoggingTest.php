@@ -187,7 +187,7 @@ final class AuthLoggingTest extends TestCase {
 		$die_handler = static fn () => static function (): void { throw new \RuntimeException( 'admin-denied' ); };
 		add_filter( 'wp_die_handler', $die_handler );
 		try {
-			foreach ( [ 'generate', 'revoke', 'render' ] as $method ) {
+			foreach ( [ 'generate', 'revoke', 'render', 'save_log' ] as $method ) {
 				try {
 					Admin::$method();
 					$this->fail( 'Non-admin access was not rejected.' );
@@ -207,7 +207,7 @@ final class AuthLoggingTest extends TestCase {
 		$die_handler = static fn () => static function (): void { throw new \RuntimeException('csrf-denied'); };
 		add_filter('wp_die_handler', $die_handler);
 		try {
-			foreach (['generate', 'revoke'] as $method) {
+			foreach (['generate', 'revoke', 'save_log'] as $method) {
 				$_REQUEST = ['_wpnonce' => 'invalid-fixture'];
 				try {
 					Admin::$method();

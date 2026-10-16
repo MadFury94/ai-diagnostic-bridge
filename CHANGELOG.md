@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9 - Plugin log setup
+
+- Add administrator log setup under Settings > AI Diagnostic Bridge, with automatic detection of configured WordPress/PHP file logging and readable/missing/unreadable status.
+- Allow a nonce-protected, administrator-only override pointing to an existing readable local file; clearing it restores automatic detection. Preserve credentials and respect server-configured overrides.
+- Keep paths and raw log content out of diagnostic responses. No debug mode, log creation, permissions, or server configuration changes are made automatically. Existing Worker contract is unchanged.
+
 ## 0.1.8 - Operational evidence and Anbe monitoring
 
 - Add an authenticated read-only operations endpoint for fresh database Commands out of sync signatures, overdue WordPress events, and pending/in-progress Action Scheduler observations.
